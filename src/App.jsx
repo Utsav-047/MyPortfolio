@@ -29,7 +29,7 @@ function App() {
       { label: 'ML Projects Built', value: '4+' },
       { label: 'Tech Stack', value: '10+' },
       { label: 'Experience', value: 'Student' },
-      { label: 'Academic CGPA', value: '8.8+' }
+      { label: 'Academic CGPA', value: '7.44' }
     ],
 
     // Floating Image Badges
