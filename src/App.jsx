@@ -3,6 +3,7 @@ import Home from './components/Home';
 import About from './components/About';
 import Skills from './components/Skills';
 import Projects from './components/Projects';
+import Practical4 from './components/Practical4';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 
@@ -138,6 +139,12 @@ function App() {
             color={profile.themeColor} 
           />
         );
+      case 'practical4':
+        return (
+          <Practical4 
+            color={profile.themeColor} 
+          />
+        );
       case 'contact':
         return (
           <Contact 
@@ -201,6 +208,12 @@ function App() {
               onClick={() => setCurrentPage('projects')}
             >
               Projects
+            </button>
+            <button 
+              className={`nav-item-link ${currentPage === 'practical4' ? 'active' : ''}`}
+              onClick={() => setCurrentPage('practical4')}
+            >
+              TaskAPI
             </button>
             <button 
               className={`nav-contact-btn ${currentPage === 'contact' ? 'active' : ''}`}
