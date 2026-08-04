@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import Todo from './todo.jsx';
 
 const API_BASE = 'http://localhost:5000';
 
@@ -8,7 +9,8 @@ function Practical4() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [serverOnline, setServerOnline] = useState(false);
-  const [activeTab, setActiveTab] = useState('dashboard'); // dashboard | logs | architecture | maturity
+  const [activeTab, setActiveTab] = useState('todo'); // todo | dashboard | logs | architecture | maturity
+
 
   // Form state
   const [formTitle, setFormTitle] = useState('');
@@ -167,7 +169,8 @@ function Practical4() {
         {/* Navigation Sub-Tabs */}
         <div className="p4-nav-tabs">
           {[
-            { key: 'dashboard', label: '📋 Task Manager' },
+            { key: 'todo', label: '📝 Todo.jsx & Task.jsx (Array)' },
+            { key: 'dashboard', label: '📋 Task Dashboard' },
             { key: 'logs', label: '📟 Live Console Logs' },
             { key: 'architecture', label: '🏗️ Middleware Architecture' },
             { key: 'maturity', label: '📊 Maturity Model' },
@@ -187,6 +190,9 @@ function Practical4() {
             ✅ {successMsg}
           </div>
         )}
+
+        {/* ================= TODO ARRAY TAB ================= */}
+        {activeTab === 'todo' && <Todo />}
 
         {/* ================= DASHBOARD TAB ================= */}
         {activeTab === 'dashboard' && (
