@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Todo from './todo.jsx';
 
 const API_BASE = 'http://localhost:5000';
 
@@ -9,7 +8,7 @@ function Practical4() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [serverOnline, setServerOnline] = useState(false);
-  const [activeTab, setActiveTab] = useState('todo'); // todo | dashboard | logs | architecture | maturity
+  const [activeTab, setActiveTab] = useState('dashboard'); // dashboard | logs | architecture | maturity
 
 
   // Form state
@@ -17,7 +16,7 @@ function Practical4() {
   const [formDesc, setFormDesc] = useState('');
   const [editingTask, setEditingTask] = useState(null);
   const [formError, setFormError] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  const [popup, setPopup] = useState(null);
 
   const logTerminalRef = useRef(null);
 
@@ -62,9 +61,11 @@ function Practical4() {
     }
   }, [logs]);
 
-  const showSuccess = (msg) => {
-    setSuccessMsg(msg);
-    setTimeout(() => setSuccessMsg(''), 2500);
+  const triggerPopup = (type, titleText, messageText) => {
+    setPopup({ type, title: titleText, message: messageText });
+    setTimeout(() => {
+      setPopup(null);
+    }, 4000);
   };
 
   // ── Create / Update task ──────────────────────────────────
@@ -85,8 +86,13 @@ function Practical4() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title: formTitle, description: formDesc }),
         });
+        const data = await res.json();
         if (!res.ok) throw new Error('Update failed');
-        showSuccess(`Task #${editingTask.id} updated`);
+        triggerPopup(
+          'submit',
+          '🔔 Notification on Server & Client',
+          data.message || 'Your data is submitted'
+        );
         setEditingTask(null);
       } else {
         // POST create
@@ -95,8 +101,13 @@ function Practical4() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title: formTitle, description: formDesc, completed: false }),
         });
+        const data = await res.json();
         if (!res.ok) throw new Error('Create failed');
-        showSuccess('Task created');
+        triggerPopup(
+          'submit',
+          '🔔 Notification on Server & Client',
+          data.message || 'Your data is submitted'
+        );
       }
 
       setFormTitle('');
@@ -111,11 +122,15 @@ function Practical4() {
   // ── Toggle completed / pending ─────────────────────────────
   const toggleComplete = async (task) => {
     try {
-      await fetch(`${API_BASE}/api/tasks/${task.id}`, {
+      const res = await fetch(`${API_BASE}/api/tasks/${task.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ completed: !task.completed }),
       });
+      const data = await res.json();
+      if (res.ok) {
+        triggerPopup('info', 'Task Updated', `Task status changed to ${!task.completed ? 'Completed' : 'Pending'}`);
+      }
       fetchTasks();
       setTimeout(fetchLogs, 300);
     } catch {
@@ -127,8 +142,9 @@ function Practical4() {
   const deleteTask = async (id) => {
     try {
       const res = await fetch(`${API_BASE}/api/tasks/${id}`, { method: 'DELETE' });
+      const data = await res.json();
       if (!res.ok) throw new Error('Delete failed');
-      showSuccess(`Task #${id} deleted`);
+      triggerPopup('delete', '🚨 Data Deleted', data.message || 'Data deleted');
       fetchTasks();
       setTimeout(fetchLogs, 300);
     } catch {
@@ -169,7 +185,6 @@ function Practical4() {
         {/* Navigation Sub-Tabs */}
         <div className="p4-nav-tabs">
           {[
-            { key: 'todo', label: '📝 Todo.jsx & Task.jsx (Array)' },
             { key: 'dashboard', label: '📋 Task Dashboard' },
             { key: 'logs', label: '📟 Live Console Logs' },
             { key: 'architecture', label: '🏗️ Middleware Architecture' },
@@ -185,14 +200,46 @@ function Practical4() {
           ))}
         </div>
 
-        {successMsg && (
-          <div className="p4-toast">
-            ✅ {successMsg}
+        {/* Interactive Toast Popup for Notifications */}
+        {popup && (
+          <div
+            style={{
+              position: 'fixed',
+              top: '20px',
+              right: '20px',
+              zIndex: 9999,
+              minWidth: '320px',
+              padding: '1rem 1.25rem',
+              borderRadius: '12px',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
+              backgroundColor: popup.type === 'delete' ? 'rgba(220, 38, 38, 0.95)' : popup.type === 'submit' ? 'rgba(16, 185, 129, 0.95)' : 'rgba(59, 130, 246, 0.95)',
+              color: '#ffffff',
+              backdropFilter: 'blur(10px)',
+              animation: 'fadeIn 0.3s ease-in-out',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <strong style={{ fontSize: '1rem' }}>{popup.title}</strong>
+              <button
+                onClick={() => setPopup(null)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#fff',
+                  fontSize: '1.2rem',
+                  cursor: 'pointer',
+                  opacity: 0.8
+                }}
+              >
+                &times;
+              </button>
+            </div>
+            <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.95rem', fontWeight: '500' }}>
+              {popup.message}
+            </p>
           </div>
         )}
-
-        {/* ================= TODO ARRAY TAB ================= */}
-        {activeTab === 'todo' && <Todo />}
 
         {/* ================= DASHBOARD TAB ================= */}
         {activeTab === 'dashboard' && (

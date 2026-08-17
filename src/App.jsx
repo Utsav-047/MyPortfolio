@@ -4,6 +4,8 @@ import About from './components/About';
 import Skills from './components/Skills';
 import Projects from './components/Projects';
 import Practical4 from './components/Practical4';
+import Practical5 from './components/Practical5';
+import Practical6 from './components/Practical6';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 
@@ -145,6 +147,18 @@ function App() {
             color={profile.themeColor} 
           />
         );
+      case 'practical5':
+        return (
+          <Practical5 
+            color={profile.themeColor} 
+          />
+        );
+      case 'practical6':
+        return (
+          <Practical6 
+            color={profile.themeColor} 
+          />
+        );
       case 'contact':
         return (
           <Contact 
@@ -213,7 +227,19 @@ function App() {
               className={`nav-item-link ${currentPage === 'practical4' ? 'active' : ''}`}
               onClick={() => setCurrentPage('practical4')}
             >
-              TaskAPI
+              Practical 4
+            </button>
+            <button 
+              className={`nav-item-link ${currentPage === 'practical5' ? 'active' : ''}`}
+              onClick={() => setCurrentPage('practical5')}
+            >
+              Practical 5 (MongoDB)
+            </button>
+            <button 
+              className={`nav-item-link ${currentPage === 'practical6' ? 'active' : ''}`}
+              onClick={() => setCurrentPage('practical6')}
+            >
+              Practical 6 (Full Stack)
             </button>
             <button 
               className={`nav-contact-btn ${currentPage === 'contact' ? 'active' : ''}`}
