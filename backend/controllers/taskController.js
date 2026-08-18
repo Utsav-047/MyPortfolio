@@ -12,13 +12,33 @@ const getAllTasks = async (req, res, next) => {
     const limit = Math.max(1, parseInt(req.query.limit, 10) || 5);
     const skip = (page - 1) * limit;
 
-    const filter = {};
+    const conditions = [];
     if (req.query.priority) {
-      filter.priority = req.query.priority;
+      conditions.push({ priority: req.query.priority });
+    }
+    if (req.query.status && req.query.status !== 'all') {
+      if (req.query.status === 'completed') {
+        conditions.push({ $or: [{ status: 'completed' }, { completed: true }] });
+      } else if (req.query.status === 'in_progress') {
+        conditions.push({ status: 'in_progress' });
+      } else if (req.query.status === 'pending') {
+        conditions.push({
+          $or: [
+            { status: 'pending' },
+            { status: { $exists: false }, completed: false },
+            { status: null, completed: false }
+          ]
+        });
+      }
     }
     if (req.query.search) {
-      filter.title = { $regex: req.query.search, $options: 'i' };
+      const searchRegex = { $regex: req.query.search, $options: 'i' };
+      conditions.push({
+        $or: [{ title: searchRegex }, { description: searchRegex }]
+      });
     }
+
+    const filter = conditions.length > 0 ? { $and: conditions } : {};
 
     if (isDbConnected()) {
       const total = await Task.countDocuments(filter);
@@ -45,9 +65,18 @@ const getAllTasks = async (req, res, next) => {
     if (req.query.priority) {
       filteredTasks = filteredTasks.filter(t => t.priority === req.query.priority);
     }
+    if (req.query.status && req.query.status !== 'all') {
+      filteredTasks = filteredTasks.filter(t => {
+        const taskStatus = t.status || (t.completed ? 'completed' : 'pending');
+        return taskStatus === req.query.status;
+      });
+    }
     if (req.query.search) {
       const q = req.query.search.toLowerCase();
-      filteredTasks = filteredTasks.filter(t => t.title.toLowerCase().includes(q));
+      filteredTasks = filteredTasks.filter(t =>
+        (t.title && t.title.toLowerCase().includes(q)) ||
+        (t.description && t.description.toLowerCase().includes(q))
+      );
     }
 
     const total = filteredTasks.length;
@@ -108,19 +137,22 @@ const getTaskById = async (req, res, next) => {
 // 3. POST /api/tasks — Create a new task with schema validation
 const createTask = async (req, res, next) => {
   try {
-    const { title, description, completed, priority } = req.body;
+    const { title, description, completed, priority, status } = req.body;
+    const computedStatus = status || (completed ? 'completed' : 'pending');
+    const isCompleted = computedStatus === 'completed';
 
     if (isDbConnected()) {
       const newTask = await Task.create({
         title,
         description,
-        completed,
+        completed: isCompleted,
+        status: computedStatus,
         priority
       });
 
       console.log(`\n========================================`);
       console.log(`🍃 MONGODB NOTIFICATION: Document Created!`);
-      console.log(`   ID: ${newTask._id} | Title: "${newTask.title}" | Priority: ${newTask.priority}`);
+      console.log(`   ID: ${newTask._id} | Title: "${newTask.title}" | Status: ${newTask.status}`);
       console.log(`========================================\n`);
 
       return res.status(201).json({
@@ -143,7 +175,8 @@ const createTask = async (req, res, next) => {
       id: store.nextId(),
       title: title.trim(),
       description: description ? description.trim() : '',
-      completed: Boolean(completed),
+      completed: isCompleted,
+      status: computedStatus,
       priority: priority || 'medium',
       createdAt: new Date()
     };
@@ -163,12 +196,25 @@ const createTask = async (req, res, next) => {
 // 4. PUT /api/tasks/:id — Update existing task with validation
 const updateTask = async (req, res, next) => {
   try {
-    const { title, description, completed, priority } = req.body;
+    const { title, description, completed, priority, status } = req.body;
+
+    const updateData = {};
+    if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    if (priority !== undefined) updateData.priority = priority;
+
+    if (status !== undefined) {
+      updateData.status = status;
+      updateData.completed = status === 'completed';
+    } else if (completed !== undefined) {
+      updateData.completed = Boolean(completed);
+      updateData.status = completed ? 'completed' : 'pending';
+    }
 
     if (isDbConnected()) {
       const updatedTask = await Task.findByIdAndUpdate(
         req.params.id,
-        { title, description, completed, priority },
+        updateData,
         { new: true, runValidators: true }
       );
 
@@ -181,7 +227,7 @@ const updateTask = async (req, res, next) => {
 
       console.log(`\n========================================`);
       console.log(`🍃 MONGODB NOTIFICATION: Document Updated!`);
-      console.log(`   ID: ${updatedTask._id} | Title: "${updatedTask.title}" | Completed: ${updatedTask.completed}`);
+      console.log(`   ID: ${updatedTask._id} | Title: "${updatedTask.title}" | Status: ${updatedTask.status}`);
       console.log(`========================================\n`);
 
       return res.status(200).json({
@@ -205,8 +251,14 @@ const updateTask = async (req, res, next) => {
     const task = store.tasks[index];
     if (title !== undefined) task.title = String(title).trim();
     if (description !== undefined) task.description = String(description).trim();
-    if (completed !== undefined) task.completed = Boolean(completed);
     if (priority !== undefined) task.priority = String(priority).trim();
+    if (status !== undefined) {
+      task.status = status;
+      task.completed = status === 'completed';
+    } else if (completed !== undefined) {
+      task.completed = Boolean(completed);
+      task.status = completed ? 'completed' : 'pending';
+    }
 
     return res.status(200).json({
       success: true,

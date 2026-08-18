@@ -17,6 +17,16 @@ const taskSchema = new mongoose.Schema(
       default: false,
       index: true
     },
+    status: {
+      type: String,
+      lowercase: true,
+      enum: {
+        values: ['pending', 'in_progress', 'completed'],
+        message: '{VALUE} is not a valid status. Allowed values: pending, in_progress, completed'
+      },
+      default: 'pending',
+      index: true
+    },
     priority: {
       type: String,
       lowercase: true,
@@ -36,10 +46,17 @@ const taskSchema = new mongoose.Schema(
 // Compound / sorting index matching Compass (createdAt_-1)
 taskSchema.index({ createdAt: -1 });
 
-// Pre-save hook: Automatically trim whitespace from title field
+// Pre-save hook: Automatically trim whitespace and sync status/completed
 taskSchema.pre('save', function () {
   if (this.title) {
     this.title = this.title.trim();
+  }
+  if (this.status === 'completed') {
+    this.completed = true;
+  } else if (this.completed) {
+    this.status = 'completed';
+  } else if (!this.status || (this.status !== 'in_progress' && this.status !== 'completed')) {
+    this.status = 'pending';
   }
 });
 

@@ -11,6 +11,7 @@ const connectDB = require('./config/db');
 const requestLogger = require('./middleware/requestLogger');
 const { notFoundHandler, globalErrorHandler } = require('./utils/errorHandler');
 const taskRoutes = require('./routes/taskRoutes');
+const authRoutes = require('./routes/authRoutes');
 const systemRoutes = require('./routes/systemRoutes');
 
 const app = express();
@@ -41,6 +42,7 @@ app.get('/api/db-status', (req, res) => {
 });
 
 // 5. Mount Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/', systemRoutes);
 

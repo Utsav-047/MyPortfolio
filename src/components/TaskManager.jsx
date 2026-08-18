@@ -23,8 +23,14 @@ function TaskManager() {
   const [formTitle, setFormTitle] = useState('');
   const [formDesc, setFormDesc] = useState('');
   const [formPriority, setFormPriority] = useState('medium');
+  const [formStatus, setFormStatus] = useState('pending'); // pending | in_progress | completed
   const [editingTask, setEditingTask] = useState(null);
   const [formError, setFormError] = useState(null);
+
+  // Filter & Search state
+  const [statusFilter, setStatusFilter] = useState('all'); // all | pending | in_progress | completed
+  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Modal state for deleting tasks
   const [taskToDelete, setTaskToDelete] = useState(null);
@@ -41,7 +47,7 @@ function TaskManager() {
     setToasts(prev => [...prev, { id, type, title, message }]);
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
-    }, 4000);
+    }, 4500);
   };
 
   const removeToast = (id) => {
@@ -72,10 +78,14 @@ function TaskManager() {
   }, []);
 
   // ── Fetch Paginated Tasks (5 items per page) ───────────────
-  const fetchPaginatedTasks = useCallback(async (pageToFetch = pagination.page) => {
+  const fetchPaginatedTasks = useCallback(async (
+    pageToFetch = pagination.page,
+    filterStatus = statusFilter,
+    querySearch = searchQuery
+  ) => {
     setLoading(true);
     try {
-      const res = await getTasks(pageToFetch, 5);
+      const res = await getTasks(pageToFetch, 5, '', querySearch, filterStatus);
       setTasks(res.data || []);
       setPagination({
         page: res.currentPage || pageToFetch,
@@ -90,10 +100,10 @@ function TaskManager() {
     } finally {
       setLoading(false);
     }
-  }, [pagination.page]);
+  }, [pagination.page, statusFilter, searchQuery]);
 
   useEffect(() => {
-    fetchPaginatedTasks(1);
+    fetchPaginatedTasks(1, statusFilter, searchQuery);
     checkBackendStatus();
     fetchLogs();
     const interval = setInterval(() => {
@@ -109,7 +119,70 @@ function TaskManager() {
     }
   }, [logs]);
 
-  // ── Optimistic Task Creation & Editing ─────────────────────
+  // ── Handle Status Filter Tab Click ─────────────────────────
+  const handleStatusFilterChange = (newStatus) => {
+    setStatusFilter(newStatus);
+    fetchPaginatedTasks(1, newStatus, searchQuery);
+  };
+
+  // ── Handle Search Button Trigger ──────────────────────────
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    setSearchQuery(searchInput);
+    fetchPaginatedTasks(1, statusFilter, searchInput);
+  };
+
+  const handleClearSearch = () => {
+    setSearchInput('');
+    setSearchQuery('');
+    fetchPaginatedTasks(1, statusFilter, '');
+  };
+
+  // ── Task-Wise Download with Timestamp Handler ─────────────
+  const handleDownloadTask = (task) => {
+    const now = new Date();
+    const timestampISO = now.toISOString();
+    const timestampLocal = now.toLocaleString();
+    const taskId = task._id || task.id;
+
+    const exportData = {
+      taskDetails: {
+        id: taskId,
+        title: task.title,
+        description: task.description || '',
+        status: task.status || (task.completed ? 'completed' : 'pending'),
+        completed: Boolean(task.completed || task.status === 'completed'),
+        priority: task.priority || 'medium',
+        createdAt: task.createdAt || null,
+        updatedAt: task.updatedAt || null
+      },
+      downloadMetadata: {
+        downloadedAtISO: timestampISO,
+        downloadedAtLocal: timestampLocal,
+        timestamp: now.getTime()
+      }
+    };
+
+    const jsonStr = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const cleanTitle = (task.title || 'task').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    link.href = url;
+    link.download = `Task_${taskId}_${cleanTitle}_${now.getTime()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    addToast(
+      'success',
+      '📥 Task Downloaded',
+      `Task #${taskId} exported with timestamp: ${timestampLocal}`
+    );
+  };
+
+  // ── Task Creation & Editing ─────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError(null);
@@ -123,7 +196,8 @@ function TaskManager() {
       title: formTitle.trim(),
       description: formDesc.trim(),
       priority: formPriority,
-      completed: editingTask ? editingTask.completed : false
+      status: formStatus,
+      completed: formStatus === 'completed'
     };
 
     if (editingTask) {
@@ -135,7 +209,8 @@ function TaskManager() {
         setFormTitle('');
         setFormDesc('');
         setFormPriority('medium');
-        fetchPaginatedTasks(pagination.page);
+        setFormStatus('pending');
+        fetchPaginatedTasks(pagination.page, statusFilter, searchQuery);
       } catch (err) {
         setFormError(err.raw || { error: err.message });
         addToast('error', 'Update Failed', err.message);
@@ -149,7 +224,8 @@ function TaskManager() {
         title: payload.title,
         description: payload.description,
         priority: payload.priority,
-        completed: false,
+        status: payload.status,
+        completed: payload.completed,
         createdAt: new Date().toISOString(),
         isOptimistic: true
       };
@@ -158,12 +234,13 @@ function TaskManager() {
       setFormTitle('');
       setFormDesc('');
       setFormPriority('medium');
+      setFormStatus('pending');
       addToast('info', 'Optimistic Update', 'Task added to UI! Syncing with database...');
 
       try {
         const res = await createTask(payload);
         addToast('success', 'Database Synchronized', `Task saved to MongoDB with ID ${res.data._id || res.data.id}`);
-        fetchPaginatedTasks(1);
+        fetchPaginatedTasks(1, statusFilter, searchQuery);
       } catch (err) {
         setTasks(prev => prev.filter(t => (t._id || t.id) !== tempId));
         setFormError(err.raw || { error: err.message });
@@ -172,20 +249,22 @@ function TaskManager() {
     }
   };
 
-  // ── Optimistic Toggle Completion Status ───────────────────
-  const handleToggleComplete = async (task) => {
+  // ── Handle Direct Status Change ───────────────────────────
+  const handleStatusChange = async (task, newStatus) => {
     const taskId = task._id || task.id;
-    const oldStatus = task.completed;
-    const newStatus = !oldStatus;
+    const oldStatus = task.status || (task.completed ? 'completed' : 'pending');
+    const oldCompleted = task.completed;
+    const isCompleted = newStatus === 'completed';
 
-    setTasks(prev => prev.map(t => (t._id || t.id) === taskId ? { ...t, completed: newStatus } : t));
+    setTasks(prev => prev.map(t => (t._id || t.id) === taskId ? { ...t, status: newStatus, completed: isCompleted } : t));
 
     try {
-      await updateTask(taskId, { completed: newStatus });
-      addToast('success', 'Status Updated', `Task status changed to ${newStatus ? 'COMPLETED' : 'PENDING'}`);
+      await updateTask(taskId, { status: newStatus, completed: isCompleted });
+      addToast('success', 'Status Updated', `Task status changed to ${newStatus.toUpperCase()}`);
+      fetchPaginatedTasks(pagination.page, statusFilter, searchQuery);
     } catch (err) {
-      setTasks(prev => prev.map(t => (t._id || t.id) === taskId ? { ...t, completed: oldStatus } : t));
-      addToast('error', 'Toggle Failed', 'Rolled back status change');
+      setTasks(prev => prev.map(t => (t._id || t.id) === taskId ? { ...t, status: oldStatus, completed: oldCompleted } : t));
+      addToast('error', 'Update Failed', 'Rolled back status change');
     }
   };
 
@@ -199,7 +278,7 @@ function TaskManager() {
       await deleteTask(taskId);
       addToast('delete', 'Task Deleted', `Task #${taskId} permanently removed from database`);
       setTaskToDelete(null);
-      fetchPaginatedTasks(pagination.page);
+      fetchPaginatedTasks(pagination.page, statusFilter, searchQuery);
     } catch (err) {
       addToast('error', 'Delete Failed', err.message);
     } finally {
@@ -212,6 +291,7 @@ function TaskManager() {
     setFormTitle(task.title);
     setFormDesc(task.description || '');
     setFormPriority(task.priority || 'medium');
+    setFormStatus(task.status || (task.completed ? 'completed' : 'pending'));
     setFormError(null);
   };
 
@@ -220,6 +300,7 @@ function TaskManager() {
     setFormTitle('');
     setFormDesc('');
     setFormPriority('medium');
+    setFormStatus('pending');
     setFormError(null);
   };
 
@@ -229,6 +310,16 @@ function TaskManager() {
       case 'medium': return { bg: '#e0e7ff', color: '#3730a3' };
       case 'low': return { bg: '#f3f4f6', color: '#4b5563' };
       default: return { bg: '#e0e7ff', color: '#3730a3' };
+    }
+  };
+
+  const getStatusBadge = (status, completed) => {
+    const s = status || (completed ? 'completed' : 'pending');
+    switch (s) {
+      case 'completed': return { bg: '#d1fae5', color: '#065f46', label: 'COMPLETED' };
+      case 'in_progress': return { bg: '#e0f2fe', color: '#0369a1', label: 'IN PROGRESS' };
+      case 'pending':
+      default: return { bg: '#fef3c7', color: '#92400e', label: 'PENDING' };
     }
   };
 
@@ -631,6 +722,19 @@ function TaskManager() {
                   </select>
                 </div>
 
+                <div>
+                  <label className="tm-label">Status Format</label>
+                  <select
+                    className="tm-select"
+                    value={formStatus}
+                    onChange={e => setFormStatus(e.target.value)}
+                  >
+                    <option value="pending">⏳ Pending</option>
+                    <option value="in_progress">⚡ In Progress</option>
+                    <option value="completed">✅ Completed</option>
+                  </select>
+                </div>
+
                 {formError && (
                   <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 14px', color: '#991b1b', fontSize: '13px' }}>
                     <strong>❌ {formError.error || 'Error'}:</strong> {formError.message}
@@ -652,12 +756,98 @@ function TaskManager() {
 
             {/* Paginated List */}
             <div className="tm-card">
-              <h3 className="tm-card-title">
-                <span>Tasks List (Page {pagination.page} of {pagination.totalPages})</span>
-                <span style={{ fontSize: '12px', background: '#e0e7ff', color: '#3730a3', padding: '3px 10px', borderRadius: '9999px' }}>
-                  Total: {pagination.total} Tasks
-                </span>
-              </h3>
+              {/* Status Filter Tabs & Search Bar */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                  <span style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a' }}>
+                    Filter by Status:
+                  </span>
+                  <span style={{ fontSize: '12px', background: '#e0e7ff', color: '#3730a3', padding: '3px 10px', borderRadius: '9999px', fontWeight: '600' }}>
+                    Total: {pagination.total} Tasks
+                  </span>
+                </div>
+
+                {/* Filter Tabs: All, Pending, In Progress, Completed */}
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {[
+                    { key: 'all', label: 'All Tasks', icon: '📋' },
+                    { key: 'pending', label: 'Pending', icon: '⏳' },
+                    { key: 'in_progress', label: 'In Progress', icon: '⚡' },
+                    { key: 'completed', label: 'Completed', icon: '✅' }
+                  ].map(tab => (
+                    <button
+                      key={tab.key}
+                      onClick={() => handleStatusFilterChange(tab.key)}
+                      style={{
+                        padding: '7px 16px',
+                        borderRadius: '20px',
+                        fontSize: '13px',
+                        fontWeight: '700',
+                        border: statusFilter === tab.key ? '2px solid #4f46e5' : '1px solid #cbd5e1',
+                        background: statusFilter === tab.key ? '#e0e7ff' : '#f8fafc',
+                        color: statusFilter === tab.key ? '#3730a3' : '#475569',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <span>{tab.icon}</span>
+                      <span>{tab.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Search Bar with Search Button */}
+                <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    className="tm-input"
+                    placeholder="Search tasks by title or description..."
+                    value={searchInput}
+                    onChange={e => setSearchInput(e.target.value)}
+                    style={{ flex: 1 }}
+                  />
+                  <button
+                    type="submit"
+                    style={{
+                      background: '#4f46e5',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '10px 18px',
+                      borderRadius: '8px',
+                      fontWeight: '700',
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    <span>🔍</span> Search
+                  </button>
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={handleClearSearch}
+                      style={{
+                        background: '#f1f5f9',
+                        color: '#64748b',
+                        border: '1px solid #cbd5e1',
+                        padding: '10px 14px',
+                        borderRadius: '8px',
+                        fontWeight: '600',
+                        fontSize: '13px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      ✖ Clear
+                    </button>
+                  )}
+                </form>
+              </div>
 
               {loading ? (
                 <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>
@@ -665,20 +855,21 @@ function TaskManager() {
                 </div>
               ) : tasks.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>
-                  No tasks found on this page. Add a task using the form on the left!
+                  No tasks found matching status or search query. Add a task or adjust filters!
                 </div>
               ) : (
                 <div>
                   {tasks.map(task => {
                     const taskId = task._id || task.id;
                     const badge = getPriorityBadge(task.priority);
+                    const statusBadge = getStatusBadge(task.status, task.completed);
 
                     return (
                       <div
                         key={taskId}
                         className={`tm-task-item ${task.isOptimistic ? 'optimistic' : ''}`}
                       >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
                           <div>
                             <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#64748b' }}>
                               ID: {taskId} {task.isOptimistic && '(Syncing...)'}
@@ -688,21 +879,40 @@ function TaskManager() {
                             </h4>
                           </div>
 
-                          <div style={{ display: 'flex', gap: '6px' }}>
+                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+                            <select
+                              value={task.status || (task.completed ? 'completed' : 'pending')}
+                              onChange={(e) => handleStatusChange(task, e.target.value)}
+                              style={{
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                padding: '4px 8px',
+                                borderRadius: '6px',
+                                border: '1px solid #cbd5e1',
+                                background: '#f8fafc',
+                                color: '#0f172a',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <option value="pending">⏳ Pending</option>
+                              <option value="in_progress">⚡ In Progress</option>
+                              <option value="completed">✅ Completed</option>
+                            </select>
                             <button
-                              style={{ background: '#e0e7ff', color: '#4338ca', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
+                              style={{ background: '#0284c7', color: '#ffffff', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+                              onClick={() => handleDownloadTask(task)}
+                              title="Download task with timestamp"
+                            >
+                              📥 Download
+                            </button>
+                            <button
+                              style={{ background: '#e0e7ff', color: '#4338ca', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
                               onClick={() => startEdit(task)}
                             >
                               Edit
                             </button>
                             <button
-                              style={{ background: '#ecfdf5', color: '#047857', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
-                              onClick={() => handleToggleComplete(task)}
-                            >
-                              {task.completed ? 'Mark Pending' : 'Mark Done'}
-                            </button>
-                            <button
-                              style={{ background: '#fef2f2', color: '#dc2626', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
+                              style={{ background: '#fef2f2', color: '#dc2626', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
                               onClick={() => setTaskToDelete(task)}
                             >
                               Delete
@@ -710,9 +920,9 @@ function TaskManager() {
                           </div>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                          <span style={{ fontSize: '11px', fontWeight: '700', padding: '2px 8px', borderRadius: '9999px', background: task.completed ? '#d1fae5' : '#fef3c7', color: task.completed ? '#065f46' : '#92400e' }}>
-                            {task.completed ? 'COMPLETED' : 'PENDING'}
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px' }}>
+                          <span style={{ fontSize: '11px', fontWeight: '700', padding: '2px 8px', borderRadius: '9999px', background: statusBadge.bg, color: statusBadge.color }}>
+                            {statusBadge.label}
                           </span>
                           <span style={{ fontSize: '11px', fontWeight: '700', padding: '2px 8px', borderRadius: '9999px', background: badge.bg, color: badge.color }}>
                             {task.priority || 'medium'} priority
@@ -720,7 +930,7 @@ function TaskManager() {
                         </div>
 
                         {task.description && (
-                          <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#475569' }}>
+                          <p style={{ margin: '6px 0 0 0', fontSize: '13px', color: '#475569' }}>
                             {task.description}
                           </p>
                         )}

@@ -6,6 +6,7 @@ import Projects from './components/Projects';
 import TaskManager from './components/TaskManager';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import GoogleAuthBtn from './components/GoogleAuthBtn';
 
 function App() {
   // 1. Core Profile State (Utsav Patel's details)
@@ -222,6 +223,7 @@ function App() {
             >
               Contact Me
             </button>
+            <GoogleAuthBtn />
           </nav>
         </div>
       </header>

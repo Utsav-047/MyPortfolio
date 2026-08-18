@@ -26,10 +26,11 @@ async function handleResponse(response) {
 /**
  * Fetch paginated tasks from backend (Default 5 items per page)
  */
-export async function getTasks(page = 1, limit = 5, priority = '', search = '') {
+export async function getTasks(page = 1, limit = 5, priority = '', search = '', status = 'all') {
   let url = `${BASE_URL}/api/tasks?page=${page}&limit=${limit}`;
-  if (priority) url += `&priority=${encodeURIComponent(priority)}`;
+  if (priority && priority !== 'all') url += `&priority=${encodeURIComponent(priority)}`;
   if (search) url += `&search=${encodeURIComponent(search)}`;
+  if (status && status !== 'all') url += `&status=${encodeURIComponent(status)}`;
 
   const response = await fetch(url);
   return handleResponse(response);

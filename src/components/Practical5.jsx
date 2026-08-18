@@ -14,9 +14,15 @@ function Practical5() {
   const [formTitle, setFormTitle] = useState('');
   const [formDesc, setFormDesc] = useState('');
   const [formPriority, setFormPriority] = useState('medium');
+  const [formStatus, setFormStatus] = useState('pending');
   const [editingTask, setEditingTask] = useState(null);
   const [formError, setFormError] = useState(null);
   const [popup, setPopup] = useState(null);
+
+  // Filter & Search state
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Single Task ID Lookup (Supplementary requirement: GET /tasks/:id test)
   const [lookupId, setLookupId] = useState('');
@@ -54,9 +60,16 @@ function Practical5() {
   }, []);
 
   // ── Fetch All Tasks ───────────────────────────────────────
-  const fetchTasks = useCallback(async () => {
+  const fetchTasks = useCallback(async (
+    filterStatus = statusFilter,
+    querySearch = searchQuery
+  ) => {
     try {
-      const res = await fetch(`${API_BASE}/api/tasks`);
+      let url = `${API_BASE}/api/tasks?limit=100`;
+      if (filterStatus && filterStatus !== 'all') url += `&status=${encodeURIComponent(filterStatus)}`;
+      if (querySearch) url += `&search=${encodeURIComponent(querySearch)}`;
+
+      const res = await fetch(url);
       const data = await res.json();
       setTasks(data.data || []);
       setServerOnline(true);
@@ -65,17 +78,80 @@ function Practical5() {
       setServerOnline(false);
       setLoading(false);
     }
-  }, []);
+  }, [statusFilter, searchQuery]);
 
   // ── Initial Load & Polling ────────────────────────────────
   useEffect(() => {
-    fetchTasks();
+    fetchTasks(statusFilter, searchQuery);
     fetchDbStatus();
     const interval = setInterval(() => {
       fetchDbStatus();
     }, 4000);
     return () => clearInterval(interval);
   }, [fetchTasks, fetchDbStatus]);
+
+  // ── Filter Tab Change ─────────────────────────────────────
+  const handleStatusFilterChange = (newStatus) => {
+    setStatusFilter(newStatus);
+    fetchTasks(newStatus, searchQuery);
+  };
+
+  // ── Search Submit & Clear ─────────────────────────────────
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    setSearchQuery(searchInput);
+    fetchTasks(statusFilter, searchInput);
+  };
+
+  const handleClearSearch = () => {
+    setSearchInput('');
+    setSearchQuery('');
+    fetchTasks(statusFilter, '');
+  };
+
+  // ── Task-Wise Download with Timestamp Handler ─────────────
+  const handleDownloadTask = (task) => {
+    const now = new Date();
+    const timestampISO = now.toISOString();
+    const timestampLocal = now.toLocaleString();
+    const taskId = task._id || task.id;
+
+    const exportData = {
+      taskDetails: {
+        id: taskId,
+        title: task.title,
+        description: task.description || '',
+        status: task.status || (task.completed ? 'completed' : 'pending'),
+        completed: Boolean(task.completed || task.status === 'completed'),
+        priority: task.priority || 'medium',
+        createdAt: task.createdAt || null,
+        updatedAt: task.updatedAt || null
+      },
+      downloadMetadata: {
+        downloadedAtISO: timestampISO,
+        downloadedAtLocal: timestampLocal,
+        timestamp: now.getTime()
+      }
+    };
+
+    const jsonStr = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const cleanTitle = (task.title || 'task').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    link.href = url;
+    link.download = `Task_${taskId}_${cleanTitle}_${now.getTime()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    triggerPopup(
+      'info',
+      '📥 Task Exported',
+      `Task #${taskId} downloaded with timestamp: ${timestampLocal}`
+    );
+  };
 
   // ── Create or Update Task ─────────────────────────────────
   const handleSubmit = async (e) => {
@@ -86,7 +162,8 @@ function Practical5() {
       title: formTitle,
       description: formDesc,
       priority: formPriority,
-      completed: editingTask ? editingTask.completed : false
+      status: formStatus,
+      completed: formStatus === 'completed'
     };
 
     try {
@@ -134,30 +211,33 @@ function Practical5() {
       setFormTitle('');
       setFormDesc('');
       setFormPriority('medium');
-      fetchTasks();
+      setFormStatus('pending');
+      fetchTasks(statusFilter, searchQuery);
     } catch (err) {
       console.error(err);
     }
   };
 
-  // ── Toggle Completion Status ──────────────────────────────
-  const toggleComplete = async (task) => {
+  // ── Toggle Completion / Status Change ──────────────────────
+  const changeTaskStatus = async (task, newStatus) => {
     const taskId = task._id || task.id;
+    const isCompleted = newStatus === 'completed';
+
     try {
       const res = await fetch(`${API_BASE}/api/tasks/${taskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ completed: !task.completed })
+        body: JSON.stringify({ status: newStatus, completed: isCompleted })
       });
       const data = await res.json();
       if (res.ok) {
         triggerPopup(
           'info',
           'Status Updated in MongoDB',
-          `Status changed to ${!task.completed ? 'COMPLETED' : 'PENDING'}`
+          `Status changed to ${newStatus.toUpperCase()}`
         );
       }
-      fetchTasks();
+      fetchTasks(statusFilter, searchQuery);
     } catch (err) {
       console.error(err);
     }
@@ -174,7 +254,7 @@ function Practical5() {
       if (!res.ok) throw new Error(data.message || 'Delete failed');
 
       triggerPopup('delete', '🚨 Document Deleted', data.message || 'Document removed from MongoDB');
-      fetchTasks();
+      fetchTasks(statusFilter, searchQuery);
     } catch (err) {
       console.error(err);
     }
@@ -229,6 +309,7 @@ function Practical5() {
     setFormTitle(task.title);
     setFormDesc(task.description || '');
     setFormPriority(task.priority || 'medium');
+    setFormStatus(task.status || (task.completed ? 'completed' : 'pending'));
     setFormError(null);
   };
 
@@ -237,6 +318,7 @@ function Practical5() {
     setFormTitle('');
     setFormDesc('');
     setFormPriority('medium');
+    setFormStatus('pending');
     setFormError(null);
   };
 
@@ -703,6 +785,19 @@ function Practical5() {
                   </select>
                 </div>
 
+                <div>
+                  <label className="p5-label">Status Format (pending | in_progress | completed)</label>
+                  <select
+                    className="p5-select"
+                    value={formStatus}
+                    onChange={(e) => setFormStatus(e.target.value)}
+                  >
+                    <option value="pending">⏳ Pending</option>
+                    <option value="in_progress">⚡ In Progress</option>
+                    <option value="completed">✅ Completed</option>
+                  </select>
+                </div>
+
                 {formError && (
                   <div className="p5-error-box">
                     <div className="p5-error-title">❌ {formError.error || 'Validation Error'}</div>
@@ -735,7 +830,7 @@ function Practical5() {
               <h3 className="p5-card-title">
                 <span>Database Tasks ({tasks.length})</span>
                 <button
-                  onClick={fetchTasks}
+                  onClick={() => fetchTasks(statusFilter, searchQuery)}
                   style={{
                     background: '#f1f5f9',
                     border: '1px solid #cbd5e1',
@@ -749,18 +844,102 @@ function Practical5() {
                 </button>
               </h3>
 
+              {/* Status Filter Tabs & Search Bar */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px', paddingBottom: '14px', borderBottom: '1px solid #e2e8f0' }}>
+                {/* Filter Tabs: All, Pending, In Progress, Completed */}
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  {[
+                    { key: 'all', label: 'All', icon: '📋' },
+                    { key: 'pending', label: 'Pending', icon: '⏳' },
+                    { key: 'in_progress', label: 'In Progress', icon: '⚡' },
+                    { key: 'completed', label: 'Completed', icon: '✅' }
+                  ].map((tab) => (
+                    <button
+                      key={tab.key}
+                      onClick={() => handleStatusFilterChange(tab.key)}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: '20px',
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        border: statusFilter === tab.key ? '2px solid #4f46e5' : '1px solid #cbd5e1',
+                        background: statusFilter === tab.key ? '#e0e7ff' : '#f8fafc',
+                        color: statusFilter === tab.key ? '#3730a3' : '#475569',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      <span>{tab.icon}</span>
+                      <span>{tab.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Search Bar with Search Button */}
+                <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    className="p5-input"
+                    placeholder="Search by title or description..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    style={{ flex: 1, padding: '8px 12px', fontSize: '13px' }}
+                  />
+                  <button
+                    type="submit"
+                    style={{
+                      background: '#4f46e5',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '8px 14px',
+                      borderRadius: '8px',
+                      fontWeight: '700',
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    🔍 Search
+                  </button>
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={handleClearSearch}
+                      style={{
+                        background: '#f1f5f9',
+                        color: '#64748b',
+                        border: '1px solid #cbd5e1',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      ✖ Clear
+                    </button>
+                  )}
+                </form>
+              </div>
+
               {loading ? (
                 <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>
                   Connecting &amp; loading tasks from MongoDB...
                 </div>
               ) : tasks.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>
-                  No tasks found in collection. Add a task using the form on the left!
+                  No tasks found in collection matching filters.
                 </div>
               ) : (
                 <div className="p5-task-list">
                   {tasks.map((task) => {
                     const taskId = task._id || task.id;
+                    const taskStatus = task.status || (task.completed ? 'completed' : 'pending');
                     return (
                       <div key={taskId} className="p5-task-item">
                         <div className="p5-task-header">
@@ -771,18 +950,36 @@ function Practical5() {
                             </div>
                           </div>
 
-                          <div style={{ display: 'flex', gap: '6px' }}>
+                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+                            <select
+                              value={taskStatus}
+                              onChange={(e) => changeTaskStatus(task, e.target.value)}
+                              style={{
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                padding: '4px 6px',
+                                borderRadius: '6px',
+                                border: '1px solid #cbd5e1',
+                                background: '#f8fafc',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <option value="pending">⏳ Pending</option>
+                              <option value="in_progress">⚡ In Progress</option>
+                              <option value="completed">✅ Completed</option>
+                            </select>
+                            <button
+                              style={{ background: '#0284c7', color: '#ffffff', border: 'none', padding: '5px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+                              onClick={() => handleDownloadTask(task)}
+                              title="Download task with timestamp"
+                            >
+                              📥 Download
+                            </button>
                             <button
                               className="p5-action-btn p5-btn-edit"
                               onClick={() => startEdit(task)}
                             >
                               Edit
-                            </button>
-                            <button
-                              className="p5-action-btn p5-btn-toggle"
-                              onClick={() => toggleComplete(task)}
-                            >
-                              {task.completed ? 'Mark Pending' : 'Mark Done'}
                             </button>
                             <button
                               className="p5-action-btn p5-btn-delete"
@@ -795,9 +992,20 @@ function Practical5() {
 
                         <div className="p5-badge-row">
                           <span
-                            className={`p5-badge ${task.completed ? 'p5-badge-completed' : 'p5-badge-pending'}`}
+                            className={`p5-badge ${
+                              taskStatus === 'completed'
+                                ? 'p5-badge-completed'
+                                : taskStatus === 'in_progress'
+                                ? 'p5-badge-medium'
+                                : 'p5-badge-pending'
+                            }`}
+                            style={
+                              taskStatus === 'in_progress'
+                                ? { background: '#e0f2fe', color: '#0369a1' }
+                                : {}
+                            }
                           >
-                            {task.completed ? 'COMPLETED' : 'PENDING'}
+                            {taskStatus.replace('_', ' ').toUpperCase()}
                           </span>
                           <span className={`p5-badge ${getPriorityBadgeClass(task.priority)}`}>
                             {task.priority || 'medium'} priority
