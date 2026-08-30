@@ -27,3 +27,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local request logs & data
+backend/data/*.csv
+*.csv
+
