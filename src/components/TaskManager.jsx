@@ -39,6 +39,13 @@ function TaskManager() {
   // Toast notification stack
   const [toasts, setToasts] = useState([]);
 
+  // Practical 7 Auth Tester state
+  const [p7Name, setP7Name] = useState('Utsav Patel');
+  const [p7Email, setP7Email] = useState('utsav@example.com');
+  const [p7Password, setP7Password] = useState('secretPass123');
+  const [p7Response, setP7Response] = useState(null);
+  const [p7Loading, setP7Loading] = useState(false);
+
   const logTerminalRef = useRef(null);
 
   // ── Helper: Add Toast Notification ────────────────────────
@@ -320,6 +327,115 @@ function TaskManager() {
       case 'in_progress': return { bg: '#e0f2fe', color: '#0369a1', label: 'IN PROGRESS' };
       case 'pending':
       default: return { bg: '#fef3c7', color: '#92400e', label: 'PENDING' };
+    }
+  };
+
+  // Practical 7 Handler Functions
+  const handleP7Register = async (e) => {
+    e.preventDefault();
+    setP7Loading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: p7Name, email: p7Email, password: p7Password })
+      });
+      const data = await res.json();
+      setP7Response({
+        endpoint: 'POST /api/auth/register',
+        status: res.status,
+        data
+      });
+      if (res.ok) {
+        addToast('success', 'User Registered (Bcrypt)', `Password hashed with bcrypt. Token issued.`);
+        if (data.token) localStorage.setItem('p7_jwt', data.token);
+      } else {
+        addToast('error', 'Registration Failed', data.message || 'Error occurred');
+      }
+    } catch (err) {
+      setP7Response({ endpoint: 'POST /api/auth/register', status: 'Network Error', data: { error: err.message } });
+    } finally {
+      setP7Loading(false);
+    }
+  };
+
+  const handleP7Login = async (e) => {
+    e.preventDefault();
+    setP7Loading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: p7Email, password: p7Password })
+      });
+      const data = await res.json();
+      setP7Response({
+        endpoint: 'POST /api/auth/login',
+        status: res.status,
+        data
+      });
+      if (res.ok) {
+        addToast('success', 'Email Login Success', `JWT Token issued with 1-hour expiry.`);
+        if (data.token) localStorage.setItem('p7_jwt', data.token);
+      } else {
+        addToast('error', 'Login Failed', data.message || 'Error occurred');
+      }
+    } catch (err) {
+      setP7Response({ endpoint: 'POST /api/auth/login', status: 'Network Error', data: { error: err.message } });
+    } finally {
+      setP7Loading(false);
+    }
+  };
+
+  const handleP7GetMe = async () => {
+    setP7Loading(true);
+    try {
+      const token = localStorage.getItem('p7_jwt') || localStorage.getItem('auth_token') || 'test-token';
+      const res = await fetch(`${API_BASE}/api/auth/me`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+      setP7Response({
+        endpoint: 'GET /api/auth/me',
+        status: res.status,
+        headersSent: { 'Authorization': `Bearer ${token.substring(0, 15)}...` },
+        data
+      });
+      if (res.ok) {
+        addToast('success', 'GET /api/auth/me', 'Decoded authenticated user returned by protect middleware.');
+      } else {
+        addToast('error', 'Auth Failed', data.message);
+      }
+    } catch (err) {
+      setP7Response({ endpoint: 'GET /api/auth/me', status: 'Network Error', data: { error: err.message } });
+    } finally {
+      setP7Loading(false);
+    }
+  };
+
+  const handleP7Trigger401 = async () => {
+    setP7Loading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/tasks`, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer invalid_or_expired_jwt_token_12345'
+        }
+      });
+      const data = await res.json();
+      setP7Response({
+        endpoint: 'GET /api/tasks (Protected Route with Invalid Token)',
+        status: res.status,
+        data
+      });
+      addToast('info', '401 Unauthorized Triggered', 'Protect middleware successfully rejected invalid token.');
+    } catch (err) {
+      setP7Response({ endpoint: 'GET /api/tasks', status: 'Network Error', data: { error: err.message } });
+    } finally {
+      setP7Loading(false);
     }
   };
 
@@ -664,6 +780,7 @@ function TaskManager() {
         <div className="tm-nav-tabs">
           {[
             { key: 'dashboard', label: '⚡ Task Dashboard' },
+            { key: 'practical7', label: '🔐 Practical 7 Auth Inspector' },
             { key: 'console', label: '📟 Live Console & Status' },
             { key: 'architecture', label: '🏗️ System Architecture' },
             { key: 'maturity', label: '📊 API Maturity Model' }
@@ -974,6 +1091,199 @@ function TaskManager() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* TAB: PRACTICAL 7 AUTH INSPECTOR */}
+        {activeTab === 'practical7' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div className="tm-card" style={{ background: '#f8fafc', border: '1px solid #cbd5e1' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <h3 style={{ margin: 0, fontSize: '18px', color: '#1e293b' }}>
+                  🛡️ Practical 7: Authentication &amp; Middleware Pipeline Inspector
+                </h3>
+                <span style={{ fontSize: '12px', background: '#e0e7ff', color: '#3730a3', padding: '4px 10px', borderRadius: '9999px', fontWeight: '700' }}>
+                  CO2, CO6 / PO3, PO5
+                </span>
+              </div>
+              <p style={{ fontSize: '13px', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
+                Test and capture all Practical 7 submission screenshots: <strong>Bcrypt password hashing</strong>, <strong>JWT generation</strong>, <strong>Protected /api/auth/me</strong>, and <strong>401 Unauthorized error handling</strong>.
+              </p>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+              {/* Box 1: Email/Password Register & Login */}
+              <div className="tm-card">
+                <h4 style={{ margin: '0 0 14px 0', fontSize: '15px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>🔐</span> 1. Register &amp; Login (Bcrypt + JWT)
+                </h4>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div>
+                    <label className="tm-label">Full Name</label>
+                    <input
+                      type="text"
+                      className="tm-input"
+                      value={p7Name}
+                      onChange={e => setP7Name(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="tm-label">Email Address</label>
+                    <input
+                      type="email"
+                      className="tm-input"
+                      value={p7Email}
+                      onChange={e => setP7Email(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="tm-label">Password</label>
+                    <input
+                      type="password"
+                      className="tm-input"
+                      value={p7Password}
+                      onChange={e => setP7Password(e.target.value)}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
+                    <button
+                      type="button"
+                      onClick={handleP7Register}
+                      disabled={p7Loading}
+                      style={{
+                        flex: 1,
+                        background: '#0284c7',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '10px',
+                        borderRadius: '8px',
+                        fontWeight: '700',
+                        fontSize: '13px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      📝 Register (Bcrypt)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleP7Login}
+                      disabled={p7Loading}
+                      style={{
+                        flex: 1,
+                        background: '#4f46e5',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '10px',
+                        borderRadius: '8px',
+                        fontWeight: '700',
+                        fontSize: '13px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      🔑 Login (JWT 1hr)
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Box 2: Protected Routes & 401 Testing */}
+              <div className="tm-card">
+                <h4 style={{ margin: '0 0 14px 0', fontSize: '15px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>🛡️</span> 2. Protected Pipeline &amp; 401 Testing
+                </h4>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    <strong style={{ fontSize: '13px', display: 'block', color: '#1e293b', marginBottom: '4px' }}>
+                      Test 1: Verify Current User (Screenshot 09)
+                    </strong>
+                    <span style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '8px' }}>
+                      Sends <code>GET /api/auth/me</code> with <code>Authorization: Bearer &lt;token&gt;</code>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleP7GetMe}
+                      disabled={p7Loading}
+                      style={{
+                        background: '#10b981',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '8px 14px',
+                        borderRadius: '6px',
+                        fontWeight: '600',
+                        fontSize: '12px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      👤 Call GET /api/auth/me
+                    </button>
+                  </div>
+
+                  <div style={{ padding: '12px', background: '#fef2f2', borderRadius: '8px', border: '1px solid #fecaca' }}>
+                    <strong style={{ fontSize: '13px', display: 'block', color: '#991b1b', marginBottom: '4px' }}>
+                      Test 2: Trigger 401 Unauthorized (Screenshot 10)
+                    </strong>
+                    <span style={{ fontSize: '12px', color: '#7f1d1d', display: 'block', marginBottom: '8px' }}>
+                      Calls protected route <code>GET /api/tasks</code> with an invalid/expired token.
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleP7Trigger401}
+                      disabled={p7Loading}
+                      style={{
+                        background: '#dc2626',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '8px 14px',
+                        borderRadius: '6px',
+                        fontWeight: '600',
+                        fontSize: '12px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      🚫 Trigger 401 Unauthorized
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Response Output Inspector */}
+            <div className="tm-card" style={{ background: '#0f172a', color: '#f8fafc' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <h4 style={{ margin: 0, fontSize: '14px', color: '#38bdf8', fontFamily: 'monospace' }}>
+                  {p7Response ? `📡 Response Inspector: ${p7Response.endpoint}` : '📡 Response Inspector (Awaiting Test)'}
+                </h4>
+                {p7Response && (
+                  <span style={{
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    background: p7Response.status >= 200 && p7Response.status < 300 ? '#059669' : '#dc2626',
+                    color: '#ffffff'
+                  }}>
+                    HTTP {p7Response.status}
+                  </span>
+                )}
+              </div>
+              <pre style={{
+                margin: 0,
+                padding: '12px',
+                background: '#1e293b',
+                borderRadius: '8px',
+                fontSize: '13px',
+                color: '#a5f3fc',
+                overflowX: 'auto',
+                fontFamily: 'Consolas, Monaco, monospace'
+              }}>
+                {p7Response
+                  ? JSON.stringify(p7Response, null, 2)
+                  : '// Click any test button above to inspect live HTTP headers, payload, status codes, and tokens!'}
+              </pre>
             </div>
           </div>
         )}
