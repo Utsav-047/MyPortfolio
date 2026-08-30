@@ -7,8 +7,14 @@ import TaskManager from './components/TaskManager';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import GoogleAuthBtn from './components/GoogleAuthBtn';
+import AuthGate from './components/AuthGate';
 
 function App() {
+  // Lifted auth state — shared between GoogleAuthBtn (navbar) and AuthGate (task manager)
+  const [authUser, setAuthUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('auth_user')); } catch { return null; }
+  });
+
   // 1. Core Profile State (Utsav Patel's details)
   const [profile] = useState({
     name: 'Utsav Patel',
@@ -142,9 +148,9 @@ function App() {
         );
       case 'taskmanager':
         return (
-          <TaskManager 
-            color={profile.themeColor} 
-          />
+          <AuthGate onAuthChange={setAuthUser}>
+            <TaskManager color={profile.themeColor} />
+          </AuthGate>
         );
       case 'contact':
         return (

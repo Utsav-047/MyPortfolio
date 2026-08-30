@@ -1,8 +1,17 @@
-// ============================================================
+
 //  MyPortfolio Practical 6 Central API Client Service
-// ============================================================
+
 
 const BASE_URL = 'http://localhost:5000';
+
+/**
+ * Returns the Authorization header object if a JWT token is stored in localStorage.
+ * This token is obtained after Google Sign-In and is required for all task endpoints.
+ */
+function getAuthHeaders() {
+  const token = localStorage.getItem('auth_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 /**
  * Generic helper for handling HTTP fetch requests and parsing JSON error responses.
@@ -24,7 +33,8 @@ async function handleResponse(response) {
 }
 
 /**
- * Fetch paginated tasks from backend (Default 5 items per page)
+ * Fetch paginated tasks from backend (Default 5 items per page).
+ * Requires: Authorization Bearer token (Google Auth).
  */
 export async function getTasks(page = 1, limit = 5, priority = '', search = '', status = 'all') {
   let url = `${BASE_URL}/api/tasks?page=${page}&limit=${limit}`;
@@ -32,54 +42,63 @@ export async function getTasks(page = 1, limit = 5, priority = '', search = '', 
   if (search) url += `&search=${encodeURIComponent(search)}`;
   if (status && status !== 'all') url += `&status=${encodeURIComponent(status)}`;
 
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    headers: { ...getAuthHeaders() }
+  });
   return handleResponse(response);
 }
 
 /**
- * Fetch single task by ID
+ * Fetch single task by ID.
+ * Requires: Authorization Bearer token.
  */
 export async function getTaskById(id) {
-  const response = await fetch(`${BASE_URL}/api/tasks/${id}`);
+  const response = await fetch(`${BASE_URL}/api/tasks/${id}`, {
+    headers: { ...getAuthHeaders() }
+  });
   return handleResponse(response);
 }
 
 /**
- * Create a new Task (POST /api/tasks)
+ * Create a new Task (POST /api/tasks).
+ * Requires: Authorization Bearer token.
  */
 export async function createTask(taskData) {
   const response = await fetch(`${BASE_URL}/api/tasks`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify(taskData)
   });
   return handleResponse(response);
 }
 
 /**
- * Update an existing Task (PUT /api/tasks/:id)
+ * Update an existing Task (PUT /api/tasks/:id).
+ * Requires: Authorization Bearer token.
  */
 export async function updateTask(id, taskData) {
   const response = await fetch(`${BASE_URL}/api/tasks/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify(taskData)
   });
   return handleResponse(response);
 }
 
 /**
- * Delete a Task by ID (DELETE /api/tasks/:id)
+ * Delete a Task by ID (DELETE /api/tasks/:id).
+ * Requires: Authorization Bearer token.
  */
 export async function deleteTask(id) {
   const response = await fetch(`${BASE_URL}/api/tasks/${id}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    headers: { ...getAuthHeaders() }
   });
   return handleResponse(response);
 }
 
 /**
- * Check MongoDB & Express Backend status
+ * Check MongoDB & Express Backend status (no auth required).
  */
 export async function getDbStatus() {
   const response = await fetch(`${BASE_URL}/api/db-status`);
