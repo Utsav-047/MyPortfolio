@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema(
   {
     googleId: {
       type: String,
-      required: true,
-      unique: true,
+      sparse: true,
       index: true
     },
     name: {
@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true
     },
+    password: {
+      type: String,
+      select: true
+    },
     avatar: {
       type: String,
       default: ''
@@ -30,4 +34,11 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+// Method to compare password with hashed password in DB
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  if (!this.password) return false;
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
 module.exports = mongoose.model('User', userSchema);
+
