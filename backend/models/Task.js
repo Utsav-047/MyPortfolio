@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 
 const taskSchema = new mongoose.Schema(
   {
+    // Owner — links this task to the authenticated Google user
+    userId: {
+      type: String,
+      required: [true, 'userId is required'],
+      index: true
+    },
     title: {
       type: String,
       required: [true, 'Title is required'],

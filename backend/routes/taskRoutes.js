@@ -1,5 +1,6 @@
 const express = require('express');
 const { validateContentType, validateTaskId } = require('../middleware/validators');
+const { protect } = require('../middleware/authMiddleware');
 const {
   getAllTasks,
   getTaskById,
@@ -9,6 +10,9 @@ const {
 } = require('../controllers/taskController');
 
 const router = express.Router();
+
+// All task routes are protected — require a valid JWT (Google Auth)
+router.use(protect);
 
 router.get('/', getAllTasks);
 router.get('/:id', validateTaskId, getTaskById);

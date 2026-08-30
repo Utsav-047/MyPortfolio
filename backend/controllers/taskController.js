@@ -5,14 +5,17 @@ const store = require('../data/store'); // Fallback memory store if DB disconnec
 // Check if MongoDB connection is ready
 const isDbConnected = () => mongoose.connection.readyState === 1;
 
-// 1. GET /api/tasks — Retrieve paginated tasks (Default: 5 per page)
+// 1. GET /api/tasks — Retrieve paginated tasks scoped to authenticated user
 const getAllTasks = async (req, res, next) => {
   try {
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const limit = Math.max(1, parseInt(req.query.limit, 10) || 5);
     const skip = (page - 1) * limit;
 
-    const conditions = [];
+    // Always filter by the authenticated user's ID
+    const userId = req.user.id;
+    const conditions = [{ userId }];
+
     if (req.query.priority) {
       conditions.push({ priority: req.query.priority });
     }
@@ -38,7 +41,7 @@ const getAllTasks = async (req, res, next) => {
       });
     }
 
-    const filter = conditions.length > 0 ? { $and: conditions } : {};
+    const filter = { $and: conditions };
 
     if (isDbConnected()) {
       const total = await Task.countDocuments(filter);
@@ -60,8 +63,8 @@ const getAllTasks = async (req, res, next) => {
       });
     }
 
-    // Fallback in-memory store pagination
-    let filteredTasks = store.tasks;
+    // Fallback in-memory store (filtered by userId)
+    let filteredTasks = store.tasks.filter(t => t.userId === userId);
     if (req.query.priority) {
       filteredTasks = filteredTasks.filter(t => t.priority === req.query.priority);
     }
@@ -98,15 +101,17 @@ const getAllTasks = async (req, res, next) => {
   }
 };
 
-// 2. GET /api/tasks/:id — Retrieve single task by ID
+// 2. GET /api/tasks/:id — Retrieve single task (only if owned by user)
 const getTaskById = async (req, res, next) => {
   try {
+    const userId = req.user.id;
+
     if (isDbConnected()) {
-      const task = await Task.findById(req.params.id);
+      const task = await Task.findOne({ _id: req.params.id, userId });
       if (!task) {
         return res.status(404).json({
           error: 'Not Found',
-          message: `Task with ID '${req.params.id}' not found in database`
+          message: `Task with ID '${req.params.id}' not found`
         });
       }
       return res.status(200).json({
@@ -117,7 +122,9 @@ const getTaskById = async (req, res, next) => {
     }
 
     const numericId = parseInt(req.params.id, 10);
-    const task = store.tasks.find(t => t.id === numericId || t._id === req.params.id);
+    const task = store.tasks.find(
+      t => (t.id === numericId || t._id === req.params.id) && t.userId === userId
+    );
     if (!task) {
       return res.status(404).json({
         error: 'Not Found',
@@ -134,15 +141,17 @@ const getTaskById = async (req, res, next) => {
   }
 };
 
-// 3. POST /api/tasks — Create a new task with schema validation
+// 3. POST /api/tasks — Create a new task, stamped with the authenticated user's ID
 const createTask = async (req, res, next) => {
   try {
     const { title, description, completed, priority, status } = req.body;
+    const userId = req.user.id;
     const computedStatus = status || (completed ? 'completed' : 'pending');
     const isCompleted = computedStatus === 'completed';
 
     if (isDbConnected()) {
       const newTask = await Task.create({
+        userId,
         title,
         description,
         completed: isCompleted,
@@ -152,7 +161,7 @@ const createTask = async (req, res, next) => {
 
       console.log(`\n========================================`);
       console.log(`🍃 MONGODB NOTIFICATION: Document Created!`);
-      console.log(`   ID: ${newTask._id} | Title: "${newTask.title}" | Status: ${newTask.status}`);
+      console.log(`   ID: ${newTask._id} | User: ${userId} | Title: "${newTask.title}" | Status: ${newTask.status}`);
       console.log(`========================================\n`);
 
       return res.status(201).json({
@@ -173,6 +182,7 @@ const createTask = async (req, res, next) => {
 
     const newTask = {
       id: store.nextId(),
+      userId,
       title: title.trim(),
       description: description ? description.trim() : '',
       completed: isCompleted,
@@ -193,10 +203,11 @@ const createTask = async (req, res, next) => {
   }
 };
 
-// 4. PUT /api/tasks/:id — Update existing task with validation
+// 4. PUT /api/tasks/:id — Update task (only if owned by the requesting user)
 const updateTask = async (req, res, next) => {
   try {
     const { title, description, completed, priority, status } = req.body;
+    const userId = req.user.id;
 
     const updateData = {};
     if (title !== undefined) updateData.title = title;
@@ -212,8 +223,9 @@ const updateTask = async (req, res, next) => {
     }
 
     if (isDbConnected()) {
-      const updatedTask = await Task.findByIdAndUpdate(
-        req.params.id,
+      // Scope update to current user (prevents cross-user mutation)
+      const updatedTask = await Task.findOneAndUpdate(
+        { _id: req.params.id, userId },
         updateData,
         { new: true, runValidators: true }
       );
@@ -227,7 +239,7 @@ const updateTask = async (req, res, next) => {
 
       console.log(`\n========================================`);
       console.log(`🍃 MONGODB NOTIFICATION: Document Updated!`);
-      console.log(`   ID: ${updatedTask._id} | Title: "${updatedTask.title}" | Status: ${updatedTask.status}`);
+      console.log(`   ID: ${updatedTask._id} | User: ${userId} | Title: "${updatedTask.title}" | Status: ${updatedTask.status}`);
       console.log(`========================================\n`);
 
       return res.status(200).json({
@@ -238,9 +250,11 @@ const updateTask = async (req, res, next) => {
       });
     }
 
-    // Fallback update
+    // Fallback update (also scoped by userId)
     const numericId = parseInt(req.params.id, 10);
-    const index = store.tasks.findIndex(t => t.id === numericId || t._id === req.params.id);
+    const index = store.tasks.findIndex(
+      t => (t.id === numericId || t._id === req.params.id) && t.userId === userId
+    );
     if (index === -1) {
       return res.status(404).json({
         error: 'Not Found',
@@ -271,11 +285,14 @@ const updateTask = async (req, res, next) => {
   }
 };
 
-// 5. DELETE /api/tasks/:id — Delete task from database
+// 5. DELETE /api/tasks/:id — Delete task (only if owned by the requesting user)
 const deleteTask = async (req, res, next) => {
   try {
+    const userId = req.user.id;
+
     if (isDbConnected()) {
-      const deletedTask = await Task.findByIdAndDelete(req.params.id);
+      // Scope delete to current user (prevents cross-user deletion)
+      const deletedTask = await Task.findOneAndDelete({ _id: req.params.id, userId });
 
       if (!deletedTask) {
         return res.status(404).json({
@@ -286,7 +303,7 @@ const deleteTask = async (req, res, next) => {
 
       console.log(`\n========================================`);
       console.log(`🚨 MONGODB NOTIFICATION: Document Deleted!`);
-      console.log(`   Deleted ID: ${deletedTask._id} | Title: "${deletedTask.title}"`);
+      console.log(`   Deleted ID: ${deletedTask._id} | User: ${userId} | Title: "${deletedTask.title}"`);
       console.log(`========================================\n`);
 
       return res.status(200).json({
@@ -297,9 +314,11 @@ const deleteTask = async (req, res, next) => {
       });
     }
 
-    // Fallback delete
+    // Fallback delete (also scoped by userId)
     const numericId = parseInt(req.params.id, 10);
-    const index = store.tasks.findIndex(t => t.id === numericId || t._id === req.params.id);
+    const index = store.tasks.findIndex(
+      t => (t.id === numericId || t._id === req.params.id) && t.userId === userId
+    );
     if (index === -1) {
       return res.status(404).json({
         error: 'Not Found',
