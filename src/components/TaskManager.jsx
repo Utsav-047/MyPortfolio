@@ -1,34 +1,35 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   getTasks,
   createTask,
   updateTask,
   deleteTask,
+  getTeamMembers,
   getDbStatus
 } from '../services/api';
 
-const API_BASE = 'http://localhost:5000';
-
-function TaskManager() {
+function TaskManager({ userRole = 'manager', currentUser = null }) {
   // ── State Management ───────────────────────────────────────
+  const [role, setRole] = useState(userRole || 'manager');
   const [tasks, setTasks] = useState([]);
+  const [teamMembers, setTeamMembers] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, limit: 5, total: 0, totalPages: 1 });
   const [dbStatus, setDbStatus] = useState({ status: 'checking', dbState: 'Checking...' });
-  const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [serverOnline, setServerOnline] = useState(false);
-  const [activeTab, setActiveTab] = useState('dashboard'); // dashboard | console | architecture | maturity
 
   // Form state
   const [formTitle, setFormTitle] = useState('');
   const [formDesc, setFormDesc] = useState('');
   const [formPriority, setFormPriority] = useState('medium');
   const [formStatus, setFormStatus] = useState('pending'); // pending | in_progress | completed
+  const [formAssignee, setFormAssignee] = useState(''); // email of assignee
   const [editingTask, setEditingTask] = useState(null);
   const [formError, setFormError] = useState(null);
 
   // Filter & Search state
   const [statusFilter, setStatusFilter] = useState('all'); // all | pending | in_progress | completed
+  const [assigneeFilter, setAssigneeFilter] = useState('all');
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -39,14 +40,20 @@ function TaskManager() {
   // Toast notification stack
   const [toasts, setToasts] = useState([]);
 
-  // Practical 7 Auth Tester state
-  const [p7Name, setP7Name] = useState('Utsav Patel');
-  const [p7Email, setP7Email] = useState('utsav@example.com');
-  const [p7Password, setP7Password] = useState('secretPass123');
-  const [p7Response, setP7Response] = useState(null);
-  const [p7Loading, setP7Loading] = useState(false);
+  // Sync userRole prop or role_changed event
+  useEffect(() => {
+    if (userRole) setRole(userRole);
+  }, [userRole]);
 
-  const logTerminalRef = useRef(null);
+  useEffect(() => {
+    const handleRoleChanged = (e) => {
+      const newRole = e.detail || 'manager';
+      setRole(newRole);
+      fetchPaginatedTasks(1, statusFilter, searchQuery, 'all', newRole);
+    };
+    window.addEventListener('role_changed', handleRoleChanged);
+    return () => window.removeEventListener('role_changed', handleRoleChanged);
+  }, [statusFilter, searchQuery]);
 
   // ── Helper: Add Toast Notification ────────────────────────
   const addToast = (type, title, message) => {
@@ -73,26 +80,43 @@ function TaskManager() {
     }
   }, []);
 
-  // ── Fetch Live Console Logs ────────────────────────────────
-  const fetchLogs = useCallback(async () => {
+  // ── Fetch Team Members ─────────────────────────────────────
+  const fetchTeam = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/logs`);
-      const data = await res.json();
-      setLogs(data.data || []);
+      const res = await getTeamMembers();
+      const list = res.data || [];
+      setTeamMembers(list);
+      if (list.length > 0 && !formAssignee) {
+        setFormAssignee(list[0].email);
+      }
     } catch {
-      // ignore
+      setTeamMembers([
+        { id: 'emp-1', name: 'Utsav Patel (Lead)', email: 'utsavpatel788190@gmail.com', role: 'manager' },
+        { id: 'emp-2', name: 'Rahul Sharma (Frontend)', email: 'rahul.sharma@company.dev', role: 'employee' },
+        { id: 'emp-3', name: 'Priya Patel (ML Dev)', email: 'priya.patel@company.dev', role: 'employee' },
+        { id: 'emp-4', name: 'Sneha Joshi (Backend)', email: 'sneha.joshi@company.dev', role: 'employee' }
+      ]);
     }
-  }, []);
+  }, [formAssignee]);
 
-  // ── Fetch Paginated Tasks (5 items per page) ───────────────
+  // ── Fetch Paginated Tasks ─────────────────────────────────
   const fetchPaginatedTasks = useCallback(async (
     pageToFetch = pagination.page,
     filterStatus = statusFilter,
-    querySearch = searchQuery
+    querySearch = searchQuery,
+    filterAssignee = assigneeFilter,
+    activeRole = role
   ) => {
     setLoading(true);
     try {
-      const res = await getTasks(pageToFetch, 5, '', querySearch, filterStatus);
+      const res = await getTasks(
+        pageToFetch,
+        5,
+        '',
+        querySearch,
+        filterStatus,
+        activeRole === 'manager' ? filterAssignee : 'all'
+      );
       setTasks(res.data || []);
       setPagination({
         page: res.currentPage || pageToFetch,
@@ -103,46 +127,47 @@ function TaskManager() {
       setServerOnline(true);
     } catch (err) {
       setServerOnline(false);
-      addToast('error', 'Network Error', 'Failed to connect to backend server at http://localhost:5000');
+      if (err.status !== 401) {
+        addToast('error', 'Network Error', 'Failed to fetch tasks from backend.');
+      }
     } finally {
       setLoading(false);
     }
-  }, [pagination.page, statusFilter, searchQuery]);
+  }, [pagination.page, statusFilter, searchQuery, assigneeFilter, role]);
 
   useEffect(() => {
-    fetchPaginatedTasks(1, statusFilter, searchQuery);
+    fetchPaginatedTasks(1, statusFilter, searchQuery, assigneeFilter, role);
+    fetchTeam();
     checkBackendStatus();
-    fetchLogs();
     const interval = setInterval(() => {
       checkBackendStatus();
-      fetchLogs();
-    }, 4000);
+    }, 6000);
     return () => clearInterval(interval);
   }, []);
-
-  useEffect(() => {
-    if (logTerminalRef.current) {
-      logTerminalRef.current.scrollTop = logTerminalRef.current.scrollHeight;
-    }
-  }, [logs]);
 
   // ── Handle Status Filter Tab Click ─────────────────────────
   const handleStatusFilterChange = (newStatus) => {
     setStatusFilter(newStatus);
-    fetchPaginatedTasks(1, newStatus, searchQuery);
+    fetchPaginatedTasks(1, newStatus, searchQuery, assigneeFilter, role);
+  };
+
+  // ── Handle Assignee Filter Change (Manager Only) ────────────
+  const handleAssigneeFilterChange = (newAssignee) => {
+    setAssigneeFilter(newAssignee);
+    fetchPaginatedTasks(1, statusFilter, searchQuery, newAssignee, role);
   };
 
   // ── Handle Search Button Trigger ──────────────────────────
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setSearchQuery(searchInput);
-    fetchPaginatedTasks(1, statusFilter, searchInput);
+    fetchPaginatedTasks(1, statusFilter, searchInput, assigneeFilter, role);
   };
 
   const handleClearSearch = () => {
     setSearchInput('');
     setSearchQuery('');
-    fetchPaginatedTasks(1, statusFilter, '');
+    fetchPaginatedTasks(1, statusFilter, '', assigneeFilter, role);
   };
 
   // ── Task-Wise Download with Timestamp Handler ─────────────
@@ -160,6 +185,8 @@ function TaskManager() {
         status: task.status || (task.completed ? 'completed' : 'pending'),
         completed: Boolean(task.completed || task.status === 'completed'),
         priority: task.priority || 'medium',
+        assignedTo: task.assignedTo || { name: 'Unassigned' },
+        assignedBy: task.assignedBy || { name: 'Manager' },
         createdAt: task.createdAt || null,
         updatedAt: task.updatedAt || null
       },
@@ -189,7 +216,7 @@ function TaskManager() {
     );
   };
 
-  // ── Task Creation & Editing ─────────────────────
+  // ── Task Creation & Editing ───────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError(null);
@@ -199,12 +226,25 @@ function TaskManager() {
       return;
     }
 
+    let assignedToObj;
+    if (formAssignee === 'all_employees' || formAssignee === 'all@team.dev' || formAssignee === 'all') {
+      assignedToObj = { id: 'all', name: 'All Employees', email: 'all@team.dev' };
+    } else {
+      const selectedMember = teamMembers.find(m => m.email === formAssignee);
+      assignedToObj = selectedMember
+        ? { id: selectedMember.id || '', name: selectedMember.name, email: selectedMember.email }
+        : (formAssignee ? { id: '', name: formAssignee, email: '' } : { id: '', name: 'Unassigned', email: '' });
+    }
+
+    const isCompleted = formStatus === 'completed';
+
     const payload = {
       title: formTitle.trim(),
       description: formDesc.trim(),
       priority: formPriority,
       status: formStatus,
-      completed: formStatus === 'completed'
+      completed: isCompleted,
+      assignedTo: assignedToObj
     };
 
     if (editingTask) {
@@ -212,18 +252,13 @@ function TaskManager() {
       try {
         await updateTask(targetId, payload);
         addToast('success', 'Task Updated', `Task #${targetId} updated successfully`);
-        setEditingTask(null);
-        setFormTitle('');
-        setFormDesc('');
-        setFormPriority('medium');
-        setFormStatus('pending');
-        fetchPaginatedTasks(pagination.page, statusFilter, searchQuery);
+        cancelEdit();
+        fetchPaginatedTasks(pagination.page, statusFilter, searchQuery, assigneeFilter, role);
       } catch (err) {
         setFormError(err.raw || { error: err.message });
         addToast('error', 'Update Failed', err.message);
       }
     } else {
-      // Optimistic UI Update for Task Creation
       const tempId = `optimistic-${Date.now()}`;
       const optimisticTask = {
         _id: tempId,
@@ -233,6 +268,8 @@ function TaskManager() {
         priority: payload.priority,
         status: payload.status,
         completed: payload.completed,
+        assignedTo: payload.assignedTo,
+        assignedBy: { name: currentUser?.name || 'Manager', email: currentUser?.email || '' },
         createdAt: new Date().toISOString(),
         isOptimistic: true
       };
@@ -242,12 +279,12 @@ function TaskManager() {
       setFormDesc('');
       setFormPriority('medium');
       setFormStatus('pending');
-      addToast('info', 'Optimistic Update', 'Task added to UI! Syncing with database...');
+      addToast('info', 'Optimistic Update', `Task assigned to ${payload.assignedTo.name}! Syncing with database...`);
 
       try {
         const res = await createTask(payload);
         addToast('success', 'Database Synchronized', `Task saved to MongoDB with ID ${res.data._id || res.data.id}`);
-        fetchPaginatedTasks(1, statusFilter, searchQuery);
+        fetchPaginatedTasks(1, statusFilter, searchQuery, assigneeFilter, role);
       } catch (err) {
         setTasks(prev => prev.filter(t => (t._id || t.id) !== tempId));
         setFormError(err.raw || { error: err.message });
@@ -256,22 +293,32 @@ function TaskManager() {
     }
   };
 
-  // ── Handle Direct Status Change ───────────────────────────
-  const handleStatusChange = async (task, newStatus) => {
+  // ── Handle Task Workflow Status Transitions (Strict State Machine) ──
+  const handleStatusTransition = async (task, targetStatus) => {
     const taskId = task._id || task.id;
-    const oldStatus = task.status || (task.completed ? 'completed' : 'pending');
-    const oldCompleted = task.completed;
-    const isCompleted = newStatus === 'completed';
+    const currentStatus = task.status || (task.completed ? 'completed' : 'pending');
 
-    setTasks(prev => prev.map(t => (t._id || t.id) === taskId ? { ...t, status: newStatus, completed: isCompleted } : t));
+    if (currentStatus === 'completed' && targetStatus !== 'completed' && targetStatus !== 'reopen') {
+      addToast('error', 'Invalid Action', 'Completed tasks are finalized. Click "Reopen Task" to start work again.');
+      return;
+    }
+
+    const nextStatus = targetStatus === 'reopen' ? 'pending' : targetStatus;
+    const nextCompleted = nextStatus === 'completed';
+
+    const oldStatus = task.status;
+    const oldCompleted = task.completed;
+
+    setTasks(prev => prev.map(t => (t._id || t.id) === taskId ? { ...t, status: nextStatus, completed: nextCompleted } : t));
 
     try {
-      await updateTask(taskId, { status: newStatus, completed: isCompleted });
-      addToast('success', 'Status Updated', `Task status changed to ${newStatus.toUpperCase()}`);
-      fetchPaginatedTasks(pagination.page, statusFilter, searchQuery);
+      await updateTask(taskId, { status: nextStatus, completed: nextCompleted });
+      const toastTitle = nextStatus === 'completed' ? '🎉 Task Completed' : (targetStatus === 'reopen' ? '🔄 Task Reopened' : '⚡ Task In Progress');
+      addToast('success', toastTitle, `Task #${taskId} is now ${nextStatus.toUpperCase()}`);
+      fetchPaginatedTasks(pagination.page, statusFilter, searchQuery, assigneeFilter, role);
     } catch (err) {
       setTasks(prev => prev.map(t => (t._id || t.id) === taskId ? { ...t, status: oldStatus, completed: oldCompleted } : t));
-      addToast('error', 'Update Failed', 'Rolled back status change');
+      addToast('error', 'Status Update Failed', err.message || 'Rolled back status change');
     }
   };
 
@@ -285,7 +332,7 @@ function TaskManager() {
       await deleteTask(taskId);
       addToast('delete', 'Task Deleted', `Task #${taskId} permanently removed from database`);
       setTaskToDelete(null);
-      fetchPaginatedTasks(pagination.page, statusFilter, searchQuery);
+      fetchPaginatedTasks(pagination.page, statusFilter, searchQuery, assigneeFilter, role);
     } catch (err) {
       addToast('error', 'Delete Failed', err.message);
     } finally {
@@ -299,6 +346,11 @@ function TaskManager() {
     setFormDesc(task.description || '');
     setFormPriority(task.priority || 'medium');
     setFormStatus(task.status || (task.completed ? 'completed' : 'pending'));
+    if (task.assignedTo?.id === 'all' || task.assignedTo?.name === 'All Employees' || task.assignedTo?.email === 'all@team.dev') {
+      setFormAssignee('all_employees');
+    } else {
+      setFormAssignee(task.assignedTo?.email || '');
+    }
     setFormError(null);
   };
 
@@ -313,131 +365,29 @@ function TaskManager() {
 
   const getPriorityBadge = (priority) => {
     switch (priority) {
-      case 'high': return { bg: '#fee2e2', color: '#991b1b' };
-      case 'medium': return { bg: '#e0e7ff', color: '#3730a3' };
-      case 'low': return { bg: '#f3f4f6', color: '#4b5563' };
-      default: return { bg: '#e0e7ff', color: '#3730a3' };
+      case 'high': return { bg: '#fee2e2', color: '#991b1b', label: 'HIGH PRIORITY' };
+      case 'medium': return { bg: '#e0e7ff', color: '#3730a3', label: 'MEDIUM PRIORITY' };
+      case 'low': return { bg: '#f3f4f6', color: '#4b5563', label: 'LOW PRIORITY' };
+      default: return { bg: '#e0e7ff', color: '#3730a3', label: 'MEDIUM PRIORITY' };
     }
   };
 
   const getStatusBadge = (status, completed) => {
     const s = status || (completed ? 'completed' : 'pending');
     switch (s) {
-      case 'completed': return { bg: '#d1fae5', color: '#065f46', label: 'COMPLETED' };
-      case 'in_progress': return { bg: '#e0f2fe', color: '#0369a1', label: 'IN PROGRESS' };
+      case 'completed': return { bg: '#d1fae5', color: '#065f46', label: '✅ COMPLETED' };
+      case 'in_progress': return { bg: '#e0f2fe', color: '#0369a1', label: '⚡ IN PROGRESS' };
       case 'pending':
-      default: return { bg: '#fef3c7', color: '#92400e', label: 'PENDING' };
+      default: return { bg: '#fef3c7', color: '#92400e', label: '⏳ PENDING' };
     }
   };
 
-  // Practical 7 Handler Functions
-  const handleP7Register = async (e) => {
-    e.preventDefault();
-    setP7Loading(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: p7Name, email: p7Email, password: p7Password })
-      });
-      const data = await res.json();
-      setP7Response({
-        endpoint: 'POST /api/auth/register',
-        status: res.status,
-        data
-      });
-      if (res.ok) {
-        addToast('success', 'User Registered (Bcrypt)', `Password hashed with bcrypt. Token issued.`);
-        if (data.token) localStorage.setItem('p7_jwt', data.token);
-      } else {
-        addToast('error', 'Registration Failed', data.message || 'Error occurred');
-      }
-    } catch (err) {
-      setP7Response({ endpoint: 'POST /api/auth/register', status: 'Network Error', data: { error: err.message } });
-    } finally {
-      setP7Loading(false);
-    }
-  };
+  const isManager = role === 'manager';
 
-  const handleP7Login = async (e) => {
-    e.preventDefault();
-    setP7Loading(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: p7Email, password: p7Password })
-      });
-      const data = await res.json();
-      setP7Response({
-        endpoint: 'POST /api/auth/login',
-        status: res.status,
-        data
-      });
-      if (res.ok) {
-        addToast('success', 'Email Login Success', `JWT Token issued with 1-hour expiry.`);
-        if (data.token) localStorage.setItem('p7_jwt', data.token);
-      } else {
-        addToast('error', 'Login Failed', data.message || 'Error occurred');
-      }
-    } catch (err) {
-      setP7Response({ endpoint: 'POST /api/auth/login', status: 'Network Error', data: { error: err.message } });
-    } finally {
-      setP7Loading(false);
-    }
-  };
-
-  const handleP7GetMe = async () => {
-    setP7Loading(true);
-    try {
-      const token = localStorage.getItem('p7_jwt') || localStorage.getItem('auth_token') || 'test-token';
-      const res = await fetch(`${API_BASE}/api/auth/me`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const data = await res.json();
-      setP7Response({
-        endpoint: 'GET /api/auth/me',
-        status: res.status,
-        headersSent: { 'Authorization': `Bearer ${token.substring(0, 15)}...` },
-        data
-      });
-      if (res.ok) {
-        addToast('success', 'GET /api/auth/me', 'Decoded authenticated user returned by protect middleware.');
-      } else {
-        addToast('error', 'Auth Failed', data.message);
-      }
-    } catch (err) {
-      setP7Response({ endpoint: 'GET /api/auth/me', status: 'Network Error', data: { error: err.message } });
-    } finally {
-      setP7Loading(false);
-    }
-  };
-
-  const handleP7Trigger401 = async () => {
-    setP7Loading(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/tasks`, {
-        method: 'GET',
-        headers: {
-          'Authorization': 'Bearer invalid_or_expired_jwt_token_12345'
-        }
-      });
-      const data = await res.json();
-      setP7Response({
-        endpoint: 'GET /api/tasks (Protected Route with Invalid Token)',
-        status: res.status,
-        data
-      });
-      addToast('info', '401 Unauthorized Triggered', 'Protect middleware successfully rejected invalid token.');
-    } catch (err) {
-      setP7Response({ endpoint: 'GET /api/tasks', status: 'Network Error', data: { error: err.message } });
-    } finally {
-      setP7Loading(false);
-    }
-  };
+  // Compute live overview metrics
+  const completedCount = tasks.filter(t => t.status === 'completed' || t.completed).length;
+  const inProgressCount = tasks.filter(t => t.status === 'in_progress' && !t.completed).length;
+  const pendingCount = tasks.filter(t => (!t.status || t.status === 'pending') && !t.completed).length;
 
   return (
     <div className="page-view" style={{ width: '100%' }}>
@@ -464,7 +414,7 @@ function TaskManager() {
         }
 
         .tm-title {
-          font-size: 26px;
+          font-size: 24px;
           font-weight: 800;
           color: #0f172a;
           margin: 0;
@@ -489,34 +439,45 @@ function TaskManager() {
         .tm-dot.online { background-color: #10b981; box-shadow: 0 0 8px #10b981; }
         .tm-dot.offline { background-color: #ef4444; }
 
-        .tm-nav-tabs {
-          display: flex;
-          gap: 8px;
-          background: #f1f5f9;
-          padding: 6px;
-          border-radius: 12px;
-          border: 1px solid #e2e8f0;
-          overflow-x: auto;
+        /* Role KPI Stats Grid */
+        .tm-stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 14px;
         }
 
-        .tm-tab-btn {
-          flex: 1;
-          padding: 10px 16px;
-          border: none;
-          background: none;
-          font-size: 14px;
+        .tm-stat-card {
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 14px;
+          padding: 16px 18px;
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .tm-stat-icon {
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 20px;
+        }
+
+        .tm-stat-number {
+          font-size: 22px;
+          font-weight: 800;
+          color: #0f172a;
+          line-height: 1.1;
+        }
+
+        .tm-stat-label {
+          font-size: 12px;
           font-weight: 600;
           color: #64748b;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          white-space: nowrap;
-        }
-
-        .tm-tab-btn.active {
-          background: #ffffff;
-          color: #4f46e5;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
         }
 
         .tm-grid {
@@ -525,7 +486,7 @@ function TaskManager() {
           gap: 24px;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 960px) {
           .tm-grid { grid-template-columns: 1fr; }
         }
 
@@ -588,22 +549,35 @@ function TaskManager() {
           cursor: pointer;
         }
 
-        /* Task Cards & Pagination */
+        /* Task Cards & Actions */
         .tm-task-item {
           background: #ffffff;
           border: 1px solid #e2e8f0;
-          border-radius: 12px;
-          padding: 16px;
+          border-radius: 14px;
+          padding: 18px;
           display: flex;
           flex-direction: column;
-          gap: 8px;
-          margin-bottom: 12px;
+          gap: 10px;
+          margin-bottom: 14px;
           transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .tm-task-item:hover {
           transform: translateY(-2px);
-          box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 6px 14px -2px rgba(0, 0, 0, 0.06);
+        }
+
+        .tm-task-item.completed-locked {
+          border-left: 5px solid #10b981;
+          background: #fcfdfd;
+        }
+
+        .tm-task-item.in-progress-active {
+          border-left: 5px solid #0284c7;
+        }
+
+        .tm-task-item.pending-active {
+          border-left: 5px solid #f59e0b;
         }
 
         .tm-task-item.optimistic {
@@ -695,19 +669,6 @@ function TaskManager() {
           width: 100%;
           box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
-
-        /* Terminal Logs */
-        .tm-terminal {
-          background: #0f172a;
-          border-radius: 12px;
-          padding: 16px;
-          font-family: var(--font-mono, monospace);
-          color: #38bdf8;
-          max-height: 400px;
-          overflow-y: auto;
-          font-size: 13px;
-          line-height: 1.6;
-        }
       `}</style>
 
       {/* Toast Notification Stack */}
@@ -761,603 +722,531 @@ function TaskManager() {
       <div className="tm-container">
         {/* Top Header Bar */}
         <div className="tm-header-bar">
-          <h2 className="tm-title">
-            <span>📋</span> Full-Stack Task Manager
-          </h2>
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div>
+            <h2 className="tm-title">
+              <span>{isManager ? '👑' : '💼'}</span> {isManager ? 'Manager Task Center' : 'Employee Task Hub'}
+            </h2>
+            <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
+              {isManager
+                ? 'Manager Workspace: Create tasks, assign work to employees, and supervise progress.'
+                : 'Employee Workspace: View assigned tasks, track deliverables, and complete work.'}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <div className="tm-status-pill">
               <span className={`tm-dot ${serverOnline ? 'online' : 'offline'}`}></span>
-              <span>Express API: {serverOnline ? 'Online (Port 5000)' : 'Offline'}</span>
+              <span>API: {serverOnline ? 'Online (5000)' : 'Offline'}</span>
             </div>
             <div className="tm-status-pill" style={{ background: dbStatus.status === 'online' ? '#ecfdf5' : '#fff1f2' }}>
               <span className={`tm-dot ${dbStatus.status === 'online' ? 'online' : 'offline'}`}></span>
-              <span>Database: <strong>{dbStatus.dbState}</strong></span>
+              <span>DB: <strong>{dbStatus.dbState}</strong></span>
             </div>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="tm-nav-tabs">
-          {[
-            { key: 'dashboard', label: '⚡ Task Dashboard' },
-            { key: 'practical7', label: '🔐 Practical 7 Auth Inspector' },
-            { key: 'console', label: '📟 Live Console & Status' },
-            { key: 'architecture', label: '🏗️ System Architecture' },
-            { key: 'maturity', label: '📊 API Maturity Model' }
-          ].map(tab => (
-            <button
-              key={tab.key}
-              className={`tm-tab-btn ${activeTab === tab.key ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab.key)}
-            >
-              {tab.label}
-            </button>
-          ))}
+        {/* Overview Stats Cards */}
+        <div className="tm-stats-grid">
+          <div className="tm-stat-card">
+            <div className="tm-stat-icon" style={{ background: '#e0e7ff', color: '#4338ca' }}>📋</div>
+            <div>
+              <div className="tm-stat-number">{pagination.total}</div>
+              <div className="tm-stat-label">{isManager ? 'Total Team Tasks' : 'My Total Tasks'}</div>
+            </div>
+          </div>
+
+          <div className="tm-stat-card">
+            <div className="tm-stat-icon" style={{ background: '#e0f2fe', color: '#0369a1' }}>⚡</div>
+            <div>
+              <div className="tm-stat-number">{inProgressCount}</div>
+              <div className="tm-stat-label">In Progress</div>
+            </div>
+          </div>
+
+          <div className="tm-stat-card">
+            <div className="tm-stat-icon" style={{ background: '#d1fae5', color: '#065f46' }}>✅</div>
+            <div>
+              <div className="tm-stat-number">{completedCount}</div>
+              <div className="tm-stat-label">Completed</div>
+            </div>
+          </div>
+
+          <div className="tm-stat-card">
+            <div className="tm-stat-icon" style={{ background: '#fef3c7', color: '#92400e' }}>⏳</div>
+            <div>
+              <div className="tm-stat-number">{pendingCount}</div>
+              <div className="tm-stat-label">Pending Action</div>
+            </div>
+          </div>
+
+          {isManager && (
+            <div className="tm-stat-card">
+              <div className="tm-stat-icon" style={{ background: '#f5f3ff', color: '#7c3aed' }}>👥</div>
+              <div>
+                <div className="tm-stat-number">{teamMembers.length}</div>
+                <div className="tm-stat-label">Team Members</div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* TAB 1: TASK DASHBOARD */}
-        {activeTab === 'dashboard' && (
-          <div className="tm-grid">
-            {/* Form */}
-            <div className="tm-card">
-              <h3 className="tm-card-title">
-                {editingTask ? `Edit Task` : 'Add New Task'}
-              </h3>
-              <form onSubmit={handleSubmit} className="tm-form">
-                <div>
-                  <label className="tm-label">Task Title (Required) *</label>
-                  <input
-                    type="text"
-                    className="tm-input"
-                    placeholder="Enter title..."
-                    value={formTitle}
-                    onChange={e => setFormTitle(e.target.value)}
-                  />
-                </div>
+        {/* TASK DASHBOARD */}
+        <div className="tm-grid">
+          {/* Form */}
+          <div className="tm-card">
+            <h3 className="tm-card-title">
+              {editingTask
+                ? `✏️ Edit Task`
+                : (isManager ? '➕ Assign New Task' : '➕ Create Personal Task')}
+            </h3>
+            <form onSubmit={handleSubmit} className="tm-form">
+              <div>
+                <label className="tm-label">Task Title (Required) *</label>
+                <input
+                  type="text"
+                  className="tm-input"
+                  placeholder="Enter task title..."
+                  value={formTitle}
+                  onChange={e => setFormTitle(e.target.value)}
+                />
+              </div>
 
-                <div>
-                  <label className="tm-label">Description</label>
-                  <textarea
-                    className="tm-textarea"
-                    rows={3}
-                    placeholder="Task details..."
-                    value={formDesc}
-                    onChange={e => setFormDesc(e.target.value)}
-                  />
-                </div>
+              <div>
+                <label className="tm-label">Description / Instructions</label>
+                <textarea
+                  className="tm-textarea"
+                  rows={3}
+                  placeholder="Task details & requirements..."
+                  value={formDesc}
+                  onChange={e => setFormDesc(e.target.value)}
+                />
+              </div>
 
+              {/* Assignee Field — Manager can assign to any employee or entire team */}
+              {isManager && (
                 <div>
-                  <label className="tm-label">Priority</label>
+                  <label className="tm-label">👥 Assign To (Team Member or Entire Team)</label>
                   <select
                     className="tm-select"
-                    value={formPriority}
-                    onChange={e => setFormPriority(e.target.value)}
+                    value={formAssignee}
+                    onChange={e => setFormAssignee(e.target.value)}
                   >
-                    <option value="low">Low Priority</option>
-                    <option value="medium">Medium Priority (Default)</option>
-                    <option value="high">High Priority</option>
+                    <option value="all_employees">
+                      📢 All Employees (Entire Team Broadcast)
+                    </option>
+                    <optgroup label="👤 Individual Team Members">
+                      {teamMembers.map(m => (
+                        <option key={m.email || m.name} value={m.email}>
+                          {m.name} ({m.role === 'manager' ? 'Lead' : 'Employee'}) — {m.email}
+                        </option>
+                      ))}
+                    </optgroup>
                   </select>
                 </div>
+              )}
 
-                <div>
-                  <label className="tm-label">Status Format</label>
-                  <select
-                    className="tm-select"
-                    value={formStatus}
-                    onChange={e => setFormStatus(e.target.value)}
-                  >
-                    <option value="pending">⏳ Pending</option>
-                    <option value="in_progress">⚡ In Progress</option>
-                    <option value="completed">✅ Completed</option>
-                  </select>
+              <div>
+                <label className="tm-label">Priority</label>
+                <select
+                  className="tm-select"
+                  value={formPriority}
+                  onChange={e => setFormPriority(e.target.value)}
+                >
+                  <option value="low">🟢 Low Priority</option>
+                  <option value="medium">🔵 Medium Priority (Default)</option>
+                  <option value="high">🔴 High Priority</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="tm-label">Initial Status</label>
+                <select
+                  className="tm-select"
+                  value={formStatus}
+                  onChange={e => setFormStatus(e.target.value)}
+                >
+                  <option value="pending">⏳ Pending (To Do)</option>
+                  <option value="in_progress">⚡ In Progress</option>
+                  <option value="completed">✅ Completed</option>
+                </select>
+              </div>
+
+              {formError && (
+                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 14px', color: '#991b1b', fontSize: '13px' }}>
+                  <strong>❌ {formError.error || 'Error'}:</strong> {formError.message}
                 </div>
+              )}
 
-                {formError && (
-                  <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 14px', color: '#991b1b', fontSize: '13px' }}>
-                    <strong>❌ {formError.error || 'Error'}:</strong> {formError.message}
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
-                  <button type="submit" className="tm-submit-btn" style={{ flex: 1 }}>
-                    {editingTask ? 'Save Changes' : '+ Add Task (Optimistic UI)'}
+              <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
+                <button type="submit" className="tm-submit-btn" style={{ flex: 1 }}>
+                  {editingTask ? 'Save Changes' : (isManager ? '👑 Assign Task (Optimistic UI)' : '+ Add Task')}
+                </button>
+                {editingTask && (
+                  <button type="button" className="tm-cancel-btn" onClick={cancelEdit}>
+                    Cancel
                   </button>
-                  {editingTask && (
-                    <button type="button" className="tm-cancel-btn" onClick={cancelEdit}>
-                      Cancel
-                    </button>
-                  )}
+                )}
+              </div>
+            </form>
+          </div>
+
+          {/* Paginated List */}
+          <div className="tm-card">
+            {/* Status Filter & Manager Assignee Filter */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                <span style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a' }}>
+                  {isManager ? 'Filter Team Tasks:' : 'Filter My Tasks:'}
+                </span>
+                <span style={{ fontSize: '12px', background: '#e0e7ff', color: '#3730a3', padding: '3px 10px', borderRadius: '9999px', fontWeight: '600' }}>
+                  Total: {pagination.total} Tasks
+                </span>
+              </div>
+
+              {/* Filter Tabs: All, Pending, In Progress, Completed */}
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {[
+                  { key: 'all', label: 'All Tasks', icon: '📋' },
+                  { key: 'pending', label: 'Pending', icon: '⏳' },
+                  { key: 'in_progress', label: 'In Progress', icon: '⚡' },
+                  { key: 'completed', label: 'Completed', icon: '✅' }
+                ].map(tab => (
+                  <button
+                    key={tab.key}
+                    onClick={() => handleStatusFilterChange(tab.key)}
+                    style={{
+                      padding: '7px 16px',
+                      borderRadius: '20px',
+                      fontSize: '13px',
+                      fontWeight: '700',
+                      border: statusFilter === tab.key ? '2px solid #4f46e5' : '1px solid #cbd5e1',
+                      background: statusFilter === tab.key ? '#e0e7ff' : '#f8fafc',
+                      color: statusFilter === tab.key ? '#3730a3' : '#475569',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <span>{tab.icon}</span>
+                    <span>{tab.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Manager Assignee Filter Dropdown */}
+              {isManager && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '600', color: '#475569' }}>
+                    Filter by Assignee:
+                  </span>
+                  <select
+                    value={assigneeFilter}
+                    onChange={e => handleAssigneeFilterChange(e.target.value)}
+                    style={{
+                      fontSize: '13px',
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      border: '1px solid #cbd5e1',
+                      background: '#ffffff',
+                      color: '#0f172a',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="all">👥 All Team Tasks & Broadcasts</option>
+                    <option value="all_employees">📢 Team Broadcasts (All Employees)</option>
+                    {teamMembers.length > 0 && (
+                      <optgroup label="👤 Individual Employees">
+                        {teamMembers.map(m => (
+                          <option key={m.email || m.name} value={m.email}>
+                            {m.name} ({m.email})
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                  </select>
                 </div>
+              )}
+
+              {/* Search Bar */}
+              <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  className="tm-input"
+                  placeholder="Search tasks by title, description, assignee..."
+                  value={searchInput}
+                  onChange={e => setSearchInput(e.target.value)}
+                  style={{ flex: 1 }}
+                />
+                <button
+                  type="submit"
+                  style={{
+                    background: '#4f46e5',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '10px 18px',
+                    borderRadius: '8px',
+                    fontWeight: '700',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <span>🔍</span> Search
+                </button>
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={handleClearSearch}
+                    style={{
+                      background: '#f1f5f9',
+                      color: '#64748b',
+                      border: '1px solid #cbd5e1',
+                      padding: '10px 14px',
+                      borderRadius: '8px',
+                      fontWeight: '600',
+                      fontSize: '13px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    ✖ Clear
+                  </button>
+                )}
               </form>
             </div>
 
-            {/* Paginated List */}
-            <div className="tm-card">
-              {/* Status Filter Tabs & Search Bar */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #e2e8f0' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                  <span style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a' }}>
-                    Filter by Status:
-                  </span>
-                  <span style={{ fontSize: '12px', background: '#e0e7ff', color: '#3730a3', padding: '3px 10px', borderRadius: '9999px', fontWeight: '600' }}>
-                    Total: {pagination.total} Tasks
-                  </span>
-                </div>
-
-                {/* Filter Tabs: All, Pending, In Progress, Completed */}
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  {[
-                    { key: 'all', label: 'All Tasks', icon: '📋' },
-                    { key: 'pending', label: 'Pending', icon: '⏳' },
-                    { key: 'in_progress', label: 'In Progress', icon: '⚡' },
-                    { key: 'completed', label: 'Completed', icon: '✅' }
-                  ].map(tab => (
-                    <button
-                      key={tab.key}
-                      onClick={() => handleStatusFilterChange(tab.key)}
-                      style={{
-                        padding: '7px 16px',
-                        borderRadius: '20px',
-                        fontSize: '13px',
-                        fontWeight: '700',
-                        border: statusFilter === tab.key ? '2px solid #4f46e5' : '1px solid #cbd5e1',
-                        background: statusFilter === tab.key ? '#e0e7ff' : '#f8fafc',
-                        color: statusFilter === tab.key ? '#3730a3' : '#475569',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}
-                    >
-                      <span>{tab.icon}</span>
-                      <span>{tab.label}</span>
-                    </button>
-                  ))}
-                </div>
-
-                {/* Search Bar with Search Button */}
-                <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '8px' }}>
-                  <input
-                    type="text"
-                    className="tm-input"
-                    placeholder="Search tasks by title or description..."
-                    value={searchInput}
-                    onChange={e => setSearchInput(e.target.value)}
-                    style={{ flex: 1 }}
-                  />
-                  <button
-                    type="submit"
-                    style={{
-                      background: '#4f46e5',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '10px 18px',
-                      borderRadius: '8px',
-                      fontWeight: '700',
-                      fontSize: '13px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    <span>🔍</span> Search
-                  </button>
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={handleClearSearch}
-                      style={{
-                        background: '#f1f5f9',
-                        color: '#64748b',
-                        border: '1px solid #cbd5e1',
-                        padding: '10px 14px',
-                        borderRadius: '8px',
-                        fontWeight: '600',
-                        fontSize: '13px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      ✖ Clear
-                    </button>
-                  )}
-                </form>
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>
+                Loading tasks from database...
               </div>
+            ) : tasks.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>
+                No tasks found. {isManager ? 'Assign a task to get started!' : 'No tasks assigned to you right now.'}
+              </div>
+            ) : (
+              <div>
+                {tasks.map(task => {
+                  const taskId = task._id || task.id;
+                  const badge = getPriorityBadge(task.priority);
+                  const isCompleted = task.status === 'completed' || task.completed;
+                  const statusBadge = getStatusBadge(task.status, task.completed);
+                  const isTeamBroadcast = task.assignedTo?.id === 'all' || task.assignedTo?.name === 'All Employees' || task.assignedTo?.email === 'all@team.dev';
+                  const isAssignedToMe = currentUser && task.assignedTo && (task.assignedTo.email === currentUser.email || task.assignedTo.id === currentUser.id);
 
-              {loading ? (
-                <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>
-                  Loading tasks from database...
-                </div>
-              ) : tasks.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>
-                  No tasks found matching status or search query. Add a task or adjust filters!
-                </div>
-              ) : (
-                <div>
-                  {tasks.map(task => {
-                    const taskId = task._id || task.id;
-                    const badge = getPriorityBadge(task.priority);
-                    const statusBadge = getStatusBadge(task.status, task.completed);
-
-                    return (
-                      <div
-                        key={taskId}
-                        className={`tm-task-item ${task.isOptimistic ? 'optimistic' : ''}`}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
-                          <div>
+                  return (
+                    <div
+                      key={taskId}
+                      className={`tm-task-item ${isCompleted ? 'completed-locked' : (task.status === 'in_progress' ? 'in-progress-active' : 'pending-active')} ${task.isOptimistic ? 'optimistic' : ''}`}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                             <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#64748b' }}>
                               ID: {taskId} {task.isOptimistic && '(Syncing...)'}
                             </span>
-                            <h4 style={{ margin: '4px 0', fontSize: '15px', color: '#0f172a' }}>
-                              {task.title}
-                            </h4>
-                          </div>
 
-                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-                            <select
-                              value={task.status || (task.completed ? 'completed' : 'pending')}
-                              onChange={(e) => handleStatusChange(task, e.target.value)}
-                              style={{
-                                fontSize: '12px',
-                                fontWeight: '600',
-                                padding: '4px 8px',
+                            {/* Assignee Pill */}
+                            {task.assignedTo?.name && (
+                              <span style={{
+                                fontSize: '11px',
+                                fontWeight: '700',
+                                padding: '3px 9px',
                                 borderRadius: '6px',
-                                border: '1px solid #cbd5e1',
-                                background: '#f8fafc',
-                                color: '#0f172a',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              <option value="pending">⏳ Pending</option>
-                              <option value="in_progress">⚡ In Progress</option>
-                              <option value="completed">✅ Completed</option>
-                            </select>
-                            <button
-                              style={{ background: '#0284c7', color: '#ffffff', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
-                              onClick={() => handleDownloadTask(task)}
-                              title="Download task with timestamp"
-                            >
-                              📥 Download
-                            </button>
-                            <button
-                              style={{ background: '#e0e7ff', color: '#4338ca', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
-                              onClick={() => startEdit(task)}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              style={{ background: '#fef2f2', color: '#dc2626', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
-                              onClick={() => setTaskToDelete(task)}
-                            >
-                              Delete
-                            </button>
+                                background: isTeamBroadcast
+                                  ? '#ede9fe'
+                                  : (isAssignedToMe ? '#dbeafe' : '#f1f5f9'),
+                                color: isTeamBroadcast
+                                  ? '#5b21b6'
+                                  : (isAssignedToMe ? '#1d4ed8' : '#334155'),
+                                border: isTeamBroadcast
+                                  ? '1px solid #c4b5fd'
+                                  : (isAssignedToMe ? '1px solid #93c5fd' : '1px solid #cbd5e1'),
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                              }}>
+                                {isTeamBroadcast ? (
+                                  <>📢 Assigned: <strong>All Employees (Entire Team)</strong></>
+                                ) : (
+                                  <>👤 Assigned to: <strong>{task.assignedTo.name}</strong> {isAssignedToMe && '(You)'}</>
+                                )}
+                              </span>
+                            )}
                           </div>
+
+                          <h4 style={{
+                            margin: '6px 0 4px 0',
+                            fontSize: '16px',
+                            color: isCompleted ? '#475569' : '#0f172a',
+                            textDecoration: isCompleted ? 'line-through' : 'none'
+                          }}>
+                            {task.title}
+                          </h4>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px' }}>
-                          <span style={{ fontSize: '11px', fontWeight: '700', padding: '2px 8px', borderRadius: '9999px', background: statusBadge.bg, color: statusBadge.color }}>
-                            {statusBadge.label}
-                          </span>
-                          <span style={{ fontSize: '11px', fontWeight: '700', padding: '2px 8px', borderRadius: '9999px', background: badge.bg, color: badge.color }}>
-                            {task.priority || 'medium'} priority
-                          </span>
-                        </div>
+                        {/* Action Controls & Workflow State Management */}
+                        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+                          {isCompleted ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{
+                                fontSize: '12px',
+                                fontWeight: '800',
+                                padding: '4px 10px',
+                                borderRadius: '6px',
+                                background: '#dcfce7',
+                                color: '#166534',
+                                border: '1px solid #86efac'
+                              }}>
+                                🔒 COMPLETED
+                              </span>
+                              <button
+                                onClick={() => handleStatusTransition(task, 'reopen')}
+                                style={{
+                                  background: '#fef3c7',
+                                  color: '#92400e',
+                                  border: '1px solid #fde68a',
+                                  padding: '4px 9px',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  fontWeight: '700',
+                                  cursor: 'pointer'
+                                }}
+                                title="Reopen task and move back to Pending"
+                              >
+                                🔄 Reopen Task
+                              </button>
+                            </div>
+                          ) : (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              {task.status !== 'in_progress' && (
+                                <button
+                                  onClick={() => handleStatusTransition(task, 'in_progress')}
+                                  style={{
+                                    background: '#e0f2fe',
+                                    color: '#0369a1',
+                                    border: '1px solid #bae6fd',
+                                    padding: '4px 10px',
+                                    borderRadius: '6px',
+                                    fontSize: '12px',
+                                    fontWeight: '700',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  ⚡ Start Work
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleStatusTransition(task, 'completed')}
+                                style={{
+                                  background: '#dcfce7',
+                                  color: '#166534',
+                                  border: '1px solid #86efac',
+                                  padding: '4px 10px',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  fontWeight: '700',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                ✅ Mark Done
+                              </button>
+                            </div>
+                          )}
 
-                        {task.description && (
-                          <p style={{ margin: '6px 0 0 0', fontSize: '13px', color: '#475569' }}>
-                            {task.description}
-                          </p>
+                          {/* Download Task with Timestamp */}
+                          <button
+                            style={{ background: '#0284c7', color: '#ffffff', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+                            onClick={() => handleDownloadTask(task)}
+                            title="Download task with timestamp"
+                          >
+                            📥 Download
+                          </button>
+
+                          {/* Manager Actions */}
+                          {isManager && (
+                            <>
+                              <button
+                                style={{ background: '#e0e7ff', color: '#4338ca', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+                                onClick={() => startEdit(task)}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                style={{ background: '#fef2f2', color: '#dc2626', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+                                onClick={() => setTaskToDelete(task)}
+                              >
+                                Delete
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Status & Priority Badges */}
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '2px', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '11px', fontWeight: '700', padding: '3px 8px', borderRadius: '9999px', background: statusBadge.bg, color: statusBadge.color }}>
+                          {statusBadge.label}
+                        </span>
+                        <span style={{ fontSize: '11px', fontWeight: '700', padding: '3px 8px', borderRadius: '9999px', background: badge.bg, color: badge.color }}>
+                          {badge.label}
+                        </span>
+                        {task.assignedBy?.name && (
+                          <span style={{ fontSize: '11px', color: '#64748b' }}>
+                            Created by: <strong>{task.assignedBy.name}</strong>
+                          </span>
                         )}
                       </div>
-                    );
-                  })}
 
-                  {/* Pagination Controls */}
-                  <div className="tm-pagination-bar">
-                    <span style={{ fontSize: '13px', color: '#64748b' }}>
-                      Showing {(pagination.page - 1) * pagination.limit + 1} - {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}
-                    </span>
-
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                      <button
-                        className="tm-page-btn"
-                        disabled={pagination.page <= 1}
-                        onClick={() => fetchPaginatedTasks(pagination.page - 1)}
-                      >
-                        &laquo; Prev
-                      </button>
-
-                      {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(p => (
-                        <button
-                          key={p}
-                          className={`tm-page-btn ${pagination.page === p ? 'active' : ''}`}
-                          onClick={() => fetchPaginatedTasks(p)}
-                        >
-                          {p}
-                        </button>
-                      ))}
-
-                      <button
-                        className="tm-page-btn"
-                        disabled={pagination.page >= pagination.totalPages}
-                        onClick={() => fetchPaginatedTasks(pagination.page + 1)}
-                      >
-                        Next &raquo;
-                      </button>
+                      {task.description && (
+                        <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#475569', lineHeight: 1.4 }}>
+                          {task.description}
+                        </p>
+                      )}
                     </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+                  );
+                })}
 
-        {/* TAB: PRACTICAL 7 AUTH INSPECTOR */}
-        {activeTab === 'practical7' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div className="tm-card" style={{ background: '#f8fafc', border: '1px solid #cbd5e1' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <h3 style={{ margin: 0, fontSize: '18px', color: '#1e293b' }}>
-                  🛡️ Practical 7: Authentication &amp; Middleware Pipeline Inspector
-                </h3>
-                <span style={{ fontSize: '12px', background: '#e0e7ff', color: '#3730a3', padding: '4px 10px', borderRadius: '9999px', fontWeight: '700' }}>
-                  CO2, CO6 / PO3, PO5
-                </span>
-              </div>
-              <p style={{ fontSize: '13px', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
-                Test and capture all Practical 7 submission screenshots: <strong>Bcrypt password hashing</strong>, <strong>JWT generation</strong>, <strong>Protected /api/auth/me</strong>, and <strong>401 Unauthorized error handling</strong>.
-              </p>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
-              {/* Box 1: Email/Password Register & Login */}
-              <div className="tm-card">
-                <h4 style={{ margin: '0 0 14px 0', fontSize: '15px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span>🔐</span> 1. Register &amp; Login (Bcrypt + JWT)
-                </h4>
-                
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <div>
-                    <label className="tm-label">Full Name</label>
-                    <input
-                      type="text"
-                      className="tm-input"
-                      value={p7Name}
-                      onChange={e => setP7Name(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="tm-label">Email Address</label>
-                    <input
-                      type="email"
-                      className="tm-input"
-                      value={p7Email}
-                      onChange={e => setP7Email(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="tm-label">Password</label>
-                    <input
-                      type="password"
-                      className="tm-input"
-                      value={p7Password}
-                      onChange={e => setP7Password(e.target.value)}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
-                    <button
-                      type="button"
-                      onClick={handleP7Register}
-                      disabled={p7Loading}
-                      style={{
-                        flex: 1,
-                        background: '#0284c7',
-                        color: '#fff',
-                        border: 'none',
-                        padding: '10px',
-                        borderRadius: '8px',
-                        fontWeight: '700',
-                        fontSize: '13px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      📝 Register (Bcrypt)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleP7Login}
-                      disabled={p7Loading}
-                      style={{
-                        flex: 1,
-                        background: '#4f46e5',
-                        color: '#fff',
-                        border: 'none',
-                        padding: '10px',
-                        borderRadius: '8px',
-                        fontWeight: '700',
-                        fontSize: '13px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      🔑 Login (JWT 1hr)
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Box 2: Protected Routes & 401 Testing */}
-              <div className="tm-card">
-                <h4 style={{ margin: '0 0 14px 0', fontSize: '15px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span>🛡️</span> 2. Protected Pipeline &amp; 401 Testing
-                </h4>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                    <strong style={{ fontSize: '13px', display: 'block', color: '#1e293b', marginBottom: '4px' }}>
-                      Test 1: Verify Current User (Screenshot 09)
-                    </strong>
-                    <span style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '8px' }}>
-                      Sends <code>GET /api/auth/me</code> with <code>Authorization: Bearer &lt;token&gt;</code>
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleP7GetMe}
-                      disabled={p7Loading}
-                      style={{
-                        background: '#10b981',
-                        color: '#fff',
-                        border: 'none',
-                        padding: '8px 14px',
-                        borderRadius: '6px',
-                        fontWeight: '600',
-                        fontSize: '12px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      👤 Call GET /api/auth/me
-                    </button>
-                  </div>
-
-                  <div style={{ padding: '12px', background: '#fef2f2', borderRadius: '8px', border: '1px solid #fecaca' }}>
-                    <strong style={{ fontSize: '13px', display: 'block', color: '#991b1b', marginBottom: '4px' }}>
-                      Test 2: Trigger 401 Unauthorized (Screenshot 10)
-                    </strong>
-                    <span style={{ fontSize: '12px', color: '#7f1d1d', display: 'block', marginBottom: '8px' }}>
-                      Calls protected route <code>GET /api/tasks</code> with an invalid/expired token.
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleP7Trigger401}
-                      disabled={p7Loading}
-                      style={{
-                        background: '#dc2626',
-                        color: '#fff',
-                        border: 'none',
-                        padding: '8px 14px',
-                        borderRadius: '6px',
-                        fontWeight: '600',
-                        fontSize: '12px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      🚫 Trigger 401 Unauthorized
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Response Output Inspector */}
-            <div className="tm-card" style={{ background: '#0f172a', color: '#f8fafc' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <h4 style={{ margin: 0, fontSize: '14px', color: '#38bdf8', fontFamily: 'monospace' }}>
-                  {p7Response ? `📡 Response Inspector: ${p7Response.endpoint}` : '📡 Response Inspector (Awaiting Test)'}
-                </h4>
-                {p7Response && (
-                  <span style={{
-                    fontSize: '12px',
-                    fontWeight: '700',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    background: p7Response.status >= 200 && p7Response.status < 300 ? '#059669' : '#dc2626',
-                    color: '#ffffff'
-                  }}>
-                    HTTP {p7Response.status}
+                {/* Pagination Controls */}
+                <div className="tm-pagination-bar">
+                  <span style={{ fontSize: '13px', color: '#64748b' }}>
+                    Showing {(pagination.page - 1) * pagination.limit + 1} - {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}
                   </span>
-                )}
-              </div>
-              <pre style={{
-                margin: 0,
-                padding: '12px',
-                background: '#1e293b',
-                borderRadius: '8px',
-                fontSize: '13px',
-                color: '#a5f3fc',
-                overflowX: 'auto',
-                fontFamily: 'Consolas, Monaco, monospace'
-              }}>
-                {p7Response
-                  ? JSON.stringify(p7Response, null, 2)
-                  : '// Click any test button above to inspect live HTTP headers, payload, status codes, and tokens!'}
-              </pre>
-            </div>
-          </div>
-        )}
 
-        {/* TAB 2: LIVE CONSOLE & STATUS */}
-        {activeTab === 'console' && (
-          <div className="tm-card">
-            <h3 className="tm-card-title">Live Express Server Request Terminal</h3>
-            <div className="tm-terminal" ref={logTerminalRef}>
-              <div>Task Management Server running on http://localhost:5000</div>
-              <div>Backend Status: {serverOnline ? 'Connected' : 'Offline'} | Database: {dbStatus.dbState}</div>
-              <hr style={{ borderColor: '#334155', margin: '10px 0' }} />
-              {logs.map((l, i) => (
-                <div key={l.id || i}>
-                  [{l.timestamp}] {l.method} {l.url} {l.ip || '::1'} - HTTP {l.statusCode || 200}
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button
+                      className="tm-page-btn"
+                      disabled={pagination.page <= 1}
+                      onClick={() => fetchPaginatedTasks(pagination.page - 1)}
+                    >
+                      &laquo; Prev
+                    </button>
+
+                    {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(p => (
+                      <button
+                        key={p}
+                        className={`tm-page-btn ${pagination.page === p ? 'active' : ''}`}
+                        onClick={() => fetchPaginatedTasks(p)}
+                      >
+                        {p}
+                      </button>
+                    ))}
+
+                    <button
+                      className="tm-page-btn"
+                      disabled={pagination.page >= pagination.totalPages}
+                      onClick={() => fetchPaginatedTasks(pagination.page + 1)}
+                    >
+                      Next &raquo;
+                    </button>
+                  </div>
                 </div>
-              ))}
-              {logs.length === 0 && <div>No HTTP requests logged yet. Perform operations in the Dashboard tab.</div>}
-            </div>
-          </div>
-        )}
-
-        {/* TAB 3: SYSTEM ARCHITECTURE */}
-        {activeTab === 'architecture' && (
-          <div className="tm-card">
-            <h3 className="tm-card-title">Full-Stack Application Architecture</h3>
-            <div style={{ textAlign: 'center', padding: '20px 0' }}>
-              <div style={{ background: '#3b82f6', color: '#fff', padding: '16px', borderRadius: '12px', fontWeight: '700', marginBottom: '12px' }}>
-                React Frontend (localhost:5173) — Central API Service (src/services/api.js)
               </div>
-              <div style={{ fontSize: '20px', color: '#94a3b8', margin: '8px 0' }}>↓ JSON HTTP Requests (CORS Middleware Enabled)</div>
-              <div style={{ background: '#8b5cf6', color: '#fff', padding: '16px', borderRadius: '12px', fontWeight: '700', margin: '12px 0' }}>
-                Node / Express Backend (localhost:5000) — Mongoose ODM Schema &amp; Controllers
-              </div>
-              <div style={{ fontSize: '20px', color: '#94a3b8', margin: '8px 0' }}>↓ Query &amp; Persistence (Task.find, Task.create, Task.findByIdAndUpdate)</div>
-              <div style={{ background: '#10b981', color: '#fff', padding: '16px', borderRadius: '12px', fontWeight: '700', marginTop: '12px' }}>
-                MongoDB Database (tasks Collection) — Document Store
-              </div>
-            </div>
+            )}
           </div>
-        )}
-
-        {/* TAB 4: API MATURITY MODEL */}
-        {activeTab === 'maturity' && (
-          <div className="tm-card">
-            <h3 className="tm-card-title">Richardson Maturity Model &amp; API Design</h3>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-              <thead>
-                <tr style={{ background: '#f8fafc', textAlign: 'left' }}>
-                  <th style={{ padding: '10px', borderBottom: '1px solid #e2e8f0' }}>Level</th>
-                  <th style={{ padding: '10px', borderBottom: '1px solid #e2e8f0' }}>Criterion</th>
-                  <th style={{ padding: '10px', borderBottom: '1px solid #e2e8f0' }}>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style={{ padding: '10px', borderBottom: '1px solid #e2e8f0' }}>Level 0</td>
-                  <td style={{ padding: '10px', borderBottom: '1px solid #e2e8f0' }}>Single URI, single verb (RPC)</td>
-                  <td style={{ padding: '10px', borderBottom: '1px solid #e2e8f0', color: '#059669', fontWeight: '700' }}>✅ Surpassed</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: '10px', borderBottom: '1px solid #e2e8f0' }}>Level 1</td>
-                  <td style={{ padding: '10px', borderBottom: '1px solid #e2e8f0' }}>Resources with individual URIs</td>
-                  <td style={{ padding: '10px', borderBottom: '1px solid #e2e8f0', color: '#059669', fontWeight: '700' }}>✅ Implemented (/api/tasks, /api/tasks/:id)</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: '10px', borderBottom: '1px solid #e2e8f0' }}>Level 2</td>
-                  <td style={{ padding: '10px', borderBottom: '1px solid #e2e8f0' }}>HTTP Verbs &amp; Status Codes</td>
-                  <td style={{ padding: '10px', borderBottom: '1px solid #e2e8f0', color: '#059669', fontWeight: '700' }}>✅ Implemented (GET 200, POST 201, PUT 200, DELETE 200, 400, 404)</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
