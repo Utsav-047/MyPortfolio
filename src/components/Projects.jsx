@@ -33,40 +33,156 @@ const LANGUAGE_COLORS = {
   Unknown: '#8b949e',
 };
 
+// Fallback curated projects if GitHub API hits rate-limits (HTTP 403) or is offline
+const FALLBACK_PROJECTS = [
+  {
+    id: 'repo-myportfolio',
+    name: 'MyPortfolio',
+    description: 'Modern Full-Stack Developer Portfolio & Task Management Platform with React 19 lazy loading, role-based access control (RBAC), Express.js, MongoDB Atlas, and Google OAuth 2.0.',
+    language: 'JavaScript',
+    stargazers_count: 5,
+    forks_count: 1,
+    watchers_count: 5,
+    html_url: 'https://github.com/Utsav-047/MyPortfolio'
+  },
+  {
+    id: 'repo-smart-attendance',
+    name: 'Smart-Attendance-System',
+    description: 'Real-time facial recognition attendance tracker developed with OpenCV, Haar Cascades/dlib, Python, and Tkinter GUI for classroom and workplace automation.',
+    language: 'Python',
+    stargazers_count: 3,
+    forks_count: 2,
+    watchers_count: 3,
+    html_url: 'https://github.com/Utsav-047'
+  },
+  {
+    id: 'repo-baja-rulebot',
+    name: 'BAJA-RuleBot',
+    description: 'Intelligent conversational AI rule-bot trained on BAJA SAE competition regulations, vehicle technical compliance rules, and mechanical safety handbooks.',
+    language: 'Python',
+    stargazers_count: 4,
+    forks_count: 1,
+    watchers_count: 4,
+    html_url: 'https://github.com/Utsav-047'
+  },
+  {
+    id: 'repo-ai-finance',
+    name: 'AI-Personal-Finance-Tracker',
+    description: 'Personal expense tracker and budgeting engine with automated expense categorization and forecasting using Scikit-Learn, Express, and React visual dashboards.',
+    language: 'JavaScript',
+    stargazers_count: 3,
+    forks_count: 0,
+    watchers_count: 3,
+    html_url: 'https://github.com/Utsav-047'
+  },
+  {
+    id: 'repo-cv-deeplearning',
+    name: 'Deep-Learning-Computer-Vision',
+    description: 'Convolutional neural networks and deep learning models for image classification, multi-object detection, and facial landmark alignment using PyTorch and OpenCV.',
+    language: 'Python',
+    stargazers_count: 2,
+    forks_count: 0,
+    watchers_count: 2,
+    html_url: 'https://github.com/Utsav-047'
+  },
+  {
+    id: 'repo-ml-pipelines',
+    name: 'Machine-Learning-Pipelines',
+    description: 'End-to-end predictive machine learning workflows, feature engineering pipelines, model evaluation metrics, and hyperparameter tuning notebooks.',
+    language: 'Jupyter Notebook',
+    stargazers_count: 2,
+    forks_count: 1,
+    watchers_count: 2,
+    html_url: 'https://github.com/Utsav-047'
+  }
+];
+
 function Projects({ color = '#6366f1' }) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [dataSource, setDataSource] = useState('live'); // 'live' | 'cache' | 'fallback'
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const fetchProjects = async () => {
+  const fetchProjects = async (forceRefresh = false) => {
+    if (forceRefresh) setRefreshing(true);
+    else setLoading(true);
+
+    // 1. Try checking cached data first if not forcing refresh
+    if (!forceRefresh) {
       try {
-        const response = await fetch(
-          'https://api.github.com/users/Utsav-047/repos?per_page=100&sort=updated'
-        );
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch GitHub repositories');
+        const cached = localStorage.getItem('utsav_github_repos');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && Array.isArray(parsed.data) && parsed.data.length > 0) {
+            if (Date.now() - parsed.timestamp < 30 * 60 * 1000) {
+              setProjects(parsed.data);
+              setDataSource('cache');
+              setLoading(false);
+              return;
+            }
+          }
         }
+      } catch (e) {
+        // ignore cache reading error
+      }
+    }
 
-        const data = await response.json();
+    // 2. Fetch live from GitHub API
+    try {
+      const response = await fetch(
+        'https://api.github.com/users/Utsav-047/repos?per_page=100&sort=updated'
+      );
 
-        // Sort by latest updated, exclude forked repos
+      if (!response.ok) {
+        console.warn(`GitHub API returned HTTP ${response.status}. Falling back to curated repositories.`);
+        fallbackToCurated();
+        return;
+      }
+
+      const data = await response.json();
+      if (Array.isArray(data) && data.length > 0) {
         const sortedProjects = data
           .filter((repo) => !repo.fork)
-          .sort(
-            (a, b) =>
-              new Date(b.updated_at) - new Date(a.updated_at)
-          );
+          .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
 
         setProjects(sortedProjects);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        setDataSource('live');
+        try {
+          localStorage.setItem('utsav_github_repos', JSON.stringify({
+            data: sortedProjects,
+            timestamp: Date.now()
+          }));
+        } catch {}
+      } else {
+        fallbackToCurated();
       }
-    };
+    } catch (err) {
+      console.warn('Network error connecting to GitHub API:', err.message);
+      fallbackToCurated();
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
+  const fallbackToCurated = () => {
+    try {
+      const cached = localStorage.getItem('utsav_github_repos');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && Array.isArray(parsed.data) && parsed.data.length > 0) {
+          setProjects(parsed.data);
+          setDataSource('cache');
+          return;
+        }
+      }
+    } catch {}
+
+    setProjects(FALLBACK_PROJECTS);
+    setDataSource('fallback');
+  };
+
+  useEffect(() => {
     fetchProjects();
   }, []);
 
@@ -76,7 +192,7 @@ function Projects({ color = '#6366f1' }) {
         <section className="section-card">
           <div className="section-tag" style={{ color: color }}>My Work</div>
           <h2 className="section-title">Projects</h2>
-          <p className="section-subtitle">Fetching repositories from GitHub...</p>
+          <p className="section-subtitle">Loading projects portfolio...</p>
           <div className="gh-projects-grid">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="gh-project-card gh-skeleton-card">
@@ -92,36 +208,59 @@ function Projects({ color = '#6366f1' }) {
     );
   }
 
-  if (error) {
-    return (
-      <div className="page-view">
-        <section className="section-card">
-          <div className="section-tag" style={{ color: color }}>My Work</div>
-          <h2 className="section-title">Projects</h2>
-          <div className="gh-error-state">
-            <span className="gh-error-icon">⚠️</span>
-            <p>Unable to load repositories: {error}</p>
-            <button
-              className="gh-retry-btn"
-              style={{ backgroundColor: color }}
-              onClick={() => window.location.reload()}
-            >
-              Retry
-            </button>
-          </div>
-        </section>
-      </div>
-    );
-  }
-
   return (
     <div className="page-view">
       <section className="section-card">
-        <div className="section-tag" style={{ color: color }}>My Work</div>
-        <h2 className="section-title">Projects</h2>
-        <p className="section-subtitle">
-          All my public repositories fetched live from GitHub — showcasing AI, ML, and web development work.
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+          <div>
+            <div className="section-tag" style={{ color: color }}>My Work</div>
+            <h2 className="section-title">Projects</h2>
+            <p className="section-subtitle" style={{ marginBottom: '16px' }}>
+              All public repositories & featured engineering works — showcasing AI, ML, and web applications.
+            </p>
+          </div>
+
+          {/* Status & Refresh Control */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: '20px',
+              fontSize: '12px',
+              fontWeight: 600,
+              background: dataSource === 'live' ? '#ecfdf5' : '#f8fafc',
+              color: dataSource === 'live' ? '#047857' : '#475569',
+              border: '1px solid #e2e8f0'
+            }}>
+              <span>{dataSource === 'live' ? '🟢' : (dataSource === 'cache' ? '⚡' : '✨')}</span>
+              <span>{dataSource === 'live' ? 'Live GitHub Sync' : (dataSource === 'cache' ? 'Cached Repos' : 'Featured Portfolio')}</span>
+            </span>
+
+            <button
+              onClick={() => fetchProjects(true)}
+              disabled={refreshing}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '6px 14px',
+                borderRadius: '8px',
+                border: '1px solid #cbd5e1',
+                background: '#ffffff',
+                color: '#334155',
+                fontSize: '12px',
+                fontWeight: 600,
+                cursor: refreshing ? 'not-allowed' : 'pointer'
+              }}
+              title="Refresh repositories from GitHub API"
+            >
+              <span>{refreshing ? '⏳' : '🔄'}</span>
+              <span>{refreshing ? 'Syncing...' : 'Refresh'}</span>
+            </button>
+          </div>
+        </div>
 
         <div className="gh-projects-grid">
           {projects.map((project, index) => (
