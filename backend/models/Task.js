@@ -8,6 +8,16 @@ const taskSchema = new mongoose.Schema(
       required: [true, 'userId is required'],
       index: true
     },
+    assignedTo: {
+      id: { type: String, default: '' },
+      name: { type: String, default: 'Unassigned' },
+      email: { type: String, default: '' }
+    },
+    assignedBy: {
+      id: { type: String, default: '' },
+      name: { type: String, default: '' },
+      email: { type: String, default: '' }
+    },
     title: {
       type: String,
       required: [true, 'Title is required'],
@@ -59,10 +69,15 @@ taskSchema.pre('save', function () {
   }
   if (this.status === 'completed') {
     this.completed = true;
+  } else if (this.status === 'in_progress') {
+    this.completed = false;
+  } else if (this.status === 'pending') {
+    this.completed = false;
   } else if (this.completed) {
     this.status = 'completed';
-  } else if (!this.status || (this.status !== 'in_progress' && this.status !== 'completed')) {
+  } else {
     this.status = 'pending';
+    this.completed = false;
   }
 });
 

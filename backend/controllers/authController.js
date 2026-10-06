@@ -7,22 +7,31 @@ const User = require('../models/User');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const isDbConnected = () => mongoose.connection.readyState === 1;
 
+// Default team members list for assignments
+const DEFAULT_TEAM = [
+  { id: 'emp-1', name: 'Utsav Patel', email: 'utsavpatel788190@gmail.com', role: 'manager' },
+  { id: 'emp-2', name: 'Rahul Sharma', email: 'rahul.sharma@company.dev', role: 'employee' },
+  { id: 'emp-3', name: 'Priya Patel', email: 'priya.patel@company.dev', role: 'employee' },
+  { id: 'emp-4', name: 'Sneha Joshi', email: 'sneha.joshi@company.dev', role: 'employee' },
+  { id: 'emp-5', name: 'Aarav Mehta', email: 'aarav.mehta@company.dev', role: 'employee' }
+];
+
 // In-memory fallback user store if MongoDB is offline
-const memoryUsers = [];
+const memoryUsers = [...DEFAULT_TEAM];
 
 // Helper: Sign JWT Token
-const generateToken = (payload, expiresIn = '1h') => {
-  const secret = process.env.JWT_SECRET || 'utsav_portfolio_jwt_secret_key_2026';
+const generateToken = (payload, expiresIn = '7d') => {
+  const secret = process.env.JWT_SECRET || 'utsav_myportfolio_super_secure_jwt_secret_2026';
   return jwt.sign(payload, secret, { expiresIn });
 };
 
 /**
  * POST /api/auth/register
- * Register with Name, Email & Password (Bcrypt hashed)
+ * Register with Name, Email, Password & Role (Bcrypt hashed)
  */
 const registerUser = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role = 'manager' } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -37,6 +46,8 @@ const registerUser = async (req, res, next) => {
         message: 'Password must be at least 6 characters long'
       });
     }
+
+    const assignedRole = role === 'employee' ? 'employee' : 'manager';
 
     // Salt and hash password with bcrypt
     const salt = await bcrypt.genSalt(10);
@@ -55,7 +66,8 @@ const registerUser = async (req, res, next) => {
       user = await User.create({
         name,
         email: email.toLowerCase(),
-        password: hashedPassword
+        password: hashedPassword,
+        role: assignedRole
       });
     } else {
       const existing = memoryUsers.find(u => u.email === email.toLowerCase());
@@ -71,12 +83,18 @@ const registerUser = async (req, res, next) => {
         name,
         email: email.toLowerCase(),
         password: hashedPassword,
+        role: assignedRole,
         createdAt: new Date().toISOString()
       };
       memoryUsers.push(user);
     }
 
-    const token = generateToken({ id: user._id || user.id, email: user.email }, '1h');
+    const token = generateToken({
+      id: user._id || user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role || assignedRole
+    }, '7d');
 
     return res.status(201).json({
       success: true,
@@ -86,7 +104,8 @@ const registerUser = async (req, res, next) => {
         id: user._id || user.id,
         name: user.name,
         email: user.email,
-        passwordHashPreview: hashedPassword.substring(0, 15) + '...' // Confirms bcrypt to student/evaluator
+        role: user.role || assignedRole,
+        passwordHashPreview: hashedPassword.substring(0, 15) + '...'
       }
     });
   } catch (err) {
@@ -139,8 +158,13 @@ const loginUser = async (req, res, next) => {
       });
     }
 
-    // 1-Hour expiry token
-    const token = generateToken({ id: user._id || user.id, email: user.email }, '1h');
+    const role = user.role || 'manager';
+    const token = generateToken({
+      id: user._id || user.id,
+      email: user.email,
+      name: user.name,
+      role
+    }, '7d');
 
     return res.status(200).json({
       success: true,
@@ -150,6 +174,7 @@ const loginUser = async (req, res, next) => {
         id: user._id || user.id,
         name: user.name,
         email: user.email,
+        role,
         avatar: user.avatar || ''
       }
     });
@@ -167,18 +192,22 @@ const getMe = async (req, res, next) => {
     const userId = req.user.id;
 
     let user;
-    if (isDbConnected()) {
+    if (isDbConnected() && mongoose.Types.ObjectId.isValid(userId)) {
       user = await User.findById(userId).select('-password');
     } else {
       user = memoryUsers.find(u => (u._id || u.id) === userId);
     }
+
+    const currentRole = req.user.role || (user && user.role) || 'manager';
 
     if (!user) {
       return res.status(200).json({
         success: true,
         user: {
           id: req.user.id,
+          name: req.user.name || 'User',
           email: req.user.email,
+          role: currentRole,
           authSource: req.user.googleId ? 'Google OAuth' : 'Local JWT'
         }
       });
@@ -190,9 +219,78 @@ const getMe = async (req, res, next) => {
         id: user._id || user.id,
         name: user.name,
         email: user.email,
+        role: user.role || currentRole,
         avatar: user.avatar || '',
         createdAt: user.createdAt
       }
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * PATCH /api/auth/role
+ * Switch or update active user role between manager and employee
+ */
+const updateRole = async (req, res, next) => {
+  try {
+    const { role } = req.body;
+    if (!role || (role !== 'manager' && role !== 'employee')) {
+      return res.status(400).json({
+        error: 'Validation Error',
+        message: 'Role must be either manager or employee'
+      });
+    }
+
+    const userId = req.user.id;
+    if (isDbConnected() && mongoose.Types.ObjectId.isValid(userId)) {
+      await User.findByIdAndUpdate(userId, { role });
+    } else {
+      const u = memoryUsers.find(item => (item._id || item.id) === userId);
+      if (u) u.role = role;
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Role switched to ${role.toUpperCase()}`,
+      role
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/auth/team
+ * Return list of team members / employees available for assignment
+ */
+const getTeamMembers = async (req, res, next) => {
+  try {
+    let team = [];
+    if (isDbConnected()) {
+      const users = await User.find({}, 'name email role avatar').lean();
+      team = users.map(u => ({
+        id: u._id.toString(),
+        name: u.name,
+        email: u.email,
+        role: u.role || 'employee',
+        avatar: u.avatar || ''
+      }));
+    }
+
+    // Merge default candidates if list is sparse
+    const knownEmails = new Set(team.map(m => m.email.toLowerCase()));
+    for (const d of DEFAULT_TEAM) {
+      if (!knownEmails.has(d.email.toLowerCase())) {
+        team.push(d);
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      count: team.length,
+      data: team
     });
   } catch (err) {
     next(err);
@@ -205,7 +303,7 @@ const getMe = async (req, res, next) => {
  */
 const googleLogin = async (req, res, next) => {
   try {
-    const { credential } = req.body;
+    const { credential, role = 'manager' } = req.body;
 
     if (!credential) {
       return res.status(400).json({
@@ -233,16 +331,20 @@ const googleLogin = async (req, res, next) => {
     }
 
     const { sub: googleId, name, email, picture: avatar } = payload;
+    const defaultRole = role === 'employee' ? 'employee' : 'manager';
 
     let user;
     if (isDbConnected()) {
       user = await User.findOneAndUpdate(
         { googleId },
-        { name, email, avatar },
+        {
+          $set: { name, email, avatar },
+          $setOnInsert: { role: defaultRole }
+        },
         { new: true, upsert: true, runValidators: true }
       );
     } else {
-      let existingUser = memoryUsers.find(u => u.googleId === googleId);
+      let existingUser = memoryUsers.find(u => u.googleId === googleId || u.email === email);
       if (existingUser) {
         existingUser.name = name;
         existingUser.email = email;
@@ -255,13 +357,21 @@ const googleLogin = async (req, res, next) => {
           name,
           email,
           avatar,
+          role: defaultRole,
           createdAt: new Date().toISOString()
         };
         memoryUsers.push(user);
       }
     }
 
-    const token = generateToken({ id: user._id || user.id, email: user.email, googleId: user.googleId }, '7d');
+    const userRole = user.role || defaultRole;
+    const token = generateToken({
+      id: user._id || user.id,
+      email: user.email,
+      name: user.name,
+      googleId: user.googleId,
+      role: userRole
+    }, '7d');
 
     return res.status(200).json({
       success: true,
@@ -271,6 +381,7 @@ const googleLogin = async (req, res, next) => {
         id: user._id || user.id,
         name: user.name,
         email: user.email,
+        role: userRole,
         avatar: user.avatar
       }
     });
@@ -283,6 +394,8 @@ module.exports = {
   registerUser,
   loginUser,
   getMe,
+  updateRole,
+  getTeamMembers,
   googleLogin
 };
 
