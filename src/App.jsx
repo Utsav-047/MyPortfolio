@@ -1,13 +1,22 @@
-import { useState, useEffect } from 'react';
-import Home from './components/Home';
-import About from './components/About';
-import Skills from './components/Skills';
-import Projects from './components/Projects';
-import TaskManager from './components/TaskManager';
-import Contact from './components/Contact';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
+import LoadingFallback from './components/LoadingFallback';
 import Footer from './components/Footer';
 import GoogleAuthBtn from './components/GoogleAuthBtn';
 import AuthGate from './components/AuthGate';
+
+// ============================================================================
+// Practical 8: Performance Optimization & Route-Level Dynamic Code Splitting
+// Converting static imports to React.lazy() chunks
+// ============================================================================
+const Home = lazy(() => import('./components/Home'));
+const About = lazy(() => import('./components/About'));
+const Skills = lazy(() => import('./components/Skills'));
+const Projects = lazy(() => import('./components/Projects'));
+const TaskManager = lazy(() => import('./components/TaskManager'));
+const Practical4 = lazy(() => import('./components/Practical4'));
+const Practical5 = lazy(() => import('./components/Practical5'));
+const Practical6 = lazy(() => import('./components/Practical6'));
+const Contact = lazy(() => import('./components/Contact'));
 
 function App() {
   // Lifted auth state — shared between GoogleAuthBtn (navbar) and AuthGate (task manager)
@@ -43,7 +52,7 @@ function App() {
     // Floating Image Badges
     badges: ['AI & ML Student', 'Web Developer'],
 
-    // Skills grouped (Matches Screenshot 2 layout)
+    // Skills grouped
     skills: [
       { name: 'Python', category: 'AI & Machine Learning', level: 'Expert', percentage: 92, icon: 'python' },
       { name: 'Machine Learning', category: 'AI & Machine Learning', level: 'Expert', percentage: 88, icon: 'sklearn' },
@@ -81,7 +90,7 @@ function App() {
     ]
   });
 
-  // 2. Active Page Routing State ('home' | 'about' | 'skills' | 'projects' | 'contact')
+  // 2. Active Page Routing State ('home' | 'about' | 'skills' | 'projects' | 'taskmanager' | 'contact')
   const [currentPage, setCurrentPage] = useState('home');
 
   // 3. Inject dynamic CSS Custom Properties for themes
@@ -152,6 +161,12 @@ function App() {
             <TaskManager color={profile.themeColor} />
           </AuthGate>
         );
+      case 'practical4':
+        return <Practical4 />;
+      case 'practical5':
+        return <Practical5 />;
+      case 'practical6':
+        return <Practical6 />;
       case 'contact':
         return (
           <Contact 
@@ -179,7 +194,7 @@ function App() {
 
   return (
     <div className="app-container">
-      {/* Sticky Top Header NavBar (Matches Screenshot 1 Nav Bar styling) */}
+      {/* Sticky Top Header NavBar */}
       <header className="app-header">
         <div className="header-wrapper">
           <button 
@@ -234,9 +249,16 @@ function App() {
         </div>
       </header>
 
-      {/* Main Page Routing Wrapper */}
+      {/* Main Page Routing Wrapper with Suspense */}
       <main className="portfolio-content">
-        {renderPage()}
+        <Suspense fallback={
+          <LoadingFallback 
+            title="Loading Route Chunk..." 
+            subtitle="Fetching split JavaScript bundle with React.lazy() & Suspense" 
+          />
+        }>
+          {renderPage()}
+        </Suspense>
 
         {/* Footer (Remains rendered at the bottom of all pages) */}
         <Footer 

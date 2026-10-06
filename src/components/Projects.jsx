@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
+
+// Practical 8 Supplementary Requirement: Heavy component-level lazy loading (Recharts)
+const ProjectAnalyticsChart = lazy(() => import('./ProjectAnalyticsChart'));
 
 // Language color mapping (matches GitHub's language colors)
 const LANGUAGE_COLORS = {
@@ -193,6 +196,16 @@ function Projects({ color = '#6366f1' }) {
             </div>
           ))}
         </div>
+
+        {/* Practical 8 Heavy Component Lazy-Loading with Suspense */}
+        <Suspense fallback={
+          <div style={{ padding: '2.5rem', textAlign: 'center', color: '#64748b' }}>
+            <div className="loading-spinner-ring" style={{ width: '32px', height: '32px', margin: '0 auto 12px auto' }} />
+            <span style={{ fontSize: '13px', fontWeight: 600 }}>Loading Recharts Analytics Bundle Chunk...</span>
+          </div>
+        }>
+          <ProjectAnalyticsChart />
+        </Suspense>
       </section>
     </div>
   );
