@@ -3,6 +3,7 @@ import LoadingFallback from './components/LoadingFallback';
 import Footer from './components/Footer';
 import GoogleAuthBtn from './components/GoogleAuthBtn';
 import AuthGate from './components/AuthGate';
+import BrandLogo from './components/BrandLogo';
 
 // ============================================================================
 // Practical 8: Performance Optimization & Route-Level Dynamic Code Splitting
@@ -200,10 +201,10 @@ function App() {
           <button 
             className="brand-logo" 
             onClick={() => setCurrentPage('home')}
-            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            title="Utsav Patel Portfolio"
           >
-            <span className="brand-dot" style={{ backgroundColor: profile.themeColor }}></span>
-            {profile.name ? profile.name.toLowerCase().replace(/\s+/g, '') + '.dev' : 'portfolio.dev'}
+            <BrandLogo color={profile.themeColor} />
           </button>
           
           <nav className="nav-menu">
