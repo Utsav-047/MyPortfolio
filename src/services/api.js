@@ -215,6 +215,11 @@ export async function getJobStatus(jobId) {
   return handleResponse(response);
 }
 
+export async function getContainerInfo() {
+  const response = await fetch(`${BASE_URL}/api/system/container-info`);
+  return handleResponse(response);
+}
+
 export default {
   BASE_URL,
   getTasks,
@@ -233,7 +238,9 @@ export default {
   getEventMetrics,
   dispatchAsyncJob,
   getAllJobs,
-  getJobStatus
+  getJobStatus,
+  getContainerInfo
 };
+
 
 

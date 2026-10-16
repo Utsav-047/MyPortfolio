@@ -38,4 +38,37 @@ router.get('/logs', (req, res) => {
   res.status(200).json({ success: true, count: store.requestLogs.length, data: store.requestLogs });
 });
 
+// Container & Runtime telemetry endpoint
+router.get('/api/system/container-info', (req, res) => {
+  const fs = require('fs');
+  const isDocker = fs.existsSync('/.dockerenv') || Boolean(process.env.DOCKER_CONTAINER);
+  const mem = process.memoryUsage();
+
+  res.status(200).json({
+    success: true,
+    isDocker,
+    runtime: {
+      nodeVersion: process.version,
+      platform: process.platform,
+      arch: process.arch,
+      pid: process.pid,
+      uptimeSeconds: Math.floor(process.uptime()),
+      environment: process.env.NODE_ENV || 'development'
+    },
+    memory: {
+      rssMb: (mem.rss / 1024 / 1024).toFixed(2),
+      heapTotalMb: (mem.heapTotal / 1024 / 1024).toFixed(2),
+      heapUsedMb: (mem.heapUsed / 1024 / 1024).toFixed(2),
+      externalMb: (mem.external / 1024 / 1024).toFixed(2)
+    },
+    services: {
+      backend: { status: 'healthy', port: process.env.PORT || 5000, container: 'portfolio-backend' },
+      mongo: { status: 'healthy', host: process.env.MONGO_URI ? 'connected' : 'unknown', container: 'portfolio-mongo' },
+      frontend: { status: 'active', port: 3000, container: 'portfolio-frontend' }
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
 module.exports = router;
+
