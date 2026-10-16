@@ -159,7 +159,7 @@ function App() {
       case 'taskmanager':
         return (
           <AuthGate onAuthChange={setAuthUser}>
-            <TaskManager color={profile.themeColor} />
+            <TaskManager color={profile.themeColor} initialTab="tasks" />
           </AuthGate>
         );
       case 'practical4':
@@ -168,6 +168,13 @@ function App() {
         return <Practical5 />;
       case 'practical6':
         return <Practical6 />;
+      case 'caching':
+      case 'caching-optimization':
+        return (
+          <AuthGate onAuthChange={setAuthUser}>
+            <TaskManager color={profile.themeColor} initialTab="caching" />
+          </AuthGate>
+        );
       case 'contact':
         return (
           <Contact 
@@ -233,7 +240,7 @@ function App() {
               Projects
             </button>
             <button 
-              className={`nav-item-link ${currentPage === 'taskmanager' ? 'active' : ''}`}
+              className={`nav-item-link ${currentPage === 'taskmanager' || currentPage === 'caching' ? 'active' : ''}`}
               onClick={() => setCurrentPage('taskmanager')}
             >
               Task Manager

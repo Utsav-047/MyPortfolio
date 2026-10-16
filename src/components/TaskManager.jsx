@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import {
   getTasks,
   createTask,
@@ -8,7 +8,13 @@ import {
   getDbStatus
 } from '../services/api';
 
-function TaskManager({ userRole = 'manager', currentUser = null }) {
+// ============================================================================
+// Component-Level Dynamic Code Splitting (React.lazy & Suspense)
+// Dynamically imported only when user switches to Caching & Optimization tab
+// ============================================================================
+const CachingOptimization = lazy(() => import('./CachingOptimization'));
+
+function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e5', initialTab = 'tasks' }) {
   // ── State Management ───────────────────────────────────────
   const [role, setRole] = useState(userRole || 'manager');
   const [tasks, setTasks] = useState([]);
@@ -36,6 +42,15 @@ function TaskManager({ userRole = 'manager', currentUser = null }) {
   // Modal state for deleting tasks
   const [taskToDelete, setTaskToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Sub-module navigation within TaskManager: 'tasks' | 'caching' | 'async'
+  const [activeModule, setActiveModule] = useState(initialTab || 'tasks');
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveModule(initialTab);
+    }
+  }, [initialTab]);
 
   // Toast notification stack
   const [toasts, setToasts] = useState([]);
@@ -587,6 +602,7 @@ function TaskManager({ userRole = 'manager', currentUser = null }) {
         }
 
         @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .tm-pagination-bar {
           display: flex;
@@ -744,8 +760,73 @@ function TaskManager({ userRole = 'manager', currentUser = null }) {
           </div>
         </div>
 
-        {/* Overview Stats Cards */}
-        <div className="tm-stats-grid">
+        {/* Module Sub-Navigation Bar inside Task Manager */}
+        <div style={{
+          display: 'flex',
+          gap: '10px',
+          background: '#ffffff',
+          padding: '10px 14px',
+          borderRadius: '16px',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+          flexWrap: 'wrap',
+          alignItems: 'center'
+        }}>
+          <button
+            onClick={() => setActiveModule('tasks')}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '10px',
+              border: activeModule === 'tasks' ? 'none' : '1px solid #e2e8f0',
+              background: activeModule === 'tasks' ? color : '#f8fafc',
+              color: activeModule === 'tasks' ? '#ffffff' : '#475569',
+              fontWeight: 700,
+              fontSize: '14px',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <span>📋</span> Task Board &amp; Workflow
+          </button>
+
+          <button
+            onClick={() => setActiveModule('caching')}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '10px',
+              border: activeModule === 'caching' ? 'none' : '1px solid #e2e8f0',
+              background: activeModule === 'caching' ? color : '#f8fafc',
+              color: activeModule === 'caching' ? '#ffffff' : '#475569',
+              fontWeight: 700,
+              fontSize: '14px',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <span>⚡</span> In-Memory Caching &amp; Optimization
+            <span style={{
+              fontSize: '11px',
+              padding: '2px 8px',
+              borderRadius: '12px',
+              background: activeModule === 'caching' ? 'rgba(255,255,255,0.25)' : '#ede9fe',
+              color: activeModule === 'caching' ? '#ffffff' : '#4f46e5',
+              fontWeight: 800
+            }}>
+              Lazy Chunk
+            </span>
+          </button>
+        </div>
+
+        {activeModule === 'tasks' && (
+          <>
+            {/* Overview Stats Cards */}
+            <div className="tm-stats-grid">
           <div className="tm-stat-card">
             <div className="tm-stat-icon" style={{ background: '#e0e7ff', color: '#4338ca' }}>📋</div>
             <div>
@@ -1247,6 +1328,41 @@ function TaskManager({ userRole = 'manager', currentUser = null }) {
             )}
           </div>
         </div>
+          </>
+        )}
+
+        {/* ── Sub-Module 2: In-Memory Caching & Query Optimization (Lazy-Loaded) ── */}
+        {activeModule === 'caching' && (
+          <Suspense fallback={
+            <div style={{
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '16px',
+              padding: '3.5rem 2rem',
+              textAlign: 'center',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+              margin: '10px 0'
+            }}>
+              <div style={{
+                width: '42px',
+                height: '42px',
+                border: '3px solid #e2e8f0',
+                borderTopColor: color,
+                borderRadius: '50%',
+                animation: 'spin 0.8s linear infinite',
+                margin: '0 auto 16px auto'
+              }} />
+              <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 800, color: '#1e293b' }}>
+                ⚡ Lazy-Loading In-Memory Caching &amp; Optimization Suite...
+              </h3>
+              <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
+                Dynamically importing split code bundle with <code>React.lazy()</code> and <code>&lt;Suspense&gt;</code> inside Task Manager
+              </p>
+            </div>
+          }>
+            <CachingOptimization color={color} />
+          </Suspense>
+        )}
       </div>
     </div>
   );

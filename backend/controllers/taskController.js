@@ -1,13 +1,27 @@
 const mongoose = require('mongoose');
 const Task = require('../models/Task');
 const store = require('../data/store'); // Fallback memory store if DB disconnected
+const { taskCache, getTaskCacheKey, invalidateTaskCache } = require('../utils/cacheService');
 
 // Check if MongoDB connection is ready
 const isDbConnected = () => mongoose.connection.readyState === 1;
 
-// 1. GET /api/tasks — Retrieve paginated tasks with Role-Based Scoping
+// 1. GET /api/tasks — Retrieve paginated tasks with In-Memory Caching & Query Optimization
 const getAllTasks = async (req, res, next) => {
   try {
+    // ── Cache Lookup (node-cache) ──────────────────────────
+    const cacheKey = getTaskCacheKey(req);
+    const cachedData = taskCache.get(cacheKey);
+
+    if (cachedData) {
+      console.log(`[CACHE HIT] ${cacheKey}`);
+      res.setHeader('X-Cache', 'HIT');
+      return res.status(200).json(cachedData);
+    }
+
+    console.log(`[CACHE MISS] ${cacheKey}`);
+    res.setHeader('X-Cache', 'MISS');
+
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const limit = Math.max(1, parseInt(req.query.limit, 10) || 5);
     const skip = (page - 1) * limit;
@@ -96,12 +110,14 @@ const getAllTasks = async (req, res, next) => {
     if (isDbConnected()) {
       const total = await Task.countDocuments(filter);
       const totalPages = Math.ceil(total / limit) || 1;
+      // Query Optimization: .lean() bypasses full Mongoose hydration for faster read performance
       const tasks = await Task.find(filter)
+        .lean()
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
 
-      return res.status(200).json({
+      const responsePayload = {
         success: true,
         count: tasks.length,
         total: total,
@@ -111,7 +127,12 @@ const getAllTasks = async (req, res, next) => {
         role: user.role,
         source: 'MongoDB',
         data: tasks
-      });
+      };
+
+      // Store in memory cache with TTL = 60 seconds
+      taskCache.set(cacheKey, responsePayload, 60);
+
+      return res.status(200).json(responsePayload);
     }
 
     // Fallback in-memory store
@@ -170,7 +191,7 @@ const getAllTasks = async (req, res, next) => {
     const totalPages = Math.ceil(total / limit) || 1;
     const paginatedTasks = filteredTasks.slice(skip, skip + limit);
 
-    return res.status(200).json({
+    const responsePayload = {
       success: true,
       count: paginatedTasks.length,
       total: total,
@@ -180,7 +201,11 @@ const getAllTasks = async (req, res, next) => {
       role: user.role,
       source: 'In-Memory Fallback',
       data: paginatedTasks
-    });
+    };
+
+    taskCache.set(cacheKey, responsePayload, 60);
+
+    return res.status(200).json(responsePayload);
   } catch (err) {
     next(err);
   }
@@ -303,6 +328,9 @@ const createTask = async (req, res, next) => {
       console.log(`   ID: ${newTask._id} | Assigned To: "${taskAssignee.name}" | Status: ${newTask.status}`);
       console.log(`========================================\n`);
 
+      // Invalidate cache on write
+      invalidateTaskCache(user.id);
+
       return res.status(201).json({
         success: true,
         message: `Task created and assigned to ${taskAssignee.name}`,
@@ -326,6 +354,9 @@ const createTask = async (req, res, next) => {
       createdAt: new Date().toISOString()
     };
     store.tasks.unshift(newTask);
+
+    // Invalidate cache on write
+    invalidateTaskCache(user.id);
 
     return res.status(201).json({
       success: true,
@@ -407,6 +438,9 @@ const updateTask = async (req, res, next) => {
       console.log(`   ID: ${updatedTask._id} | Status: ${updatedTask.status} | Completed: ${updatedTask.completed}`);
       console.log(`========================================\n`);
 
+      // Invalidate cache on write
+      invalidateTaskCache(user.id);
+
       return res.status(200).json({
         success: true,
         message: 'Task updated successfully in MongoDB',
@@ -440,6 +474,9 @@ const updateTask = async (req, res, next) => {
       task.completed = Boolean(completed);
       task.status = completed ? 'completed' : 'pending';
     }
+
+    // Invalidate cache on write
+    invalidateTaskCache(user.id);
 
     return res.status(200).json({
       success: true,
@@ -480,6 +517,9 @@ const deleteTask = async (req, res, next) => {
       console.log(`   Deleted ID: ${deletedTask._id} | Deleted by: ${user.name || user.email}`);
       console.log(`========================================\n`);
 
+      // Invalidate cache on write
+      invalidateTaskCache(user.id);
+
       return res.status(200).json({
         success: true,
         message: 'Task deleted successfully from MongoDB',
@@ -501,6 +541,10 @@ const deleteTask = async (req, res, next) => {
     }
 
     const deleted = store.tasks.splice(index, 1)[0];
+
+    // Invalidate cache on write
+    invalidateTaskCache(user.id);
+
     return res.status(200).json({
       success: true,
       message: 'Task deleted from Memory Fallback',
@@ -512,10 +556,33 @@ const deleteTask = async (req, res, next) => {
   }
 };
 
+// 6. GET /api/tasks/cache/stats — Inspect node-cache status
+const getCacheStats = (req, res) => {
+  const stats = taskCache.getStats();
+  const keys = taskCache.keys();
+  return res.status(200).json({
+    success: true,
+    stats,
+    cachedKeys: keys,
+    ttlSeconds: 60
+  });
+};
+
+// 7. DELETE /api/tasks/cache — Manually purge task cache
+const clearCache = (req, res) => {
+  invalidateTaskCache(req.user?.id);
+  return res.status(200).json({
+    success: true,
+    message: 'Task cache flushed successfully'
+  });
+};
+
 module.exports = {
   getAllTasks,
   getTaskById,
   createTask,
   updateTask,
-  deleteTask
+  deleteTask,
+  getCacheStats,
+  clearCache
 };

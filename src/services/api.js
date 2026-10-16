@@ -130,6 +130,45 @@ export async function getDbStatus() {
   return handleResponse(response);
 }
 
+/**
+ * Fetch in-memory cache statistics (hits, misses, cached keys, TTL)
+ */
+export async function getCacheStats() {
+  const response = await fetch(`${BASE_URL}/api/tasks/cache/stats`, {
+    headers: { ...getAuthHeaders() }
+  });
+  return handleResponse(response);
+}
+
+/**
+ * Manually flush in-memory task cache
+ */
+export async function clearCache() {
+  const response = await fetch(`${BASE_URL}/api/tasks/cache`, {
+    method: 'DELETE',
+    headers: { ...getAuthHeaders() }
+  });
+  return handleResponse(response);
+}
+
+/**
+ * Fetch tasks with round-trip latency measurement and cache header analysis
+ */
+export async function benchmarkTasksFetch(page = 1, limit = 5) {
+  const startTime = performance.now();
+  const response = await fetch(`${BASE_URL}/api/tasks?page=${page}&limit=${limit}`, {
+    headers: { ...getAuthHeaders() }
+  });
+  const latency = Math.round(performance.now() - startTime);
+  const cacheStatus = response.headers.get('x-cache') || 'UNKNOWN';
+  const data = await handleResponse(response);
+  return {
+    latency,
+    cacheStatus,
+    data
+  };
+}
+
 export default {
   BASE_URL,
   getTasks,
@@ -139,5 +178,9 @@ export default {
   deleteTask,
   getTeamMembers,
   updateUserRole,
-  getDbStatus
+  getDbStatus,
+  getCacheStats,
+  clearCache,
+  benchmarkTasksFetch
 };
+
