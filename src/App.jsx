@@ -175,6 +175,14 @@ function App() {
             <TaskManager color={profile.themeColor} initialTab="caching" />
           </AuthGate>
         );
+      case 'docker':
+      case 'containerization':
+      case 'docker-compose':
+        return (
+          <AuthGate onAuthChange={setAuthUser}>
+            <TaskManager color={profile.themeColor} initialTab="docker" />
+          </AuthGate>
+        );
       case 'contact':
         return (
           <Contact 
