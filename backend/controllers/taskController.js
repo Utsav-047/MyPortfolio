@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Task = require('../models/Task');
 const store = require('../data/store'); // Fallback memory store if DB disconnected
 const { taskCache, getTaskCacheKey, invalidateTaskCache } = require('../utils/cacheService');
+const appEventBus = require('../utils/eventService');
 
 // Check if MongoDB connection is ready
 const isDbConnected = () => mongoose.connection.readyState === 1;
@@ -331,6 +332,17 @@ const createTask = async (req, res, next) => {
       // Invalidate cache on write
       invalidateTaskCache(user.id);
 
+      // Emit event on Event Bus
+      appEventBus.emitAppEvent('TASK_CREATED', {
+        taskId: newTask._id,
+        title: newTask.title,
+        status: newTask.status,
+        priority: newTask.priority,
+        assignedTo: newTask.assignedTo,
+        assignedBy: newTask.assignedBy,
+        source: 'MongoDB'
+      });
+
       return res.status(201).json({
         success: true,
         message: `Task created and assigned to ${taskAssignee.name}`,
@@ -357,6 +369,17 @@ const createTask = async (req, res, next) => {
 
     // Invalidate cache on write
     invalidateTaskCache(user.id);
+
+    // Emit event on Event Bus
+    appEventBus.emitAppEvent('TASK_CREATED', {
+      taskId: newTask._id,
+      title: newTask.title,
+      status: newTask.status,
+      priority: newTask.priority,
+      assignedTo: newTask.assignedTo,
+      assignedBy: newTask.assignedBy,
+      source: 'In-Memory Fallback'
+    });
 
     return res.status(201).json({
       success: true,
@@ -441,6 +464,15 @@ const updateTask = async (req, res, next) => {
       // Invalidate cache on write
       invalidateTaskCache(user.id);
 
+      // Emit event on Event Bus
+      appEventBus.emitAppEvent('TASK_STATUS_CHANGED', {
+        taskId: updatedTask._id,
+        title: updatedTask.title,
+        newStatus: updatedTask.status,
+        completed: updatedTask.completed,
+        updatedBy: user.name || user.email
+      });
+
       return res.status(200).json({
         success: true,
         message: 'Task updated successfully in MongoDB',
@@ -477,6 +509,15 @@ const updateTask = async (req, res, next) => {
 
     // Invalidate cache on write
     invalidateTaskCache(user.id);
+
+    // Emit event on Event Bus
+    appEventBus.emitAppEvent('TASK_STATUS_CHANGED', {
+      taskId: task._id || task.id,
+      title: task.title,
+      newStatus: task.status,
+      completed: task.completed,
+      updatedBy: user.name || user.email
+    });
 
     return res.status(200).json({
       success: true,
@@ -520,6 +561,13 @@ const deleteTask = async (req, res, next) => {
       // Invalidate cache on write
       invalidateTaskCache(user.id);
 
+      // Emit event on Event Bus
+      appEventBus.emitAppEvent('TASK_DELETED', {
+        taskId: deletedTask._id,
+        title: deletedTask.title,
+        deletedBy: user.name || user.email
+      });
+
       return res.status(200).json({
         success: true,
         message: 'Task deleted successfully from MongoDB',
@@ -544,6 +592,13 @@ const deleteTask = async (req, res, next) => {
 
     // Invalidate cache on write
     invalidateTaskCache(user.id);
+
+    // Emit event on Event Bus
+    appEventBus.emitAppEvent('TASK_DELETED', {
+      taskId: deleted._id || deleted.id,
+      title: deleted.title,
+      deletedBy: user.name || user.email
+    });
 
     return res.status(200).json({
       success: true,

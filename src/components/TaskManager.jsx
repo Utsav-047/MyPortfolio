@@ -10,9 +10,10 @@ import {
 
 // ============================================================================
 // Component-Level Dynamic Code Splitting (React.lazy & Suspense)
-// Dynamically imported only when user switches to Caching & Optimization tab
+// Dynamically imported on demand inside Task Manager
 // ============================================================================
 const CachingOptimization = lazy(() => import('./CachingOptimization'));
+const AsyncEventDriven = lazy(() => import('./AsyncEventDriven'));
 
 function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e5', initialTab = 'tasks' }) {
   // ── State Management ───────────────────────────────────────
@@ -821,6 +822,36 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
               Lazy Chunk
             </span>
           </button>
+
+          <button
+            onClick={() => setActiveModule('async')}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '10px',
+              border: activeModule === 'async' ? 'none' : '1px solid #e2e8f0',
+              background: activeModule === 'async' ? color : '#f8fafc',
+              color: activeModule === 'async' ? '#ffffff' : '#475569',
+              fontWeight: 700,
+              fontSize: '14px',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <span>📡</span> Asynchronous &amp; Event-Driven Engine
+            <span style={{
+              fontSize: '11px',
+              padding: '2px 8px',
+              borderRadius: '12px',
+              background: activeModule === 'async' ? 'rgba(255,255,255,0.25)' : '#dcfce7',
+              color: activeModule === 'async' ? '#ffffff' : '#166534',
+              fontWeight: 800
+            }}>
+              SSE Stream
+            </span>
+          </button>
         </div>
 
         {activeModule === 'tasks' && (
@@ -1361,6 +1392,39 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
             </div>
           }>
             <CachingOptimization color={color} />
+          </Suspense>
+        )}
+
+        {/* ── Sub-Module 3: Asynchronous Processing & Event-Driven Engine (Lazy-Loaded) ── */}
+        {activeModule === 'async' && (
+          <Suspense fallback={
+            <div style={{
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '16px',
+              padding: '3.5rem 2rem',
+              textAlign: 'center',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+              margin: '10px 0'
+            }}>
+              <div style={{
+                width: '42px',
+                height: '42px',
+                border: '3px solid #e2e8f0',
+                borderTopColor: color,
+                borderRadius: '50%',
+                animation: 'spin 0.8s linear infinite',
+                margin: '0 auto 16px auto'
+              }} />
+              <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 800, color: '#1e293b' }}>
+                📡 Lazy-Loading Asynchronous &amp; Event-Driven Suite...
+              </h3>
+              <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
+                Dynamically importing split code bundle with <code>React.lazy()</code> and <code>&lt;Suspense&gt;</code> inside Task Manager
+              </p>
+            </div>
+          }>
+            <AsyncEventDriven color={color} />
           </Suspense>
         )}
       </div>

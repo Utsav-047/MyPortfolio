@@ -13,6 +13,7 @@ const { notFoundHandler, globalErrorHandler } = require('./utils/errorHandler');
 const taskRoutes = require('./routes/taskRoutes');
 const authRoutes = require('./routes/authRoutes');
 const systemRoutes = require('./routes/systemRoutes');
+const eventRoutes = require('./routes/eventRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -44,6 +45,7 @@ app.get('/api/db-status', (req, res) => {
 // 5. Mount Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/events', eventRoutes);
 app.use('/', systemRoutes);
 
 // 6. 404 Handler

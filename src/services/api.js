@@ -169,6 +169,52 @@ export async function benchmarkTasksFetch(page = 1, limit = 5) {
   };
 }
 
+// ============================================================================
+// Asynchronous Processing & Event-Driven Architecture API Methods
+// ============================================================================
+
+export function getEventsStreamUrl() {
+  return `${BASE_URL}/api/events/stream`;
+}
+
+export async function getEventLogs() {
+  const response = await fetch(`${BASE_URL}/api/events/logs`);
+  return handleResponse(response);
+}
+
+export async function getEventMetrics() {
+  const response = await fetch(`${BASE_URL}/api/events/metrics`);
+  return handleResponse(response);
+}
+
+export async function dispatchAsyncJob(type, payload = {}) {
+  const startTime = performance.now();
+  const response = await fetch(`${BASE_URL}/api/events/jobs/dispatch`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders()
+    },
+    body: JSON.stringify({ type, payload })
+  });
+  const clientRoundtripMs = Math.round(performance.now() - startTime);
+  const data = await handleResponse(response);
+  return {
+    clientRoundtripMs,
+    ...data
+  };
+}
+
+export async function getAllJobs() {
+  const response = await fetch(`${BASE_URL}/api/events/jobs`);
+  return handleResponse(response);
+}
+
+export async function getJobStatus(jobId) {
+  const response = await fetch(`${BASE_URL}/api/events/jobs/${jobId}`);
+  return handleResponse(response);
+}
+
 export default {
   BASE_URL,
   getTasks,
@@ -181,6 +227,13 @@ export default {
   getDbStatus,
   getCacheStats,
   clearCache,
-  benchmarkTasksFetch
+  benchmarkTasksFetch,
+  getEventsStreamUrl,
+  getEventLogs,
+  getEventMetrics,
+  dispatchAsyncJob,
+  getAllJobs,
+  getJobStatus
 };
+
 
