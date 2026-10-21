@@ -15,6 +15,7 @@ import {
 const CachingOptimization = lazy(() => import('./CachingOptimization'));
 const AsyncEventDriven = lazy(() => import('./AsyncEventDriven'));
 const DockerContainerization = lazy(() => import('./DockerContainerization'));
+const CicdPipeline = lazy(() => import('./CicdPipeline'));
 
 
 function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e5', initialTab = 'tasks' }) {
@@ -884,6 +885,36 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
               Compose v3.8
             </span>
           </button>
+
+          <button
+            onClick={() => setActiveModule('cicd')}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '10px',
+              border: activeModule === 'cicd' ? 'none' : '1px solid #e2e8f0',
+              background: activeModule === 'cicd' ? color : '#f8fafc',
+              color: activeModule === 'cicd' ? '#ffffff' : '#475569',
+              fontWeight: 700,
+              fontSize: '14px',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <span>🚀</span> CI/CD Pipeline &amp; GitHub Actions
+            <span style={{
+              fontSize: '11px',
+              padding: '2px 8px',
+              borderRadius: '12px',
+              background: activeModule === 'cicd' ? 'rgba(255,255,255,0.25)' : '#ede9fe',
+              color: activeModule === 'cicd' ? '#ffffff' : '#4f46e5',
+              fontWeight: 800
+            }}>
+              Actions v4
+            </span>
+          </button>
         </div>
 
         {activeModule === 'tasks' && (
@@ -1490,6 +1521,39 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
             </div>
           }>
             <DockerContainerization color={color} />
+          </Suspense>
+        )}
+
+        {/* ── Sub-Module 5: CI/CD Pipeline with GitHub Actions (Lazy-Loaded) ── */}
+        {activeModule === 'cicd' && (
+          <Suspense fallback={
+            <div style={{
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '16px',
+              padding: '3.5rem 2rem',
+              textAlign: 'center',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+              margin: '10px 0'
+            }}>
+              <div style={{
+                width: '42px',
+                height: '42px',
+                border: '3px solid #e2e8f0',
+                borderTopColor: color,
+                borderRadius: '50%',
+                animation: 'spin 0.8s linear infinite',
+                margin: '0 auto 16px auto'
+              }} />
+              <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 800, color: '#1e293b' }}>
+                🚀 Lazy-Loading CI/CD Pipeline &amp; GitHub Actions Suite...
+              </h3>
+              <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
+                Dynamically importing split code bundle with <code>React.lazy()</code> and <code>&lt;Suspense&gt;</code> inside Task Manager
+              </p>
+            </div>
+          }>
+            <CicdPipeline color={color} />
           </Suspense>
         )}
       </div>
