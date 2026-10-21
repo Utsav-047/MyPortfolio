@@ -15,6 +15,7 @@ const taskRoutes = require('./routes/taskRoutes');
 const authRoutes = require('./routes/authRoutes');
 const systemRoutes = require('./routes/systemRoutes');
 const eventRoutes = require('./routes/eventRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -54,6 +55,7 @@ app.get('/tasks', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/ai', aiRoutes);
 app.use('/', systemRoutes);
 
 // 6. 404 Handler

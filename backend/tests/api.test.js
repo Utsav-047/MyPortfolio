@@ -67,4 +67,60 @@ describe('Task Management API - CI/CD Automated Test Suite', () => {
     expect(res.statusCode).toBe(404);
   });
 
+  // ── Practical 13: AI API Integration & Graceful Degradation Tests ────────
+  test('POST /api/ai/generate-description returns 200 with generated description', async () => {
+    const res = await request(app)
+      .post('/api/ai/generate-description')
+      .send({ title: 'Configure Docker Compose for full-stack application' });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('success', true);
+    expect(res.body).toHaveProperty('description');
+    expect(typeof res.body.description).toBe('string');
+    expect(res.body.description.length).toBeGreaterThan(10);
+    expect(res.body).toHaveProperty('disclaimer');
+  });
+
+  test('POST /api/ai/generate-description returns 400 when title is missing', async () => {
+    const res = await request(app)
+      .post('/api/ai/generate-description')
+      .send({});
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toHaveProperty('success', false);
+    expect(res.body.error).toBe('Validation Error');
+  });
+
+  test('POST /api/ai/generate-description handles simulated failure gracefully', async () => {
+    const res = await request(app)
+      .post('/api/ai/generate-description')
+      .send({ title: 'Fix JWT Token validation bug', simulateFailure: true });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('success', true);
+    expect(res.body.fallback).toBe(true);
+    expect(res.body.source).toBe('graceful-fallback-engine');
+  });
+
+  test('POST /api/ai/suggest-priority returns suggested priority level and reasoning', async () => {
+    const res = await request(app)
+      .post('/api/ai/suggest-priority')
+      .send({ title: 'Fix critical security vulnerability in authentication middleware' });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('priority');
+    expect(['low', 'medium', 'high', 'urgent']).toContain(res.body.priority);
+    expect(res.body).toHaveProperty('confidence');
+  });
+
+  test('GET /api/ai/status returns AI configuration telemetry', async () => {
+    const res = await request(app).get('/api/ai/status');
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('success', true);
+    expect(res.body).toHaveProperty('responsibleAiPolicies');
+    expect(res.body.keyStoredSecurelyInBackend).toBe(true);
+    expect(res.body.exposedToFrontend).toBe(false);
+  });
+
 });
+

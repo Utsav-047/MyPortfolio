@@ -16,10 +16,17 @@
     "google-auth-library": "^11.0.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.9.2",
-    "node-cache": "^5.1.2"
+    "node-cache": "^5.1.2",
+    "openai": "^7.39.0"
   },
   "devDependencies": {
     "jest": "^30.5.2",
     "supertest": "^7.3.1"
+  },
+  "jest": {
+    "testMatch": [
+      "**/tests/**/*.test.js",
+      "**/__tests__/**/*.test.js"
+    ]
   }
 }
