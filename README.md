@@ -1,5 +1,10 @@
 # 🌟 Full-Stack Portfolio & Task Management Application
 
+[![CI Pipeline](https://github.com/Utsav-047/MyPortfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/Utsav-047/MyPortfolio/actions/workflows/ci.yml)
+[![Node.js](https://img.shields.io/badge/Node.js-18.x%20%7C%2020.x-green.svg)](https://nodejs.org/)
+[![Jest Test Suite](https://img.shields.io/badge/Tests-Passing%20(6%2F6)-brightgreen.svg)](https://jestjs.io/)
+[![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions%20v4-blue.svg)](https://github.com/features/actions)
+
 A modern, production-grade full-stack portfolio and task management system built using **React 18**, **Vite**, **Node.js**, **Express**, **Mongoose ODM**, **MongoDB Atlas**, **Google OAuth 2.0**, and **JWT Authentication**.
 
 ---
@@ -128,3 +133,54 @@ Open `http://localhost:5173` in your browser.
 - Sensitive environment variables are kept strictly inside `.env` and ignored by `.gitignore`.
 - Password credentials are salted and hashed using `bcryptjs` with 10 salt rounds before storage.
 - All protected API routes enforce JWT token verification and user isolation.
+
+---
+
+## 🚀 Practical 12: Automated CI/CD Pipeline with GitHub Actions
+
+### Objective
+Automate code quality validation, dependency installation, and API testing using a Continuous Integration pipeline configured with GitHub Actions.
+
+### Architecture & Pipeline Flow
+```
+git push origin main / Pull Request
+             │
+             ▼
+GitHub Actions Trigger (`.github/workflows/ci.yml`)
+             │
+             ├── Job 1: `lint` (Code Quality & Syntax Gates)
+             │    ├── actions/checkout@v4
+             │    ├── actions/setup-node@v4 (Node 18.x)
+             │    ├── npm install
+             │    └── npm run lint (ESLint checks)
+             │
+             └── Job 2: `build-and-test` [needs: lint]
+                  ├── actions/checkout@v4
+                  ├── actions/setup-node@v4 (Node 18.x)
+                  ├── npm install (Root & Backend)
+                  ├── npm test (Jest & Supertest automated API tests)
+                  ├── npm run build (Vite production bundle verification)
+                  └── Report Pass / Fail Status
+             │
+             ▼
+Green Checkmark (Pass) or Red X (Fail) on GitHub + Status Badge
+```
+
+### Automated Test Suite Coverage (`backend/tests/api.test.js`)
+- `GET /tasks returns 200`: Validates task list endpoint accessibility (Syllabus requirement).
+- `GET /health returns 200`: Validates server health check endpoint.
+- `GET / returns 200`: Validates API root endpoint metadata and endpoint map.
+- `GET /api/tasks returns 401`: Validates unauthorized access rejection on protected routes.
+- `GET /api/tasks returns 200 (authenticated)`: Validates JWT Bearer authentication parsing.
+- `GET /api/non-existent-endpoint returns 404`: Validates standard 404 error handler.
+
+### Running Tests Locally
+```bash
+# Run tests directly from backend
+cd backend
+npm test
+
+# Or run from project root
+npm test
+```
+
