@@ -14,7 +14,8 @@ describe('Task Management API - CI/CD Automated Test Suite', () => {
   // Step 2 from Practical 12: Verify GET /tasks returns HTTP 200 status code
   test('GET /tasks returns 200', async () => {
     const res = await request(app).get('/tasks');
-    expect(res.statusCode).toBe(200);
+    // Deliberate test break for Practical 12 CI failure demonstration (expecting 201 instead of 200)
+    expect(res.statusCode).toBe(201);
     expect(res.body).toHaveProperty('success', true);
     expect(Array.isArray(res.body.data)).toBe(true);
   });
