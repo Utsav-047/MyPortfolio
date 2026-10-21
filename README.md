@@ -2,8 +2,10 @@
 
 [![CI Pipeline](https://github.com/Utsav-047/MyPortfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/Utsav-047/MyPortfolio/actions/workflows/ci.yml)
 [![Node.js](https://img.shields.io/badge/Node.js-18.x%20%7C%2020.x-green.svg)](https://nodejs.org/)
-[![Jest Test Suite](https://img.shields.io/badge/Tests-Passing%20(6%2F6)-brightgreen.svg)](https://jestjs.io/)
+[![Jest Test Suite](https://img.shields.io/badge/Tests-Passing%20(11%2F11)-brightgreen.svg)](https://jestjs.io/)
 [![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions%20v4-blue.svg)](https://github.com/features/actions)
+[![OpenAI & Gemini](https://img.shields.io/badge/AI%20API-OpenAI%20%26%20Gemini-purple.svg)](https://openai.com/)
+
 
 A modern, production-grade full-stack portfolio and task management system built using **React 18**, **Vite**, **Node.js**, **Express**, **Mongoose ODM**, **MongoDB Atlas**, **Google OAuth 2.0**, and **JWT Authentication**.
 
@@ -173,6 +175,9 @@ Green Checkmark (Pass) or Red X (Fail) on GitHub + Status Badge
 - `GET /api/tasks returns 401`: Validates unauthorized access rejection on protected routes.
 - `GET /api/tasks returns 200 (authenticated)`: Validates JWT Bearer authentication parsing.
 - `GET /api/non-existent-endpoint returns 404`: Validates standard 404 error handler.
+- `POST /api/ai/generate-description`: Validates AI description generation and fallback behavior.
+- `POST /api/ai/suggest-priority`: Validates priority & effort estimation.
+- `GET /api/ai/status`: Validates server-side key security and telemetry.
 
 ### Running Tests Locally
 ```bash
@@ -183,4 +188,44 @@ npm test
 # Or run from project root
 npm test
 ```
+
+---
+
+## ✨ Practical 13: AI API Integration into a Web Application
+
+### Objective
+Integrate an external AI service (OpenAI `gpt-4o-mini` / Gemini `gemini-1.5-flash`) into the Task Management application with secure server-side API key management, graceful degradation without application crash, and Responsible AI governance.
+
+### Architecture & Security Flow
+```
+React Frontend (Form / AI Copilot)
+             │
+             │ 1. User enters task title & clicks "Auto-Generate Description"
+             │ 2. Dispatches POST /api/ai/generate-description (NO API KEY in browser)
+             ▼
+Express Backend REST API (http://localhost:5000)
+             │
+             ├── 3. Rate Limit Filter (max 20 req/min per IP)
+             ├── 4. PII Redaction Filter (sanitizes passwords, bearer tokens, emails)
+             ├── 5. Reads OPENAI_API_KEY / GEMINI_API_KEY from backend/.env
+             │
+             ├── [Path A: Key Valid & API Responds]
+             │    └── Calls OpenAI / Gemini API -> Returns generated suggestion
+             │
+             └── [Path B: Key Missing / Invalid / Timeout / Quota Exceeded]
+                  └── Catches error in try/catch -> Returns domain fallback description
+             │
+             ▼
+React Frontend (Task Form & Copilot Studio)
+             │
+             └── 6. Renders editable suggestion in description textarea
+             └── 7. Human user reviews, verifies, and saves to MongoDB
+```
+
+### Key Security & Governance Guardrails
+1. **Server-Side API Key Storage**: The API key is stored exclusively in `backend/.env` (excluded by `.gitignore`) and is never leaked or transmitted to browser network requests.
+2. **Graceful Degradation Guarantee**: If the external AI service fails or times out, the backend catches the error and serves a high-quality fallback template without throwing a 500 error or crashing the React app.
+3. **Human-in-the-Loop**: All AI outputs are editable suggestions. The user maintains full editorial control.
+4. **PII Sanitization**: Sensitive credential patterns are sanitized before prompt payloads are dispatched to external models.
+
 
