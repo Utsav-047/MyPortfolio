@@ -5,7 +5,9 @@ import {
   updateTask,
   deleteTask,
   getTeamMembers,
-  getDbStatus
+  getDbStatus,
+  generateTaskDescription,
+  suggestTaskPriority
 } from '../services/api';
 
 // ============================================================================
@@ -16,6 +18,7 @@ const CachingOptimization = lazy(() => import('./CachingOptimization'));
 const AsyncEventDriven = lazy(() => import('./AsyncEventDriven'));
 const DockerContainerization = lazy(() => import('./DockerContainerization'));
 const CicdPipeline = lazy(() => import('./CicdPipeline'));
+const AiAssistant = lazy(() => import('./AiAssistant'));
 
 
 function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e5', initialTab = 'tasks' }) {
@@ -36,6 +39,10 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
   const [formAssignee, setFormAssignee] = useState(''); // email of assignee
   const [editingTask, setEditingTask] = useState(null);
   const [formError, setFormError] = useState(null);
+
+  // Practical 13: AI Auto-fill state
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiSuggestionMeta, setAiSuggestionMeta] = useState(null);
 
   // Filter & Search state
   const [statusFilter, setStatusFilter] = useState('all'); // all | pending | in_progress | completed
@@ -85,6 +92,39 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
 
   const removeToast = (id) => {
     setToasts(prev => prev.filter(t => t.id !== id));
+  };
+
+  // ── Practical 13: AI Auto-Generate Description & Suggest Priority ──────
+  const handleAiAutoFill = async () => {
+    if (!formTitle.trim()) {
+      addToast('info', 'AI Assistant', 'Please enter a task title first so the AI can analyze it.');
+      return;
+    }
+    setAiGenerating(true);
+    try {
+      const res = await generateTaskDescription(formTitle, formDesc);
+      if (res && res.description) {
+        setFormDesc(res.description);
+        setAiSuggestionMeta({
+          fallback: res.fallback,
+          source: res.source,
+          disclaimer: res.disclaimer
+        });
+        addToast('success', 'AI Description Generated', res.fallback ? 'Fallback template provided gracefully!' : 'AI description inserted into form.');
+      }
+      try {
+        const priorityRes = await suggestTaskPriority(formTitle, res.description || formDesc);
+        if (priorityRes && priorityRes.priority) {
+          setFormPriority(priorityRes.priority);
+        }
+      } catch {
+        // ignore priority error
+      }
+    } catch (err) {
+      addToast('error', 'AI Assistant', `Could not reach AI service: ${err.message}`);
+    } finally {
+      setAiGenerating(false);
+    }
   };
 
   // ── Fetch DB Status ────────────────────────────────────────
@@ -915,6 +955,36 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
               Actions v4
             </span>
           </button>
+
+          <button
+            onClick={() => setActiveModule('ai')}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '10px',
+              border: activeModule === 'ai' ? 'none' : '1px solid #e2e8f0',
+              background: activeModule === 'ai' ? color : '#f8fafc',
+              color: activeModule === 'ai' ? '#ffffff' : '#475569',
+              fontWeight: 700,
+              fontSize: '14px',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <span>✨</span> AI Copilot &amp; Assistant
+            <span style={{
+              fontSize: '11px',
+              padding: '2px 8px',
+              borderRadius: '12px',
+              background: activeModule === 'ai' ? 'rgba(255,255,255,0.25)' : '#ecfdf5',
+              color: activeModule === 'ai' ? '#ffffff' : '#059669',
+              fontWeight: 800
+            }}>
+              GPT-4o / Gemini
+            </span>
+          </button>
         </div>
 
         {activeModule === 'tasks' && (
@@ -984,6 +1054,57 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                   onChange={e => setFormTitle(e.target.value)}
                 />
               </div>
+
+              {/* Practical 13: AI Auto-Generate Button */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '-4px 0 2px 0' }}>
+                <button
+                  type="button"
+                  onClick={handleAiAutoFill}
+                  disabled={aiGenerating || !formTitle.trim()}
+                  style={{
+                    background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '6px 14px',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    cursor: aiGenerating || !formTitle.trim() ? 'not-allowed' : 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 4px rgba(79,70,229,0.2)',
+                    opacity: !formTitle.trim() ? 0.6 : 1
+                  }}
+                >
+                  <span>{aiGenerating ? '⏳' : '✨'}</span>
+                  <span>{aiGenerating ? 'Generating with AI...' : 'Auto-Generate Description & Priority'}</span>
+                </button>
+              </div>
+
+              {/* AI Suggestion Banner */}
+              {aiSuggestionMeta && (
+                <div style={{
+                  background: '#f5f3ff',
+                  border: '1px solid #ddd6fe',
+                  borderRadius: '8px',
+                  padding: '8px 12px',
+                  fontSize: '11px',
+                  color: '#6d28d9',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span>✨ <strong>AI Suggestion ({aiSuggestionMeta.source}):</strong> You can edit or refine this description before saving.</span>
+                  <button
+                    type="button"
+                    onClick={() => setAiSuggestionMeta(null)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#7c3aed', fontWeight: 800, fontSize: '14px' }}
+                  >
+                    &times;
+                  </button>
+                </div>
+              )}
 
               <div>
                 <label className="tm-label">Description / Instructions</label>
@@ -1554,6 +1675,39 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
             </div>
           }>
             <CicdPipeline color={color} />
+          </Suspense>
+        )}
+
+        {/* ── Sub-Module 6: AI API Integration & Responsible Copilot (Lazy-Loaded) ── */}
+        {activeModule === 'ai' && (
+          <Suspense fallback={
+            <div style={{
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '16px',
+              padding: '3.5rem 2rem',
+              textAlign: 'center',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+              margin: '10px 0'
+            }}>
+              <div style={{
+                width: '42px',
+                height: '42px',
+                border: '3px solid #e2e8f0',
+                borderTopColor: color,
+                borderRadius: '50%',
+                animation: 'spin 0.8s linear infinite',
+                margin: '0 auto 16px auto'
+              }} />
+              <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 800, color: '#1e293b' }}>
+                ✨ Lazy-Loading AI Assistant &amp; LLM Copilot Suite...
+              </h3>
+              <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
+                Dynamically importing split code bundle with <code>React.lazy()</code> and <code>&lt;Suspense&gt;</code> inside Task Manager
+              </p>
+            </div>
+          }>
+            <AiAssistant color={color} />
           </Suspense>
         )}
       </div>

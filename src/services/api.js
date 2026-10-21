@@ -220,6 +220,61 @@ export async function getContainerInfo() {
   return handleResponse(response);
 }
 
+// ── Practical 13: External AI API Service Integration ─────────────────────
+
+/**
+ * Request AI-generated description from backend (never calls OpenAI directly from browser)
+ */
+export async function generateTaskDescription(title, context = '', simulateFailure = false) {
+  const response = await fetch(`${BASE_URL}/api/ai/generate-description`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders()
+    },
+    body: JSON.stringify({ title, context, simulateFailure })
+  });
+  return handleResponse(response);
+}
+
+/**
+ * Request AI priority suggestion based on title & description
+ */
+export async function suggestTaskPriority(title, description = '') {
+  const response = await fetch(`${BASE_URL}/api/ai/suggest-priority`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders()
+    },
+    body: JSON.stringify({ title, description })
+  });
+  return handleResponse(response);
+}
+
+/**
+ * Request AI subtask breakdown
+ */
+export async function breakdownTaskIntoSteps(title) {
+  const response = await fetch(`${BASE_URL}/api/ai/breakdown`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders()
+    },
+    body: JSON.stringify({ title })
+  });
+  return handleResponse(response);
+}
+
+/**
+ * Fetch AI server configuration & Responsible AI telemetry
+ */
+export async function getAiStatus() {
+  const response = await fetch(`${BASE_URL}/api/ai/status`);
+  return handleResponse(response);
+}
+
 export default {
   BASE_URL,
   getTasks,
@@ -239,8 +294,13 @@ export default {
   dispatchAsyncJob,
   getAllJobs,
   getJobStatus,
-  getContainerInfo
+  getContainerInfo,
+  generateTaskDescription,
+  suggestTaskPriority,
+  breakdownTaskIntoSteps,
+  getAiStatus
 };
+
 
 
 
