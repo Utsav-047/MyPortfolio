@@ -241,10 +241,9 @@ function CachingOptimization({ color = '#4f46e5' }) {
       {/* Navigation Tabs */}
       <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #e2e8f0', marginBottom: '1.5rem', paddingBottom: '4px', flexWrap: 'wrap' }}>
         {[
-          { id: 'benchmark', label: 'Performance Benchmark' },
-          { id: 'logs', label: 'Terminal & Cache Logs' },
-          { id: 'architecture', label: 'Architecture & Flow' },
-          { id: 'stats', label: 'Cache Health & Stats' }
+          { id: 'benchmark', label: 'Performance Latency Benchmark' },
+          { id: 'architecture', label: 'Architecture & Invalidation Flow' },
+          { id: 'stats', label: 'Cache Health & Metrics' }
         ].map(tab => (
           <button
             key={tab.id}

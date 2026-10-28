@@ -191,7 +191,7 @@ function AiAssistant({ color = '#4f46e5' }) {
               borderRadius: '20px',
               border: '1px solid rgba(74, 222, 128, 0.3)'
             }}>
-              Practical 13 • CO6 / PO3, PO5, PO12
+              GPT-4o &amp; Gemini Powered
             </span>
           </div>
           <p style={{ margin: '6px 0 0 0', fontSize: '14px', color: '#475569' }}>
@@ -231,15 +231,12 @@ function AiAssistant({ color = '#4f46e5' }) {
       <div style={{
         display: 'flex',
         gap: '8px',
-        margin: '20px 0',
+        margin: '18px 0',
         flexWrap: 'wrap'
       }}>
         {[
           { key: 'copilot', label: 'AI Task Copilot Studio' },
-          { key: 'degradation', label: 'Graceful Degradation Simulator' },
-          { key: 'governance', label: 'Responsible AI & PII Privacy' },
-          { key: 'status', label: 'Backend Architecture & Security' },
-          { key: 'checklist', label: 'Lab Screenshot Guide' }
+          { key: 'status', label: 'Backend Architecture & Security' }
         ].map(t => (
           <button
             key={t.key}
@@ -247,11 +244,11 @@ function AiAssistant({ color = '#4f46e5' }) {
             style={{
               padding: '9px 18px',
               borderRadius: '10px',
-              border: activeTab === t.key ? '1px solid rgba(212,185,150,0.35)' : '1px solid rgba(255,255,255,0.08)',
-              background: activeTab === t.key ? 'rgba(212,185,150,0.15)' : 'rgba(30,41,59,0.5)',
-              color: activeTab === t.key ? '#F8F6F1' : '#94A3B8',
+              border: activeTab === t.key ? '1px solid #c7d2fe' : '1px solid #e2e8f0',
+              background: activeTab === t.key ? '#ede9fe' : '#ffffff',
+              color: activeTab === t.key ? '#4f46e5' : '#475569',
               fontWeight: 700,
-              fontSize: '13px',
+              fontSize: '13.5px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -269,7 +266,7 @@ function AiAssistant({ color = '#4f46e5' }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
           {/* Left Column: Input Form */}
           <div style={{
-            background: 'rgba(15, 23, 42, 0.6)',
+            background: '#ffffff',
             border: '1px solid #e2e8f0',
             borderRadius: '14px',
             padding: '20px'
@@ -291,8 +288,8 @@ function AiAssistant({ color = '#4f46e5' }) {
                   width: '100%',
                   padding: '10px 14px',
                   borderRadius: '8px',
-                  background: 'rgba(30, 41, 59, 0.8)',
-                  border: '1px solid rgba(212, 185, 150, 0.2)',
+                  background: '#ffffff',
+                  border: '1.5px solid #cbd5e1',
                   color: '#0f172a',
                   fontSize: '14px',
                   boxSizing: 'border-box'
@@ -313,8 +310,8 @@ function AiAssistant({ color = '#4f46e5' }) {
                   width: '100%',
                   padding: '10px 14px',
                   borderRadius: '8px',
-                  background: 'rgba(30, 41, 59, 0.8)',
-                  border: '1px solid rgba(212, 185, 150, 0.2)',
+                  background: '#ffffff',
+                  border: '1.5px solid #cbd5e1',
                   color: '#0f172a',
                   fontSize: '14px',
                   boxSizing: 'border-box'
@@ -327,19 +324,19 @@ function AiAssistant({ color = '#4f46e5' }) {
                 onClick={() => handleGenerateDescription(false)}
                 disabled={loading}
                 style={{
-                  background: 'rgba(212, 185, 150, 0.25)',
-                  color: '#0f172a',
-                  border: '1px solid rgba(212, 185, 150, 0.4)',
+                  background: loading ? '#94a3b8' : '#4f46e5',
+                  color: '#ffffff',
+                  border: 'none',
                   padding: '12px 18px',
-                  borderRadius: '8px',
-                  fontWeight: 700,
+                  borderRadius: '10px',
+                  fontWeight: 800,
                   fontSize: '14px',
                   cursor: loading ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  boxShadow: '0 4px 12px rgba(79, 70, 229, 0.25)'
                 }}
               >
                 <span>{loading ? 'Calling AI API (POST /api/ai/generate-description)...' : 'Generate Description with AI'}</span>
@@ -350,9 +347,9 @@ function AiAssistant({ color = '#4f46e5' }) {
                   onClick={handleSuggestPriority}
                   disabled={loadingPriority}
                   style={{
-                    background: 'rgba(56, 189, 248, 0.15)',
-                    color: '#38bdf8',
-                    border: '1px solid rgba(56, 189, 248, 0.35)',
+                    background: '#eff6ff',
+                    color: '#2563eb',
+                    border: '1.5px solid #bfdbfe',
                     padding: '10px 14px',
                     borderRadius: '8px',
                     fontWeight: 700,
@@ -371,9 +368,9 @@ function AiAssistant({ color = '#4f46e5' }) {
                   onClick={handleBreakdown}
                   disabled={loadingBreakdown}
                   style={{
-                    background: 'rgba(74, 222, 128, 0.15)',
-                    color: '#4ade80',
-                    border: '1px solid rgba(74, 222, 128, 0.35)',
+                    background: '#f0fdf4',
+                    color: '#16a34a',
+                    border: '1.5px solid #bbf7d0',
                     padding: '10px 14px',
                     borderRadius: '8px',
                     fontWeight: 700,
@@ -406,12 +403,13 @@ function AiAssistant({ color = '#4f46e5' }) {
                     key={idx}
                     onClick={() => setTitleInput(sample)}
                     style={{
-                      background: '#ffffff',
-                      border: '1px solid #e2e8f0',
+                      background: '#f8fafc',
+                      border: '1px solid #cbd5e1',
                       borderRadius: '6px',
-                      padding: '5px 10px',
-                      fontSize: '11px',
-                      color: '#334155',
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      color: '#0f172a',
+                      fontWeight: 500,
                       cursor: 'pointer',
                       textAlign: 'left'
                     }}
@@ -425,7 +423,7 @@ function AiAssistant({ color = '#4f46e5' }) {
 
           {/* Right Column: AI Output & Editable Review */}
           <div style={{
-            background: 'rgba(15, 23, 42, 0.6)',
+            background: '#ffffff',
             border: '1px solid #e2e8f0',
             borderRadius: '14px',
             padding: '20px',
@@ -462,11 +460,11 @@ function AiAssistant({ color = '#4f46e5' }) {
                   width: '100%',
                   padding: '12px 14px',
                   borderRadius: '10px',
-                  border: '1px solid rgba(212, 185, 150, 0.2)',
+                  border: '1.5px solid #cbd5e1',
                   fontSize: '13px',
                   lineHeight: 1.6,
                   color: '#0f172a',
-                  background: 'rgba(30, 41, 59, 0.8)',
+                  background: '#ffffff',
                   boxSizing: 'border-box'
                 }}
               />
@@ -566,7 +564,7 @@ function AiAssistant({ color = '#4f46e5' }) {
         <div>
           <div style={{
             background: '#ffffff',
-            border: '1px solid rgba(212, 185, 150, 0.2)',
+            border: '1.5px solid #cbd5e1',
             borderRadius: '12px',
             padding: '16px 20px',
             marginBottom: '20px'
@@ -581,7 +579,7 @@ function AiAssistant({ color = '#4f46e5' }) {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '20px' }}>
             <div style={{
-              background: 'rgba(15, 23, 42, 0.6)',
+              background: '#ffffff',
               border: '1px solid rgba(74, 222, 128, 0.3)',
               borderRadius: '12px',
               padding: '18px'
@@ -613,7 +611,7 @@ function AiAssistant({ color = '#4f46e5' }) {
             </div>
 
             <div style={{
-              background: 'rgba(15, 23, 42, 0.6)',
+              background: '#ffffff',
               border: '1px solid rgba(248, 113, 113, 0.3)',
               borderRadius: '12px',
               padding: '18px'
@@ -645,7 +643,7 @@ function AiAssistant({ color = '#4f46e5' }) {
             </div>
 
             <div style={{
-              background: 'rgba(15, 23, 42, 0.6)',
+              background: '#ffffff',
               border: '1px solid rgba(245, 158, 11, 0.3)',
               borderRadius: '12px',
               padding: '18px'
@@ -718,7 +716,7 @@ function AiAssistant({ color = '#4f46e5' }) {
       {activeTab === 'governance' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{
-            background: 'rgba(15, 23, 42, 0.6)',
+            background: '#ffffff',
             border: '1px solid #e2e8f0',
             borderRadius: '14px',
             padding: '20px'
@@ -742,8 +740,8 @@ function AiAssistant({ color = '#4f46e5' }) {
                   width: '100%',
                   padding: '10px',
                   borderRadius: '8px',
-                  background: 'rgba(30, 41, 59, 0.8)',
-                  border: '1px solid rgba(212, 185, 150, 0.2)',
+                  background: '#ffffff',
+                  border: '1.5px solid #cbd5e1',
                   fontSize: '13px',
                   fontFamily: 'monospace',
                   color: '#0f172a',
@@ -772,28 +770,28 @@ function AiAssistant({ color = '#4f46e5' }) {
 
           {/* 4 Pillars of Responsible AI */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
+            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
               <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>Server-Side Isolation</div>
               <div style={{ fontSize: '12px', color: '#475569', marginTop: '6px', lineHeight: 1.5 }}>
                 API keys reside solely in <code>backend/.env</code>. The React frontend never possesses API tokens, preventing quota theft via browser devtools.
               </div>
             </div>
 
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
+            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
               <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>Human-in-the-Loop</div>
               <div style={{ fontSize: '12px', color: '#475569', marginTop: '6px', lineHeight: 1.5 }}>
                 AI responses are editable recommendations. The human user retains definitive decision authority before tasks are committed to MongoDB.
               </div>
             </div>
 
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
+            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
               <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>Ethical Disclaimers</div>
               <div style={{ fontSize: '12px', color: '#475569', marginTop: '6px', lineHeight: 1.5 }}>
                 Visible UI badges inform users that generated text is synthesized by an AI model and may contain inadvertent hallucinations.
               </div>
             </div>
 
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
+            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
               <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>Rate Limiting &amp; Cost Guard</div>
               <div style={{ fontSize: '12px', color: '#475569', marginTop: '6px', lineHeight: 1.5 }}>
                 IP-based rate limits protect server quotas, while maximum token constraints (<code>max_tokens: 150</code>) prevent runaway API billing.
@@ -807,7 +805,7 @@ function AiAssistant({ color = '#4f46e5' }) {
       {activeTab === 'status' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{
-            background: 'rgba(15, 23, 42, 0.6)',
+            background: '#ffffff',
             border: '1px solid #e2e8f0',
             borderRadius: '12px',
             padding: '20px'
@@ -860,28 +858,28 @@ React Frontend Form
             gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
             gap: '12px'
           }}>
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+            <div style={{ background: '#ffffff', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
               <div style={{ fontSize: '11px', color: '#475569', fontWeight: 700 }}>Security Status</div>
               <div style={{ fontSize: '14px', fontWeight: 800, color: '#4ade80', marginTop: '2px' }}>
                 Key Stored in Backend Only
               </div>
             </div>
 
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+            <div style={{ background: '#ffffff', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
               <div style={{ fontSize: '11px', color: '#475569', fontWeight: 700 }}>Frontend Exposure</div>
               <div style={{ fontSize: '14px', fontWeight: 800, color: '#4ade80', marginTop: '2px' }}>
                 Zero Client Key Leakage
               </div>
             </div>
 
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+            <div style={{ background: '#ffffff', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
               <div style={{ fontSize: '11px', color: '#475569', fontWeight: 700 }}>Rate Limiting</div>
               <div style={{ fontSize: '14px', fontWeight: 800, color: '#38bdf8', marginTop: '2px' }}>
                 20 req / min per IP
               </div>
             </div>
 
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+            <div style={{ background: '#ffffff', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
               <div style={{ fontSize: '11px', color: '#475569', fontWeight: 700 }}>Degradation Policy</div>
               <div style={{ fontSize: '14px', fontWeight: 800, color: '#4f46e5', marginTop: '2px' }}>
                 Zero Crash Guarantee
@@ -896,7 +894,7 @@ React Frontend Form
         <div>
           <div style={{
             background: '#ffffff',
-            border: '1px solid rgba(212, 185, 150, 0.2)',
+            border: '1.5px solid #cbd5e1',
             borderRadius: '12px',
             padding: '16px 20px',
             marginBottom: '20px'
@@ -951,7 +949,7 @@ React Frontend Form
               <div
                 key={item.num}
                 style={{
-                  background: 'rgba(15, 23, 42, 0.6)',
+                  background: '#ffffff',
                   border: '1px solid #e2e8f0',
                   borderRadius: '12px',
                   padding: '16px 20px',
@@ -985,7 +983,7 @@ React Frontend Form
                   </div>
                   <code style={{
                     fontSize: '12px',
-                    background: 'rgba(30, 41, 59, 0.8)',
+                    background: '#ffffff',
                     padding: '3px 8px',
                     borderRadius: '6px',
                     color: '#334155'

@@ -243,9 +243,8 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
       <div style={{ display: 'flex', gap: '6px', borderBottom: '1px solid rgba(212,185,150,0.10)', marginBottom: '1.75rem', paddingBottom: '4px', flexWrap: 'wrap' }}>
         {[
           { id: 'dispatcher', label: 'Async Job Dispatcher' },
-          { id: 'stream', label: 'Live Event Stream (SSE)' },
-          { id: 'architecture', label: 'Architecture Flow' },
-          { id: 'metrics', label: 'Event Bus Metrics' }
+          { id: 'architecture', label: 'Event-Driven Architecture Flow' },
+          { id: 'metrics', label: 'Event Bus Metrics & Telemetry' }
         ].map(tab => (
           <button
             key={tab.id}

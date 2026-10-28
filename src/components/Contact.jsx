@@ -22,13 +22,59 @@ function Contact({ email, phone, location, github, linkedin, color }) {
 
   const [activeQA, setActiveQA] = useState(qaData[0]);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSent(true);
-    setTimeout(() => setSent(false), 3000);
-    setFormData({ name: '', email: '', message: '' });
+    if (!formData.name || !formData.email || !formData.message) return;
+
+    setSubmitting(true);
+    setErrorMsg(null);
+
+    try {
+      // Send real email directly to Utsav's inbox via FormSubmit AJAX service
+      const res = await fetch('https://formsubmit.co/ajax/utsavpatel788190@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          _subject: `New Portfolio Message from ${formData.name}`,
+          _captcha: 'false'
+        })
+      });
+
+      if (!res.ok) {
+        throw new Error(`Server returned ${res.status}`);
+      }
+
+      // Also record message in backend database
+      try {
+        const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        await fetch(`${apiBase}/api/contact`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+      } catch {
+        // Backend logging is supplementary
+      }
+
+      setSent(true);
+      setFormData({ name: '', email: '', message: '' });
+      setTimeout(() => setSent(false), 7000);
+    } catch (err) {
+      console.error('Failed to deliver message:', err);
+      setErrorMsg('Could not deliver automatically via network. Please click Email Directly below.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -114,7 +160,7 @@ function Contact({ email, phone, location, github, linkedin, color }) {
             {/* Quick Message Form */}
             <div className="contact-form-card" style={{ borderTop: `3px solid ${color}` }}>
               <div className="contact-info-title">
-                <span className="contact-title-icon" style={{ color }}>✉️</span>
+                <span className="contact-title-icon" style={{ color, display: "inline-flex", alignItems: "center" }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
                 Send a Message
               </div>
               <form onSubmit={handleSubmit} className="contact-form">
@@ -154,12 +200,52 @@ function Contact({ email, phone, location, github, linkedin, color }) {
                     style={{ borderColor: `${color}40` }}
                   />
                 </div>
+                {sent && (
+                  <div style={{
+                    background: '#f0fdf4',
+                    border: '1.5px solid #86efac',
+                    color: '#166534',
+                    padding: '12px 16px',
+                    borderRadius: '10px',
+                    fontSize: '13.5px',
+                    fontWeight: 700,
+                    marginBottom: '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Message sent! Your message was emailed directly to utsavpatel788190@gmail.com.</span>
+                  </div>
+                )}
+
+                {errorMsg && (
+                  <div style={{
+                    background: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    color: '#dc2626',
+                    padding: '12px 16px',
+                    borderRadius: '10px',
+                    fontSize: '13px',
+                    marginBottom: '14px'
+                  }}>
+                    <div>{errorMsg}</div>
+                    <a
+                      href={`mailto:utsavpatel788190@gmail.com?subject=Portfolio%20Inquiry%20from%20${encodeURIComponent(formData.name || 'Visitor')}&body=${encodeURIComponent(formData.message || '')}`}
+                      style={{ color: '#b91c1c', fontWeight: 700, textDecoration: 'underline', marginTop: '6px', display: 'inline-block' }}
+                    >
+                      Click here to send email via your default mail app →
+                    </a>
+                  </div>
+                )}
+
                 <button
                   type="submit"
                   className="btn-primary form-submit-btn"
-                  style={{ backgroundColor: color, borderColor: color }}
+                  disabled={submitting}
+                  style={{ backgroundColor: color, borderColor: color, opacity: submitting ? 0.8 : 1, cursor: submitting ? 'wait' : 'pointer' }}
                 >
-                  {sent ? '✓ Message Sent!' : 'Send Message →'}
+                  {submitting ? 'Sending to utsavpatel788190@gmail.com...' : sent ? '✓ Message Delivered!' : 'Send Message →'}
                 </button>
               </form>
             </div>

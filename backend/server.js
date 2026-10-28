@@ -87,6 +87,35 @@ app.get('/tasks', (req, res) => {
   });
 });
 
+// Contact Message Endpoint - saves contact inquiries and logs them
+app.post('/api/contact', async (req, res) => {
+  const { name, email, message } = req.body || {};
+  if (!name || !email || !message) {
+    return res.status(400).json({ success: false, message: 'Name, email, and message are required' });
+  }
+
+  console.log(`📬 [CONTACT INQUIRY] From: ${name} <${email}>: "${message.substring(0, 80)}..."`);
+
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const ContactMessage = mongoose.models.ContactMessage || mongoose.model('ContactMessage', new mongoose.Schema({
+        name: String,
+        email: String,
+        message: String,
+        createdAt: { type: Date, default: Date.now }
+      }));
+      await ContactMessage.create({ name, email, message });
+    }
+  } catch (err) {
+    console.error('Failed to save message to MongoDB:', err.message);
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Message received and recorded.'
+  });
+});
+
 // 5. Mount Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);

@@ -477,10 +477,9 @@ docs/`
         flexWrap: 'wrap'
       }}>
         {[
-          { id: 'overview', label: 'Container Architecture & Mesh' },
-          { id: 'dockerfiles', label: 'Dockerfile & Compose Specs' },
-          { id: 'cli', label: 'Interactive CLI & Terminal' },
-          { id: 'metrics', label: 'Live Telemetry & Resource Monitor' }
+          { id: 'overview', label: 'Multi-Container Architecture & Mesh' },
+          { id: 'dockerfiles', label: 'Multi-Stage Dockerfiles & Compose' },
+          { id: 'metrics', label: 'Container Telemetry & Resource Monitor' }
         ].map(tab => (
           <button
             key={tab.id}

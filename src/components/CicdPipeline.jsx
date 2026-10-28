@@ -379,10 +379,7 @@ Please fix the failing assertion and push a commit to trigger a new run.
       }}>
         {[
           { key: 'pipeline', label: 'Interactive Pipeline DAG' },
-          { key: 'terminal', label: 'GitHub Actions Logs' },
-          { key: 'yaml', label: '.github/workflows/ci.yml' },
-          { key: 'analysis', label: 'Theory & Analysis' },
-          { key: 'checklist', label: 'Screenshot Guide' }
+          { key: 'yaml', label: '.github/workflows/ci.yml Specification' }
         ].map(t => (
           <button
             key={t.key}
