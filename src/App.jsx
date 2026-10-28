@@ -17,20 +17,6 @@ const TaskManager = lazy(() => import('./components/TaskManager'));
 const Practical4 = lazy(() => import('./components/Practical4'));
 const Practical5 = lazy(() => import('./components/Practical5'));
 const Practical6 = lazy(() => import('./components/Practical6'));
-const Contact = lazy(() => import('./components/Contact'));
-
-// ============================================================================
-// Practical 8: Performance Optimization & Route-Level Dynamic Code Splitting
-// Converting static imports to React.lazy() chunks
-// ============================================================================
-const Home = lazy(() => import('./components/Home'));
-const About = lazy(() => import('./components/About'));
-const Skills = lazy(() => import('./components/Skills'));
-const Projects = lazy(() => import('./components/Projects'));
-const TaskManager = lazy(() => import('./components/TaskManager'));
-const Practical4 = lazy(() => import('./components/Practical4'));
-const Practical5 = lazy(() => import('./components/Practical5'));
-const Practical6 = lazy(() => import('./components/Practical6'));
 const Practical8 = lazy(() => import('./components/Practical8'));
 const Contact = lazy(() => import('./components/Contact'));
 
