@@ -17,7 +17,6 @@ const TaskManager = lazy(() => import('./components/TaskManager'));
 const Practical4 = lazy(() => import('./components/Practical4'));
 const Practical5 = lazy(() => import('./components/Practical5'));
 const Practical6 = lazy(() => import('./components/Practical6'));
-const Practical8 = lazy(() => import('./components/Practical8'));
 const Contact = lazy(() => import('./components/Contact'));
 
 function App() {
@@ -163,14 +162,10 @@ function App() {
             <TaskManager color={profile.themeColor} initialTab="tasks" />
           </AuthGate>
         );
-      case 'practical4':
-        return <Practical4 />;
-      case 'practical5':
-        return <Practical5 />;
-      case 'practical6':
-        return <Practical6 />;
       case 'caching':
       case 'caching-optimization':
+      case 'lazy':
+      case 'practical8':
         return (
           <AuthGate onAuthChange={setAuthUser}>
             <TaskManager color={profile.themeColor} initialTab="caching" />
@@ -190,8 +185,6 @@ function App() {
         return <Practical5 />;
       case 'practical6':
         return <Practical6 />;
-      case 'practical8':
-        return <Practical8 />;
       case 'contact':
         return (
           <Contact 
@@ -262,16 +255,7 @@ function App() {
             >
               Task Manager
             </button>
-            <button 
-              className={`nav-item-link ${currentPage === 'practical8' ? 'active' : ''}`}
-              style={{
-                color: currentPage === 'practical8' ? '#10b981' : undefined,
-                fontWeight: 600
-              }}
-              onClick={() => setCurrentPage('practical8')}
-            >
-              ⚡ Practical 8
-            </button>
+            
             <button 
               className={`nav-contact-btn ${currentPage === 'contact' ? 'active' : ''}`}
               style={{ backgroundColor: profile.themeColor }}

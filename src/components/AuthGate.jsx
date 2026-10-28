@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { GoogleLogin, googleLogout } from '@react-oauth/google';
 import { updateUserRole } from '../services/api';
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 /**
  * AuthGate
@@ -222,7 +222,7 @@ function AuthGate({ children, onAuthChange }) {
                   color: '#ffffff',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.1)'
                 }}>
-                  {isManager ? '👑 Manager Role' : '💼 Employee Role'}
+                  {isManager ? 'Manager Role' : 'Employee Role'}
                 </span>
               </div>
               <div style={{ fontSize: '12px', color: '#64748b' }}>{user.email}</div>
@@ -250,7 +250,7 @@ function AuthGate({ children, onAuthChange }) {
               }}
               title="Toggle role between Manager (assigner) and Employee (assigned tasks)"
             >
-              🔄 {switchingRole ? 'Switching...' : (isManager ? 'Switch to Employee Mode' : 'Switch to Manager Mode')}
+              {switchingRole ? 'Switching...' : (isManager ? 'Switch to Employee Mode' : 'Switch to Manager Mode')}
             </button>
 
             <button
@@ -452,7 +452,12 @@ function AuthGate({ children, onAuthChange }) {
 
       <div className="ag-gate-wrapper">
         <div className="ag-gate-card">
-          <div className="ag-lock-icon">🔐</div>
+          <div className="ag-lock-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+          </div>
 
           <h2 className="ag-gate-title">Role-Based Task Manager</h2>
           <p className="ag-gate-subtitle">
@@ -486,25 +491,10 @@ function AuthGate({ children, onAuthChange }) {
             </div>
           </div>
 
-          {/* Quick Demo Logins */}
-          <div className="ag-demo-grid">
-            <button
-              className="ag-demo-btn ag-demo-mgr"
-              onClick={() => handleDemoLogin('manager')}
-              disabled={loading}
-            >
-              👑 Demo as Manager
-            </button>
-            <button
-              className="ag-demo-btn ag-demo-emp"
-              onClick={() => handleDemoLogin('employee')}
-              disabled={loading}
-            >
-              💼 Demo as Employee
-            </button>
+          {/* Role Confirmation Prompt */}
+          <div style={{ marginTop: '16px', marginBottom: '14px', fontSize: '13px', fontWeight: '600', color: '#475569' }}>
+            Authenticate with Google OAuth 2.0 as <span style={{ color: selectedRole === 'manager' ? '#4f46e5' : '#059669', textTransform: 'capitalize', fontWeight: '800' }}>{selectedRole}</span>
           </div>
-
-          <div className="ag-divider-or">or sign in with Google ({selectedRole.toUpperCase()})</div>
 
           {/* Google Sign-In */}
           {loading ? (

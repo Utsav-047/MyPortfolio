@@ -27,36 +27,18 @@ function BrandLogo({ size = 'medium', color = '#4f46e5' }) {
         }}
       >
         <svg 
-          width={iconDimensions * 0.72} 
-          height={iconDimensions * 0.72} 
-          viewBox="0 0 32 32" 
+          width={iconDimensions * 0.65} 
+          height={iconDimensions * 0.65} 
+          viewBox="0 0 24 24" 
           fill="none" 
+          stroke="#ffffff"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Stylized code brackets and neural node symbolizing AI + Web */}
-          <path 
-            d="M9 10L4 16L9 22" 
-            stroke="#ffffff" 
-            strokeWidth="2.5" 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-          />
-          <path 
-            d="M23 10L28 16L23 22" 
-            stroke="#ffffff" 
-            strokeWidth="2.5" 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-          />
-          {/* Central Neural Pulse Node */}
-          <circle cx="16" cy="16" r="3.2" fill="#ffffff" />
-          <path 
-            d="M16 8V12.8M16 19.2V24" 
-            stroke="#ffffff" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            strokeOpacity="0.85" 
-          />
+          <polyline points="16 18 22 12 16 6" />
+          <polyline points="8 6 2 12 8 18" />
         </svg>
       </div>
 

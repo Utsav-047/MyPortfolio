@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleLogin, googleLogout } from '@react-oauth/google';
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 function GoogleAuthBtn() {
   const [user, setUser] = useState(null);
