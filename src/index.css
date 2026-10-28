@@ -51,9 +51,8 @@ body {
 .app-header {
   position: sticky;
   top: 0;
-  background-color: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
   border-bottom: 1px solid rgba(226, 232, 240, 0.9);
   z-index: 1000;
   width: 100%;

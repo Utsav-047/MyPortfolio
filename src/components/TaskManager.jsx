@@ -784,7 +784,14 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
         <div className="tm-header-bar">
           <div>
             <h2 className="tm-title">
-              <span>{isManager ? '👑' : '💼'}</span> {isManager ? 'Manager Task Center' : 'Employee Task Hub'}
+              <span style={{ display: 'inline-flex', verticalAlign: 'middle', marginRight: '8px' }}>
+                {isManager ? (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                ) : (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                )}
+              </span>
+              {isManager ? 'Team Task Management Center' : 'Personal Workspace & Tasks'}
             </h2>
             <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
               {isManager
@@ -992,7 +999,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
             {/* Overview Stats Cards */}
             <div className="tm-stats-grid">
           <div className="tm-stat-card">
-            <div className="tm-stat-icon" style={{ background: '#e0e7ff', color: '#4338ca' }}>📋</div>
+            <div className="tm-stat-icon" style={{ background: '#e0e7ff', color: '#4338ca' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
             <div>
               <div className="tm-stat-number">{pagination.total}</div>
               <div className="tm-stat-label">{isManager ? 'Total Team Tasks' : 'My Total Tasks'}</div>
@@ -1000,7 +1007,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
           </div>
 
           <div className="tm-stat-card">
-            <div className="tm-stat-icon" style={{ background: '#e0f2fe', color: '#0369a1' }}>⚡</div>
+            <div className="tm-stat-icon" style={{ background: '#e0f2fe', color: '#0369a1' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
             <div>
               <div className="tm-stat-number">{inProgressCount}</div>
               <div className="tm-stat-label">In Progress</div>
@@ -1008,7 +1015,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
           </div>
 
           <div className="tm-stat-card">
-            <div className="tm-stat-icon" style={{ background: '#d1fae5', color: '#065f46' }}>✅</div>
+            <div className="tm-stat-icon" style={{ background: '#d1fae5', color: '#065f46' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
             <div>
               <div className="tm-stat-number">{completedCount}</div>
               <div className="tm-stat-label">Completed</div>
@@ -1016,7 +1023,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
           </div>
 
           <div className="tm-stat-card">
-            <div className="tm-stat-icon" style={{ background: '#fef3c7', color: '#92400e' }}>⏳</div>
+            <div className="tm-stat-icon" style={{ background: '#fef3c7', color: '#92400e' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
             <div>
               <div className="tm-stat-number">{pendingCount}</div>
               <div className="tm-stat-label">Pending Action</div>
@@ -1025,7 +1032,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
 
           {isManager && (
             <div className="tm-stat-card">
-              <div className="tm-stat-icon" style={{ background: '#f5f3ff', color: '#7c3aed' }}>👥</div>
+              <div className="tm-stat-icon" style={{ background: '#f5f3ff', color: '#7c3aed' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
               <div>
                 <div className="tm-stat-number">{teamMembers.length}</div>
                 <div className="tm-stat-label">Team Members</div>
@@ -1120,16 +1127,16 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
               {/* Assignee Field — Manager can assign to any employee or entire team */}
               {isManager && (
                 <div>
-                  <label className="tm-label">👥 Assign To (Team Member or Entire Team)</label>
+                  <label className="tm-label">Assign To (Team Member or Entire Team)</label>
                   <select
                     className="tm-select"
                     value={formAssignee}
                     onChange={e => setFormAssignee(e.target.value)}
                   >
                     <option value="all_employees">
-                      📢 All Employees (Entire Team Broadcast)
+                      All Employees (Entire Team Broadcast)
                     </option>
-                    <optgroup label="👤 Individual Team Members">
+                    <optgroup label="Individual Team Members">
                       {teamMembers.map(m => (
                         <option key={m.email || m.name} value={m.email}>
                           {m.name} ({m.role === 'manager' ? 'Lead' : 'Employee'}) — {m.email}
@@ -1147,9 +1154,9 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                   value={formPriority}
                   onChange={e => setFormPriority(e.target.value)}
                 >
-                  <option value="low">🟢 Low Priority</option>
-                  <option value="medium">🔵 Medium Priority (Default)</option>
-                  <option value="high">🔴 High Priority</option>
+                  <option value="low">Low Priority</option>
+                  <option value="medium">Medium Priority (Default)</option>
+                  <option value="high">High Priority</option>
                 </select>
               </div>
 
@@ -1160,9 +1167,9 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                   value={formStatus}
                   onChange={e => setFormStatus(e.target.value)}
                 >
-                  <option value="pending">⏳ Pending (To Do)</option>
-                  <option value="in_progress">⚡ In Progress</option>
-                  <option value="completed">✅ Completed</option>
+                  <option value="pending">Pending (To Do)</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed</option>
                 </select>
               </div>
 
@@ -1174,7 +1181,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
 
               <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
                 <button type="submit" className="tm-submit-btn" style={{ flex: 1 }}>
-                  {editingTask ? 'Save Changes' : (isManager ? '👑 Assign Task (Optimistic UI)' : '+ Add Task')}
+                  {editingTask ? 'Save Changes' : (isManager ? 'Assign Task to Team' : 'Create Task')}
                 </button>
                 {editingTask && (
                   <button type="button" className="tm-cancel-btn" onClick={cancelEdit}>
@@ -1224,7 +1231,12 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                       gap: '6px'
                     }}
                   >
-                    <span>{tab.icon}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                      {tab.iconType === 'all' && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>}
+                      {tab.iconType === 'pending' && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>}
+                      {tab.iconType === 'progress' && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>}
+                      {tab.iconType === 'completed' && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><polyline points="20 6 9 17 4 12"/></svg>}
+                    </span>
                     <span>{tab.label}</span>
                   </button>
                 ))}
@@ -1249,10 +1261,10 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                       cursor: 'pointer'
                     }}
                   >
-                    <option value="all">👥 All Team Tasks & Broadcasts</option>
-                    <option value="all_employees">📢 Team Broadcasts (All Employees)</option>
+                    <option value="all">All Team Tasks & Broadcasts</option>
+                    <option value="all_employees">Team Broadcasts (All Employees)</option>
                     {teamMembers.length > 0 && (
-                      <optgroup label="👤 Individual Employees">
+                      <optgroup label="Individual Employees">
                         {teamMembers.map(m => (
                           <option key={m.email || m.name} value={m.email}>
                             {m.name} ({m.email})
@@ -1365,9 +1377,9 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                                 gap: '4px'
                               }}>
                                 {isTeamBroadcast ? (
-                                  <>📢 Assigned: <strong>All Employees (Entire Team)</strong></>
+                                  <>Assigned: <strong>All Employees (Entire Team)</strong></>
                                 ) : (
-                                  <>👤 Assigned to: <strong>{task.assignedTo.name}</strong> {isAssignedToMe && '(You)'}</>
+                                  <>Assigned to: <strong>{task.assignedTo.name}</strong> {isAssignedToMe && '(You)'}</>
                                 )}
                               </span>
                             )}
@@ -1396,7 +1408,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                                 color: '#166534',
                                 border: '1px solid #86efac'
                               }}>
-                                🔒 COMPLETED
+                                Completed
                               </span>
                               <button
                                 onClick={() => handleStatusTransition(task, 'reopen')}
@@ -1412,7 +1424,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                                 }}
                                 title="Reopen task and move back to Pending"
                               >
-                                🔄 Reopen Task
+                                Reopen
                               </button>
                             </div>
                           ) : (
@@ -1431,7 +1443,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                                     cursor: 'pointer'
                                   }}
                                 >
-                                  ⚡ Start Work
+                                  Start Work
                                 </button>
                               )}
                               <button
@@ -1447,7 +1459,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                                   cursor: 'pointer'
                                 }}
                               >
-                                ✅ Mark Done
+                                Mark Done
                               </button>
                             </div>
                           )}
@@ -1458,7 +1470,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                             onClick={() => handleDownloadTask(task)}
                             title="Download task with timestamp"
                           >
-                            📥 Download
+                            Download
                           </button>
 
                           {/* Manager Actions */}
