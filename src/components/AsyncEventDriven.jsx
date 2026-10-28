@@ -191,19 +191,19 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
           gap: '10px',
           animation: 'fadeIn 0.2s ease-in-out'
         }}>
-          <span>{toast.type === 'error' ? '⚠️' : toast.type === 'info' ? '⚡' : '✓'}</span>
+          <span>{toast.type === 'error' ? '⚠' : toast.type === 'info' ? 'ℹ' : '✓'}</span>
           {toast.message}
         </div>
       )}
 
       {/* Hero Header */}
       <div style={{
-        background: 'rgba(30,41,59,0.8)',
+        background: '#ffffff',
         borderRadius: '14px',
         padding: '2rem 2.5rem',
-        color: '#F8F6F1',
+        color: '#0f172a',
         marginBottom: '1.5rem',
-        border: '1px solid rgba(212,185,150,0.12)',
+        border: '1px solid #e2e8f0',
       }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
           <span style={{
@@ -213,15 +213,15 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
             background: sseConnected ? '#4ade80' : '#f87171',
             boxShadow: sseConnected ? '0 0 6px #4ade80' : 'none'
           }} />
-          <span style={{ fontSize: '11px', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.10em' }}>
+          <span style={{ fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.10em' }}>
             {sseConnected ? 'Real-Time Event Stream Active' : 'Connecting to Event Stream...'}
           </span>
         </div>
-        <h2 style={{ fontSize: '26px', fontWeight: 700, margin: '0 0 10px 0', letterSpacing: '-0.02em', fontFamily: "'Playfair Display', Georgia, serif" }}>
+        <h2 style={{ fontSize: '26px', fontWeight: 700, margin: '0 0 10px 0', letterSpacing: '-0.02em', fontFamily: 'inherit' }}>
           Asynchronous Processing & Event-Driven Architecture
         </h2>
-        <p style={{ fontSize: '14px', color: '#94A3B8', maxWidth: '700px', lineHeight: 1.7, margin: '0 0 1.5rem 0' }}>
-          Decouple client HTTP requests from heavy background execution using a non-blocking <strong style={{ color: '#F8F6F1' }}>Node.js EventEmitter Bus</strong>, instantaneous <strong style={{ color: '#F8F6F1' }}>HTTP 202 Accepted</strong> responses, and real-time <strong style={{ color: '#F8F6F1' }}>Server-Sent Events (SSE)</strong>.
+        <p style={{ fontSize: '14px', color: '#475569', maxWidth: '700px', lineHeight: 1.7, margin: '0 0 1.5rem 0' }}>
+          Decouple client HTTP requests from heavy background execution using a non-blocking <strong style={{ color: '#0f172a' }}>Node.js EventEmitter Bus</strong>, instantaneous <strong style={{ color: '#0f172a' }}>HTTP 202 Accepted</strong> responses, and real-time <strong style={{ color: '#0f172a' }}>Server-Sent Events (SSE)</strong>.
         </p>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
@@ -231,8 +231,8 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
             { label: 'Total Events Emitted', value: metrics?.totalEventsEmitted ?? logs.length, accent: true },
             { label: 'Active Jobs in Queue', value: jobs.filter(j => j.status === 'PROCESSING' || j.status === 'QUEUED').length, accent: true },
           ].map((item, i) => (
-            <div key={i} style={{ background: 'rgba(255,255,255,0.04)', padding: '10px 16px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <div style={{ color: '#64748B', fontSize: '10px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.09em' }}>{item.label}</div>
+            <div key={i} style={{ background: '#f8fafc', padding: '10px 16px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+              <div style={{ color: '#475569', fontSize: '10px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.09em' }}>{item.label}</div>
               <div style={{ fontWeight: 600, marginTop: '3px', fontSize: '14px', color: item.accent ? '#4ade80' : '#F8F6F1' }}>{item.value}</div>
             </div>
           ))}
@@ -251,13 +251,13 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             style={{
-              padding: '8px 16px',
-              fontSize: '13px',
-              fontWeight: 600,
-              border: 'none',
-              background: activeTab === tab.id ? 'rgba(212,185,150,0.12)' : 'transparent',
-              color: activeTab === tab.id ? '#D4B996' : '#64748B',
-              borderRadius: '8px',
+              padding: '9px 18px',
+              fontSize: '13.5px',
+              fontWeight: 700,
+              border: activeTab === tab.id ? '1px solid #c7d2fe' : '1px solid #e2e8f0',
+              background: activeTab === tab.id ? '#ede9fe' : '#ffffff',
+              color: activeTab === tab.id ? '#4f46e5' : '#475569',
+              borderRadius: '10px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -277,19 +277,19 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
           {/* Action Cards Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
             {/* Card 1: Bulk Task Batch Processor */}
-            <div style={{ background: 'rgba(30, 41, 59, 0.7)', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem', boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}>
+            <div style={{ background: '#ffffff', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem', boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
-                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(212, 185, 150, 0.12)', color: '#D4B996', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(212, 185, 150, 0.12)', color: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                 </div>
-                <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 8px', borderRadius: '6px', background: 'rgba(212, 185, 150, 0.15)', color: '#D4B996', border: '1px solid rgba(212, 185, 150, 0.3)' }}>
+                <span style={{ fontSize: '11px', fontWeight: 800, padding: '3px 8px', borderRadius: '6px', background: 'rgba(212, 185, 150, 0.15)', color: '#4f46e5', border: '1px solid rgba(212, 185, 150, 0.3)' }}>
                   202 ACCEPTED
                 </span>
               </div>
-              <h3 style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 6px 0', color: '#F8F6F1' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 6px 0', color: '#0f172a' }}>
                 Bulk Task Batch Processor
               </h3>
-              <p style={{ fontSize: '13px', color: '#94A3B8', lineHeight: 1.5, margin: '0 0 1.25rem 0' }}>
+              <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.5, margin: '0 0 1.25rem 0' }}>
                 Asynchronously executes batch status reconciliation and priority recalculation across all tasks without blocking the main event loop.
               </p>
               <button
@@ -317,7 +317,7 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
             </div>
 
             {/* Card 2: Automated Audit & SLA Report Generator */}
-            <div style={{ background: 'rgba(30, 41, 59, 0.7)', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem', boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}>
+            <div style={{ background: '#ffffff', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem', boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
                 <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(74, 222, 128, 0.12)', color: '#4ade80', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
@@ -326,10 +326,10 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
                   NON-BLOCKING I/O
                 </span>
               </div>
-              <h3 style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 6px 0', color: '#F8F6F1' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 6px 0', color: '#0f172a' }}>
                 Automated Audit &amp; SLA Report
               </h3>
-              <p style={{ fontSize: '13px', color: '#94A3B8', lineHeight: 1.5, margin: '0 0 1.25rem 0' }}>
+              <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.5, margin: '0 0 1.25rem 0' }}>
                 Compiles multi-dimensional compliance reports, calculating response times, task completions, and generating a timestamped audit artifact.
               </p>
               <button
@@ -338,7 +338,7 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
                 style={{
                   width: '100%',
                   background: 'rgba(255, 255, 255, 0.08)',
-                  color: '#F8F6F1',
+                  color: '#0f172a',
                   border: '1px solid rgba(255, 255, 255, 0.15)',
                   padding: '11px 18px',
                   borderRadius: '10px',
@@ -357,7 +357,7 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
             </div>
 
             {/* Card 3: Team Broadcast & Alert Dispatcher */}
-            <div style={{ background: 'rgba(30, 41, 59, 0.7)', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem', boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}>
+            <div style={{ background: '#ffffff', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem', boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
                 <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(168, 85, 247, 0.12)', color: '#c084fc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>
@@ -366,10 +366,10 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
                   PUB-SUB EVENT
                 </span>
               </div>
-              <h3 style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 6px 0', color: '#F8F6F1' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 6px 0', color: '#0f172a' }}>
                 Team Broadcast Notification
               </h3>
-              <p style={{ fontSize: '13px', color: '#94A3B8', lineHeight: 1.5, margin: '0 0 1.25rem 0' }}>
+              <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.5, margin: '0 0 1.25rem 0' }}>
                 Emits decoupled broadcast events across multiple consumer handlers (Email simulation, in-app SSE banner, and dashboard feed).
               </p>
               <button
@@ -378,7 +378,7 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
                 style={{
                   width: '100%',
                   background: 'rgba(255, 255, 255, 0.08)',
-                  color: '#F8F6F1',
+                  color: '#0f172a',
                   border: '1px solid rgba(255, 255, 255, 0.15)',
                   padding: '11px 18px',
                   borderRadius: '10px',
@@ -420,8 +420,8 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
                     Client Round-Trip Time: {lastAcceptedResponse.clientRoundtripMs || lastAcceptedResponse.queueLatencyMs} ms
                   </span>
                 </div>
-                <div style={{ fontSize: '13px', color: '#cbd5e1', marginTop: '6px' }}>
-                  Job ID: <code style={{ color: '#D4B996' }}>{lastAcceptedResponse.job?.jobId}</code> — Dispatched to asynchronous background worker thread. Request thread freed immediately!
+                <div style={{ fontSize: '13px', color: '#334155', marginTop: '6px' }}>
+                  Job ID: <code style={{ color: '#4f46e5' }}>{lastAcceptedResponse.job?.jobId}</code> — Dispatched to asynchronous background worker thread. Request thread freed immediately!
                 </div>
               </div>
               <button
@@ -434,26 +434,26 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
           )}
 
           {/* Active Job Queue Status Table */}
-          <div style={{ background: 'rgba(30, 41, 59, 0.7)', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem', boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}>
+          <div style={{ background: '#ffffff', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem', boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '10px' }}>
               <div>
-                <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0', color: '#F8F6F1' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0', color: '#0f172a' }}>
                   Asynchronous Job Queue &amp; Worker Monitor
                 </h3>
-                <p style={{ margin: 0, fontSize: '13px', color: '#94A3B8' }}>
+                <p style={{ margin: 0, fontSize: '13px', color: '#475569' }}>
                   Real-time worker lifecycle updates received automatically via Server-Sent Events.
                 </p>
               </div>
               <button
                 onClick={refreshData}
-                style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.12)', color: '#F8F6F1', padding: '6px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}
+                style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.12)', color: '#0f172a', padding: '6px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}
               >
                 Refresh Queue
               </button>
             </div>
 
             {jobs.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '2.5rem', color: '#94A3B8', background: 'rgba(15, 23, 42, 0.5)', borderRadius: '12px', border: '1px dashed rgba(255, 255, 255, 0.1)' }}>
+              <div style={{ textAlign: 'center', padding: '2.5rem', color: '#475569', background: 'rgba(15, 23, 42, 0.5)', borderRadius: '12px', border: '1px dashed rgba(255, 255, 255, 0.1)' }}>
                 No asynchronous background jobs have been dispatched yet. Click any button above to test!
               </div>
             ) : (
@@ -461,12 +461,12 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                   <thead>
                     <tr style={{ background: 'rgba(255, 255, 255, 0.04)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', textAlign: 'left' }}>
-                      <th style={{ padding: '12px 14px', color: '#94A3B8', fontWeight: 700 }}>Job ID</th>
-                      <th style={{ padding: '12px 14px', color: '#94A3B8', fontWeight: 700 }}>Job Type</th>
-                      <th style={{ padding: '12px 14px', color: '#94A3B8', fontWeight: 700 }}>Status</th>
-                      <th style={{ padding: '12px 14px', color: '#94A3B8', fontWeight: 700, minWidth: '180px' }}>Progress (SSE Stream)</th>
-                      <th style={{ padding: '12px 14px', color: '#94A3B8', fontWeight: 700 }}>Duration</th>
-                      <th style={{ padding: '12px 14px', color: '#94A3B8', fontWeight: 700 }}>Dispatched At</th>
+                      <th style={{ padding: '12px 14px', color: '#475569', fontWeight: 700 }}>Job ID</th>
+                      <th style={{ padding: '12px 14px', color: '#475569', fontWeight: 700 }}>Job Type</th>
+                      <th style={{ padding: '12px 14px', color: '#475569', fontWeight: 700 }}>Status</th>
+                      <th style={{ padding: '12px 14px', color: '#475569', fontWeight: 700, minWidth: '180px' }}>Progress (SSE Stream)</th>
+                      <th style={{ padding: '12px 14px', color: '#475569', fontWeight: 700 }}>Duration</th>
+                      <th style={{ padding: '12px 14px', color: '#475569', fontWeight: 700 }}>Dispatched At</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -475,10 +475,10 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
                       const isProcessing = job.status === 'PROCESSING';
                       return (
                         <tr key={job.jobId} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                          <td style={{ padding: '12px 14px', fontFamily: 'monospace', fontWeight: 700, color: '#D4B996' }}>
+                          <td style={{ padding: '12px 14px', fontFamily: 'monospace', fontWeight: 700, color: '#4f46e5' }}>
                             {job.jobId}
                           </td>
-                          <td style={{ padding: '12px 14px', fontWeight: 600, color: '#F8F6F1' }}>
+                          <td style={{ padding: '12px 14px', fontWeight: 600, color: '#0f172a' }}>
                             {job.type}
                           </td>
                           <td style={{ padding: '12px 14px' }}>
@@ -504,20 +504,20 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
                                   transition: 'width 0.3s ease'
                                 }} />
                               </div>
-                              <span style={{ fontSize: '11px', fontWeight: 700, minWidth: '34px', color: '#94A3B8' }}>
+                              <span style={{ fontSize: '11px', fontWeight: 700, minWidth: '34px', color: '#475569' }}>
                                 {job.progress || (isComplete ? 100 : 0)}%
                               </span>
                             </div>
                             {job.stepDescription && isProcessing && (
-                              <div style={{ fontSize: '11px', color: '#64748B', marginTop: '4px' }}>
+                              <div style={{ fontSize: '11px', color: '#475569', marginTop: '4px' }}>
                                 ↳ {job.stepDescription}
                               </div>
                             )}
                           </td>
-                          <td style={{ padding: '12px 14px', color: '#cbd5e1', fontWeight: 600 }}>
+                          <td style={{ padding: '12px 14px', color: '#334155', fontWeight: 600 }}>
                             {job.durationMs ? `${job.durationMs} ms` : (isProcessing ? 'Working...' : 'Queued')}
                           </td>
-                          <td style={{ padding: '12px 14px', color: '#94A3B8', fontSize: '12px' }}>
+                          <td style={{ padding: '12px 14px', color: '#475569', fontSize: '12px' }}>
                             {new Date(job.createdAt).toLocaleTimeString()}
                           </td>
                         </tr>
@@ -570,7 +570,7 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
 
               <button
                 onClick={() => setLogs([])}
-                style={{ background: '#1e293b', border: '1px solid #475569', color: '#94a3b8', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
+                style={{ background: '#1e293b', border: '1px solid #475569', color: '#475569', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
               >
                 Clear Screen
               </button>
@@ -615,7 +615,7 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
                     }}>
                       {badge.icon} {log.type}
                     </span>
-                    <span style={{ color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span style={{ color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {JSON.stringify(log.payload)}
                     </span>
                   </div>
@@ -639,7 +639,7 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
                 </span>
                 <button
                   onClick={() => setSelectedLogPayload(null)}
-                  style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '14px' }}
+                  style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '14px' }}
                 >
                   ✖
                 </button>
@@ -656,8 +656,8 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
       {activeTab === 'architecture' && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
           {/* Synchronous vs Asynchronous Comparison */}
-          <div style={{ background: 'rgba(30, 41, 59, 0.7)', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem', gridColumn: '1 / -1' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 1rem 0', color: '#F8F6F1' }}>
+          <div style={{ background: '#ffffff', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem', gridColumn: '1 / -1' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 1rem 0', color: '#0f172a' }}>
               Synchronous Blocking vs. Asynchronous Event-Driven Architecture
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
@@ -675,7 +675,7 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
                 <div style={{ color: '#4ade80', fontWeight: 700, marginBottom: '6px' }}>Asynchronous Event-Driven (Non-Blocking)</div>
                 <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: '#86efac', lineHeight: 1.6 }}>
                   <li>Client sends HTTP POST request.</li>
-                  <li>Server registers job and returns <strong style={{ color: '#F8F6F1' }}>HTTP 202 Accepted</strong> immediately (~4ms).</li>
+                  <li>Server registers job and returns <strong style={{ color: '#0f172a' }}>HTTP 202 Accepted</strong> immediately (~4ms).</li>
                   <li>Event Bus dispatches job to decoupled background workers (using setImmediate).</li>
                   <li>Workers emit progressive progress events streamed via Server-Sent Events (SSE).</li>
                 </ul>
@@ -684,43 +684,43 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
           </div>
 
           {/* Pipeline Flowchart */}
-          <div style={{ background: 'rgba(30, 41, 59, 0.7)', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem' }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 1rem 0', color: '#F8F6F1' }}>
+          <div style={{ background: '#ffffff', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 1rem 0', color: '#0f172a' }}>
               Event-Driven Pipeline Flow
             </h3>
-            <div style={{ background: 'rgba(15, 23, 42, 0.65)', padding: '1.25rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)', fontFamily: 'monospace', fontSize: '12px', lineHeight: 1.8, color: '#cbd5e1' }}>
-              <div>1. <strong style={{ color: '#F8F6F1' }}>Event Producer</strong>: taskController / eventController</div>
-              <div style={{ color: '#D4B996', paddingLeft: '12px' }}>└── appEventBus.emitAppEvent(eventType, payload)</div>
-              <div>2. <strong style={{ color: '#F8F6F1' }}>Central Event Bus</strong>: Node.js EventEmitter</div>
+            <div style={{ background: 'rgba(15, 23, 42, 0.65)', padding: '1.25rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)', fontFamily: 'monospace', fontSize: '12px', lineHeight: 1.8, color: '#334155' }}>
+              <div>1. <strong style={{ color: '#0f172a' }}>Event Producer</strong>: taskController / eventController</div>
+              <div style={{ color: '#4f46e5', paddingLeft: '12px' }}>└── appEventBus.emitAppEvent(eventType, payload)</div>
+              <div>2. <strong style={{ color: '#0f172a' }}>Central Event Bus</strong>: Node.js EventEmitter</div>
               <div style={{ color: '#60a5fa', paddingLeft: '12px' }}>├── AuditLogConsumer (immutable logging)</div>
               <div style={{ color: '#60a5fa', paddingLeft: '12px' }}>├── NotificationConsumer (async alerts)</div>
               <div style={{ color: '#60a5fa', paddingLeft: '12px' }}>└── JobSupervisorConsumer (lifecycle monitoring)</div>
-              <div>3. <strong style={{ color: '#F8F6F1' }}>Broadcaster</strong>: Server-Sent Events (SSE) Stream</div>
+              <div>3. <strong style={{ color: '#0f172a' }}>Broadcaster</strong>: Server-Sent Events (SSE) Stream</div>
               <div style={{ color: '#4ade80', paddingLeft: '12px' }}>└── Pushes JSON frames to all connected browser clients</div>
             </div>
           </div>
 
           {/* Decoupled Consumers */}
-          <div style={{ background: 'rgba(30, 41, 59, 0.7)', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem' }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 1rem 0', color: '#F8F6F1' }}>
+          <div style={{ background: '#ffffff', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 1rem 0', color: '#0f172a' }}>
               Active Decoupled Consumers
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ background: 'rgba(15, 23, 42, 0.65)', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                <strong style={{ fontSize: '13px', color: '#F8F6F1' }}>1. AuditLogConsumer</strong>
-                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94A3B8' }}>
+                <strong style={{ fontSize: '13px', color: '#0f172a' }}>1. AuditLogConsumer</strong>
+                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#475569' }}>
                   Listens to all task mutations (create, update, delete) and maintains tamper-evident audit records.
                 </p>
               </div>
               <div style={{ background: 'rgba(15, 23, 42, 0.65)', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                <strong style={{ fontSize: '13px', color: '#F8F6F1' }}>2. NotificationConsumer</strong>
-                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94A3B8' }}>
+                <strong style={{ fontSize: '13px', color: '#0f172a' }}>2. NotificationConsumer</strong>
+                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#475569' }}>
                   Decouples alerts from user requests, preventing external SMTP/SMS latency from slowing down task creation.
                 </p>
               </div>
               <div style={{ background: 'rgba(15, 23, 42, 0.65)', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                <strong style={{ fontSize: '13px', color: '#F8F6F1' }}>3. JobSupervisorConsumer</strong>
-                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94A3B8' }}>
+                <strong style={{ fontSize: '13px', color: '#0f172a' }}>3. JobSupervisorConsumer</strong>
+                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#475569' }}>
                   Monitors long-running background tasks, tracking elapsed duration, error states, and completion milestones.
                 </p>
               </div>
@@ -731,14 +731,14 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
 
       {/* TAB 4: METRICS */}
       {activeTab === 'metrics' && (
-        <div style={{ background: 'rgba(30, 41, 59, 0.7)', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem' }}>
+        <div style={{ background: '#ffffff', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '16px', padding: '1.75rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#F8F6F1' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
               Live Event Bus &amp; Worker Health Metrics
             </h3>
             <button
               onClick={refreshData}
-              style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.12)', color: '#F8F6F1', padding: '6px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}
+              style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.12)', color: '#0f172a', padding: '6px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}
             >
               Refresh
             </button>
@@ -746,36 +746,36 @@ function AsyncEventDriven({ color = '#4f46e5' }) {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
             <div style={{ background: 'rgba(15, 23, 42, 0.65)', padding: '1.25rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <div style={{ color: '#94A3B8', fontSize: '12px', fontWeight: 700 }}>Total Events Emitted</div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: '#D4B996', marginTop: '4px' }}>
+              <div style={{ color: '#475569', fontSize: '12px', fontWeight: 700 }}>Total Events Emitted</div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: '#4f46e5', marginTop: '4px' }}>
                 {metrics?.totalEventsEmitted ?? logs.length}
               </div>
             </div>
 
             <div style={{ background: 'rgba(15, 23, 42, 0.65)', padding: '1.25rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <div style={{ color: '#94A3B8', fontSize: '12px', fontWeight: 700 }}>Active SSE Subscribers</div>
+              <div style={{ color: '#475569', fontSize: '12px', fontWeight: 700 }}>Active SSE Subscribers</div>
               <div style={{ fontSize: '28px', fontWeight: 800, color: '#4ade80', marginTop: '4px' }}>
                 {metrics?.activeSseClients ?? (sseConnected ? 1 : 0)}
               </div>
             </div>
 
             <div style={{ background: 'rgba(15, 23, 42, 0.65)', padding: '1.25rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <div style={{ color: '#94A3B8', fontSize: '12px', fontWeight: 700 }}>Jobs Dispatched</div>
+              <div style={{ color: '#475569', fontSize: '12px', fontWeight: 700 }}>Jobs Dispatched</div>
               <div style={{ fontSize: '28px', fontWeight: 800, color: '#60a5fa', marginTop: '4px' }}>
                 {metrics?.totalJobsDispatched ?? jobs.length}
               </div>
             </div>
 
             <div style={{ background: 'rgba(15, 23, 42, 0.65)', padding: '1.25rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <div style={{ color: '#94A3B8', fontSize: '12px', fontWeight: 700 }}>Jobs Completed</div>
+              <div style={{ color: '#475569', fontSize: '12px', fontWeight: 700 }}>Jobs Completed</div>
               <div style={{ fontSize: '28px', fontWeight: 800, color: '#4ade80', marginTop: '4px' }}>
                 {metrics?.totalJobsCompleted ?? jobs.filter(j => j.status === 'COMPLETED').length}
               </div>
             </div>
 
             <div style={{ background: 'rgba(15, 23, 42, 0.65)', padding: '1.25rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <div style={{ color: '#94A3B8', fontSize: '12px', fontWeight: 700 }}>Server Uptime</div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: '#D4B996', marginTop: '4px' }}>
+              <div style={{ color: '#475569', fontSize: '12px', fontWeight: 700 }}>Server Uptime</div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: '#4f46e5', marginTop: '4px' }}>
                 {metrics?.uptimeSeconds ? `${metrics.uptimeSeconds}s` : 'Active'}
               </div>
             </div>

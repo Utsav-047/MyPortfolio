@@ -139,8 +139,8 @@ function AiAssistant({ color = '#4f46e5' }) {
 
   return (
     <div style={{
-      background: 'rgba(30, 41, 59, 0.7)',
-      border: '1px solid rgba(212, 185, 150, 0.15)',
+      background: '#ffffff',
+      border: '1px solid #e2e8f0',
       borderRadius: '16px',
       padding: '24px',
       boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
@@ -179,7 +179,7 @@ function AiAssistant({ color = '#4f46e5' }) {
       }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 800, color: '#F8F6F1', fontFamily: "'Playfair Display', Georgia, serif" }}>
+            <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 800, color: '#0f172a', fontFamily: 'inherit' }}>
               AI API Integration &amp; Responsible Copilot
             </h2>
             <span style={{
@@ -194,7 +194,7 @@ function AiAssistant({ color = '#4f46e5' }) {
               Practical 13 • CO6 / PO3, PO5, PO12
             </span>
           </div>
-          <p style={{ margin: '6px 0 0 0', fontSize: '14px', color: '#94A3B8' }}>
+          <p style={{ margin: '6px 0 0 0', fontSize: '14px', color: '#475569' }}>
             Secure server-side OpenAI (gpt-4o-mini) and Gemini API integration with zero-crash graceful degradation, PII sanitization, and human-in-the-loop review.
           </p>
         </div>
@@ -204,10 +204,10 @@ function AiAssistant({ color = '#4f46e5' }) {
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
-          background: 'rgba(15, 23, 42, 0.65)',
+          background: '#f8fafc',
           padding: '10px 18px',
           borderRadius: '12px',
-          border: '1px solid rgba(212, 185, 150, 0.15)'
+          border: '1px solid #e2e8f0'
         }}>
           <div style={{
             width: '10px',
@@ -217,10 +217,10 @@ function AiAssistant({ color = '#4f46e5' }) {
             boxShadow: '0 0 8px #4ade80'
           }} />
           <div>
-            <div style={{ fontSize: '10px', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <div style={{ fontSize: '10px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Active AI Provider
             </div>
-            <div style={{ fontSize: '13px', fontWeight: 800, color: '#F8F6F1' }}>
+            <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
               {aiStatus?.provider || 'OpenAI / Graceful Fallback Engine'}
             </div>
           </div>
@@ -270,16 +270,16 @@ function AiAssistant({ color = '#4f46e5' }) {
           {/* Left Column: Input Form */}
           <div style={{
             background: 'rgba(15, 23, 42, 0.6)',
-            border: '1px solid rgba(212, 185, 150, 0.12)',
+            border: '1px solid #e2e8f0',
             borderRadius: '14px',
             padding: '20px'
           }}>
-            <h3 style={{ margin: '0 0 14px 0', fontSize: '16px', fontWeight: 800, color: '#F8F6F1' }}>
+            <h3 style={{ margin: '0 0 14px 0', fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
               Task Definition &amp; Context
             </h3>
 
             <div style={{ marginBottom: '14px' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                 Task Title *
               </label>
               <input
@@ -293,7 +293,7 @@ function AiAssistant({ color = '#4f46e5' }) {
                   borderRadius: '8px',
                   background: 'rgba(30, 41, 59, 0.8)',
                   border: '1px solid rgba(212, 185, 150, 0.2)',
-                  color: '#F8F6F1',
+                  color: '#0f172a',
                   fontSize: '14px',
                   boxSizing: 'border-box'
                 }}
@@ -301,7 +301,7 @@ function AiAssistant({ color = '#4f46e5' }) {
             </div>
 
             <div style={{ marginBottom: '18px' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#cbd5e1', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                 Technical Context / Instructions (Optional)
               </label>
               <input
@@ -315,7 +315,7 @@ function AiAssistant({ color = '#4f46e5' }) {
                   borderRadius: '8px',
                   background: 'rgba(30, 41, 59, 0.8)',
                   border: '1px solid rgba(212, 185, 150, 0.2)',
-                  color: '#F8F6F1',
+                  color: '#0f172a',
                   fontSize: '14px',
                   boxSizing: 'border-box'
                 }}
@@ -328,7 +328,7 @@ function AiAssistant({ color = '#4f46e5' }) {
                 disabled={loading}
                 style={{
                   background: 'rgba(212, 185, 150, 0.25)',
-                  color: '#F8F6F1',
+                  color: '#0f172a',
                   border: '1px solid rgba(212, 185, 150, 0.4)',
                   padding: '12px 18px',
                   borderRadius: '8px',
@@ -392,7 +392,7 @@ function AiAssistant({ color = '#4f46e5' }) {
 
             {/* Quick Sample Prompts */}
             <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: '#94A3B8', marginBottom: '8px' }}>
+              <div style={{ fontSize: '12px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>
                 Try Quick Sample Task Titles:
               </div>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -406,12 +406,12 @@ function AiAssistant({ color = '#4f46e5' }) {
                     key={idx}
                     onClick={() => setTitleInput(sample)}
                     style={{
-                      background: 'rgba(30, 41, 59, 0.7)',
-                      border: '1px solid rgba(212, 185, 150, 0.15)',
+                      background: '#ffffff',
+                      border: '1px solid #e2e8f0',
                       borderRadius: '6px',
                       padding: '5px 10px',
                       fontSize: '11px',
-                      color: '#cbd5e1',
+                      color: '#334155',
                       cursor: 'pointer',
                       textAlign: 'left'
                     }}
@@ -426,7 +426,7 @@ function AiAssistant({ color = '#4f46e5' }) {
           {/* Right Column: AI Output & Editable Review */}
           <div style={{
             background: 'rgba(15, 23, 42, 0.6)',
-            border: '1px solid rgba(212, 185, 150, 0.12)',
+            border: '1px solid #e2e8f0',
             borderRadius: '14px',
             padding: '20px',
             display: 'flex',
@@ -435,7 +435,7 @@ function AiAssistant({ color = '#4f46e5' }) {
           }}>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#F8F6F1' }}>
+                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
                   AI Generated Description (Editable Suggestion)
                 </h3>
                 {descMetadata && (
@@ -465,7 +465,7 @@ function AiAssistant({ color = '#4f46e5' }) {
                   border: '1px solid rgba(212, 185, 150, 0.2)',
                   fontSize: '13px',
                   lineHeight: 1.6,
-                  color: '#F8F6F1',
+                  color: '#0f172a',
                   background: 'rgba(30, 41, 59, 0.8)',
                   boxSizing: 'border-box'
                 }}
@@ -474,8 +474,8 @@ function AiAssistant({ color = '#4f46e5' }) {
               {/* Priority & Effort Card */}
               {suggestedPriority && (
                 <div style={{
-                  background: 'rgba(30, 41, 59, 0.7)',
-                  border: '1px solid rgba(212, 185, 150, 0.15)',
+                  background: '#ffffff',
+                  border: '1px solid #e2e8f0',
                   borderRadius: '10px',
                   padding: '12px 14px',
                   margin: '12px 0',
@@ -484,17 +484,17 @@ function AiAssistant({ color = '#4f46e5' }) {
                   alignItems: 'center'
                 }}>
                   <div>
-                    <div style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 600 }}>Suggested Priority</div>
+                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 600 }}>Suggested Priority</div>
                     <div style={{ fontSize: '14px', fontWeight: 800, color: suggestedPriority.priority === 'High' ? '#f87171' : '#4ade80', textTransform: 'uppercase' }}>
                       {suggestedPriority.priority} ({Math.round(suggestedPriority.confidence * 100)}% confidence)
                     </div>
-                    <div style={{ fontSize: '11px', color: '#cbd5e1', marginTop: '2px' }}>
+                    <div style={{ fontSize: '11px', color: '#334155', marginTop: '2px' }}>
                       {suggestedPriority.reasoning}
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '11px', color: '#94A3B8' }}>Estimated Effort</div>
-                    <div style={{ fontSize: '14px', fontWeight: 800, color: '#D4B996' }}>
+                    <div style={{ fontSize: '11px', color: '#475569' }}>Estimated Effort</div>
+                    <div style={{ fontSize: '14px', fontWeight: 800, color: '#4f46e5' }}>
                       ~{suggestedPriority.estimatedHours} hrs
                     </div>
                   </div>
@@ -504,7 +504,7 @@ function AiAssistant({ color = '#4f46e5' }) {
               {/* Checklist Breakdown */}
               {subtasks.length > 0 && (
                 <div style={{ marginTop: '12px' }}>
-                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#94A3B8', marginBottom: '6px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#475569', marginBottom: '6px' }}>
                     Suggested Subtasks Breakdown ({subtasks.length} steps):
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -513,12 +513,12 @@ function AiAssistant({ color = '#4f46e5' }) {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
-                        background: 'rgba(30, 41, 59, 0.7)',
+                        background: '#ffffff',
                         border: '1px solid rgba(255,255,255,0.06)',
                         padding: '6px 10px',
                         borderRadius: '6px',
                         fontSize: '12px',
-                        color: '#cbd5e1'
+                        color: '#334155'
                       }}>
                         <span style={{ color: '#4ade80' }}>✓</span>
                         <span>{st.title}</span>
@@ -549,11 +549,11 @@ function AiAssistant({ color = '#4f46e5' }) {
                   justifyContent: 'space-between',
                   marginTop: '8px',
                   fontSize: '11px',
-                  color: '#94a3b8'
+                  color: '#475569'
                 }}>
-                  <span>Source: <strong style={{ color: '#cbd5e1' }}>{descMetadata.source}</strong></span>
-                  <span>Latency: <strong style={{ color: '#cbd5e1' }}>{descMetadata.latencyMs}ms</strong></span>
-                  <span>Tokens: <strong style={{ color: '#cbd5e1' }}>~{descMetadata.tokensUsed}</strong></span>
+                  <span>Source: <strong style={{ color: '#334155' }}>{descMetadata.source}</strong></span>
+                  <span>Latency: <strong style={{ color: '#334155' }}>{descMetadata.latencyMs}ms</strong></span>
+                  <span>Tokens: <strong style={{ color: '#334155' }}>~{descMetadata.tokensUsed}</strong></span>
                 </div>
               )}
             </div>
@@ -565,16 +565,16 @@ function AiAssistant({ color = '#4f46e5' }) {
       {activeTab === 'degradation' && (
         <div>
           <div style={{
-            background: 'rgba(30, 41, 59, 0.7)',
+            background: '#ffffff',
             border: '1px solid rgba(212, 185, 150, 0.2)',
             borderRadius: '12px',
             padding: '16px 20px',
             marginBottom: '20px'
           }}>
-            <h3 style={{ margin: '0 0 6px 0', fontSize: '16px', fontWeight: 800, color: '#F8F6F1' }}>
+            <h3 style={{ margin: '0 0 6px 0', fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
               Graceful Degradation &amp; Failure Path Live Simulator
             </h3>
-            <p style={{ margin: 0, fontSize: '13px', color: '#94A3B8', lineHeight: 1.5 }}>
+            <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.5 }}>
               In real production systems, third-party AI APIs can encounter <strong>401 Unauthorized</strong> (expired key), <strong>429 Rate Limits</strong> (quota exhausted), or <strong>504 Gateway Timeouts</strong>. A robust architecture must never crash when external APIs fail — it must catch errors and return intelligent fallback suggestions.
             </p>
           </div>
@@ -589,7 +589,7 @@ function AiAssistant({ color = '#4f46e5' }) {
               <div style={{ fontSize: '14px', fontWeight: 700, color: '#4ade80', marginBottom: '6px' }}>
                 Path A: Standard Healthy Call
               </div>
-              <p style={{ fontSize: '12px', color: '#94A3B8', margin: '0 0 14px 0', lineHeight: 1.5 }}>
+              <p style={{ fontSize: '12px', color: '#475569', margin: '0 0 14px 0', lineHeight: 1.5 }}>
                 Sends request to <code>/api/ai/generate-description</code> with valid parameters. Uses live OpenAI/Gemini if key is in <code>.env</code>, or returns high-quality neural template fallback.
               </p>
               <button
@@ -621,7 +621,7 @@ function AiAssistant({ color = '#4f46e5' }) {
               <div style={{ fontSize: '14px', fontWeight: 700, color: '#f87171', marginBottom: '6px' }}>
                 Path B: Simulate API Error (Invalid Key / 401)
               </div>
-              <p style={{ fontSize: '12px', color: '#94A3B8', margin: '0 0 14px 0', lineHeight: 1.5 }}>
+              <p style={{ fontSize: '12px', color: '#475569', margin: '0 0 14px 0', lineHeight: 1.5 }}>
                 Simulates a broken/revoked API key. The Express server catches the exception in <code>try/catch</code> and safely delivers a fallback description without throwing a 500 server crash!
               </p>
               <button
@@ -653,7 +653,7 @@ function AiAssistant({ color = '#4f46e5' }) {
               <div style={{ fontSize: '14px', fontWeight: 700, color: '#fbbf24', marginBottom: '6px' }}>
                 Path C: Missing Title Validation (400)
               </div>
-              <p style={{ fontSize: '12px', color: '#94A3B8', margin: '0 0 14px 0', lineHeight: 1.5 }}>
+              <p style={{ fontSize: '12px', color: '#475569', margin: '0 0 14px 0', lineHeight: 1.5 }}>
                 Demonstrates input contract enforcement. If the client submits an empty title, the backend immediately responds with HTTP 400 Bad Request before calling any external billable token APIs.
               </p>
               <button
@@ -689,7 +689,7 @@ function AiAssistant({ color = '#4f46e5' }) {
             fontFamily: 'Consolas, Monaco, "Courier New", monospace',
             fontSize: '13px',
             lineHeight: 1.6,
-            border: '1px solid rgba(212, 185, 150, 0.15)'
+            border: '1px solid #e2e8f0'
           }}>
             <div style={{ color: '#38bdf8', marginBottom: '8px' }}>
               // Server-Side Graceful Degradation Pattern in controllers/aiController.js:
@@ -719,19 +719,19 @@ function AiAssistant({ color = '#4f46e5' }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{
             background: 'rgba(15, 23, 42, 0.6)',
-            border: '1px solid rgba(212, 185, 150, 0.15)',
+            border: '1px solid #e2e8f0',
             borderRadius: '14px',
             padding: '20px'
           }}>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 800, color: '#F8F6F1' }}>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
               Live PII (Personally Identifiable Information) Redaction Sandbox
             </h3>
-            <p style={{ margin: '0 0 14px 0', fontSize: '13px', color: '#94A3B8', lineHeight: 1.5 }}>
+            <p style={{ margin: '0 0 14px 0', fontSize: '13px', color: '#475569', lineHeight: 1.5 }}>
               Task management applications frequently contain sensitive corporate credentials, emails, and secrets. Before any prompt payload is dispatched across the network to an external LLM vendor, our backend sanitizes and masks sensitive strings.
             </p>
 
             <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#cbd5e1', marginBottom: '4px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
                 Test Input with Sensitive Data:
               </label>
               <textarea
@@ -746,7 +746,7 @@ function AiAssistant({ color = '#4f46e5' }) {
                   border: '1px solid rgba(212, 185, 150, 0.2)',
                   fontSize: '13px',
                   fontFamily: 'monospace',
-                  color: '#F8F6F1',
+                  color: '#0f172a',
                   boxSizing: 'border-box'
                 }}
               />
@@ -772,30 +772,30 @@ function AiAssistant({ color = '#4f46e5' }) {
 
           {/* 4 Pillars of Responsible AI */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '12px', padding: '16px' }}>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#F8F6F1' }}>Server-Side Isolation</div>
-              <div style={{ fontSize: '12px', color: '#94A3B8', marginTop: '6px', lineHeight: 1.5 }}>
+            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>Server-Side Isolation</div>
+              <div style={{ fontSize: '12px', color: '#475569', marginTop: '6px', lineHeight: 1.5 }}>
                 API keys reside solely in <code>backend/.env</code>. The React frontend never possesses API tokens, preventing quota theft via browser devtools.
               </div>
             </div>
 
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '12px', padding: '16px' }}>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#F8F6F1' }}>Human-in-the-Loop</div>
-              <div style={{ fontSize: '12px', color: '#94A3B8', marginTop: '6px', lineHeight: 1.5 }}>
+            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>Human-in-the-Loop</div>
+              <div style={{ fontSize: '12px', color: '#475569', marginTop: '6px', lineHeight: 1.5 }}>
                 AI responses are editable recommendations. The human user retains definitive decision authority before tasks are committed to MongoDB.
               </div>
             </div>
 
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '12px', padding: '16px' }}>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#F8F6F1' }}>Ethical Disclaimers</div>
-              <div style={{ fontSize: '12px', color: '#94A3B8', marginTop: '6px', lineHeight: 1.5 }}>
+            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>Ethical Disclaimers</div>
+              <div style={{ fontSize: '12px', color: '#475569', marginTop: '6px', lineHeight: 1.5 }}>
                 Visible UI badges inform users that generated text is synthesized by an AI model and may contain inadvertent hallucinations.
               </div>
             </div>
 
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(212, 185, 150, 0.12)', borderRadius: '12px', padding: '16px' }}>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#F8F6F1' }}>Rate Limiting &amp; Cost Guard</div>
-              <div style={{ fontSize: '12px', color: '#94A3B8', marginTop: '6px', lineHeight: 1.5 }}>
+            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>Rate Limiting &amp; Cost Guard</div>
+              <div style={{ fontSize: '12px', color: '#475569', marginTop: '6px', lineHeight: 1.5 }}>
                 IP-based rate limits protect server quotas, while maximum token constraints (<code>max_tokens: 150</code>) prevent runaway API billing.
               </div>
             </div>
@@ -808,11 +808,11 @@ function AiAssistant({ color = '#4f46e5' }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{
             background: 'rgba(15, 23, 42, 0.6)',
-            border: '1px solid rgba(212, 185, 150, 0.15)',
+            border: '1px solid #e2e8f0',
             borderRadius: '12px',
             padding: '20px'
           }}>
-            <h3 style={{ margin: '0 0 14px 0', fontSize: '16px', fontWeight: 800, color: '#F8F6F1' }}>
+            <h3 style={{ margin: '0 0 14px 0', fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
               System Architecture &amp; Data Flow Diagram
             </h3>
 
@@ -825,7 +825,7 @@ function AiAssistant({ color = '#4f46e5' }) {
               fontSize: '12px',
               lineHeight: 1.6,
               overflowX: 'auto',
-              border: '1px solid rgba(212, 185, 150, 0.15)',
+              border: '1px solid #e2e8f0',
               whiteSpace: 'pre'
             }}>
 {`React Frontend (Browser)
@@ -860,30 +860,30 @@ React Frontend Form
             gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
             gap: '12px'
           }}>
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid rgba(212, 185, 150, 0.12)' }}>
-              <div style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 700 }}>Security Status</div>
+            <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+              <div style={{ fontSize: '11px', color: '#475569', fontWeight: 700 }}>Security Status</div>
               <div style={{ fontSize: '14px', fontWeight: 800, color: '#4ade80', marginTop: '2px' }}>
                 Key Stored in Backend Only
               </div>
             </div>
 
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid rgba(212, 185, 150, 0.12)' }}>
-              <div style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 700 }}>Frontend Exposure</div>
+            <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+              <div style={{ fontSize: '11px', color: '#475569', fontWeight: 700 }}>Frontend Exposure</div>
               <div style={{ fontSize: '14px', fontWeight: 800, color: '#4ade80', marginTop: '2px' }}>
                 Zero Client Key Leakage
               </div>
             </div>
 
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid rgba(212, 185, 150, 0.12)' }}>
-              <div style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 700 }}>Rate Limiting</div>
+            <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+              <div style={{ fontSize: '11px', color: '#475569', fontWeight: 700 }}>Rate Limiting</div>
               <div style={{ fontSize: '14px', fontWeight: 800, color: '#38bdf8', marginTop: '2px' }}>
                 20 req / min per IP
               </div>
             </div>
 
-            <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid rgba(212, 185, 150, 0.12)' }}>
-              <div style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 700 }}>Degradation Policy</div>
-              <div style={{ fontSize: '14px', fontWeight: 800, color: '#D4B996', marginTop: '2px' }}>
+            <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+              <div style={{ fontSize: '11px', color: '#475569', fontWeight: 700 }}>Degradation Policy</div>
+              <div style={{ fontSize: '14px', fontWeight: 800, color: '#4f46e5', marginTop: '2px' }}>
                 Zero Crash Guarantee
               </div>
             </div>
@@ -895,16 +895,16 @@ React Frontend Form
       {activeTab === 'checklist' && (
         <div>
           <div style={{
-            background: 'rgba(30, 41, 59, 0.7)',
+            background: '#ffffff',
             border: '1px solid rgba(212, 185, 150, 0.2)',
             borderRadius: '12px',
             padding: '16px 20px',
             marginBottom: '20px'
           }}>
-            <div style={{ fontSize: '15px', fontWeight: 800, color: '#F8F6F1', marginBottom: '4px' }}>
+            <div style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>
               Required Screenshots for Practical 13 Lab Journal Submission
             </div>
-            <div style={{ fontSize: '13px', color: '#94A3B8' }}>
+            <div style={{ fontSize: '13px', color: '#475569' }}>
               Here is the exact checklist of screenshots to capture for your evaluation:
             </div>
           </div>
@@ -952,7 +952,7 @@ React Frontend Form
                 key={item.num}
                 style={{
                   background: 'rgba(15, 23, 42, 0.6)',
-                  border: '1px solid rgba(212, 185, 150, 0.12)',
+                  border: '1px solid #e2e8f0',
                   borderRadius: '12px',
                   padding: '16px 20px',
                   display: 'flex',
@@ -965,7 +965,7 @@ React Frontend Form
                   height: '32px',
                   borderRadius: '50%',
                   background: 'rgba(212, 185, 150, 0.2)',
-                  color: '#D4B996',
+                  color: '#4f46e5',
                   border: '1px solid rgba(212, 185, 150, 0.3)',
                   display: 'flex',
                   alignItems: 'center',
@@ -977,10 +977,10 @@ React Frontend Form
                   {item.num}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#F8F6F1' }}>
+                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>
                     {item.title}
                   </div>
-                  <div style={{ fontSize: '13px', color: '#94A3B8', margin: '4px 0 8px 0', lineHeight: 1.5 }}>
+                  <div style={{ fontSize: '13px', color: '#475569', margin: '4px 0 8px 0', lineHeight: 1.5 }}>
                     {item.desc}
                   </div>
                   <code style={{
@@ -988,7 +988,7 @@ React Frontend Form
                     background: 'rgba(30, 41, 59, 0.8)',
                     padding: '3px 8px',
                     borderRadius: '6px',
-                    color: '#cbd5e1'
+                    color: '#334155'
                   }}>
                     {item.file}
                   </code>

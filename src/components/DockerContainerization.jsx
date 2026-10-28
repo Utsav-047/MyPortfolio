@@ -564,9 +564,9 @@ docs/`
                   padding: '16px',
                   textAlign: 'center'
                 }}>
-                  <div style={{ fontSize: '24px', marginBottom: '6px' }}>💻</div>
-                  <div style={{ fontWeight: 800, fontSize: '14px', color: '#0f172a' }}>Client Browser</div>
-                  <div style={{ fontSize: '11px', color: '#475569', marginTop: '4px' }}>Host Port: 3000</div>
+                  <div style={{ color: "#38bdf8", marginBottom: "6px", display: "flex", justifyContent: "center" }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+                  <div style={{ fontWeight: 800, fontSize: '14px', color: '#f8fafc' }}>Client Browser</div>
+                  <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>Host Port: 3000</div>
                   <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>HTTP Requests</div>
                 </div>
 
@@ -584,12 +584,12 @@ docs/`
                   boxShadow: '0 8px 20px rgba(56, 189, 248, 0.15)'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '20px' }}>🌐</span>
+                    <span style={{ color: "#38bdf8", display: "inline-flex" }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
                     <span style={{ fontSize: '10px', background: '#0284c7', color: '#ffffff', padding: '2px 8px', borderRadius: '10px', fontWeight: 800 }}>PORT 80</span>
                   </div>
                   <div style={{ fontWeight: 800, fontSize: '15px', color: '#38bdf8' }}>portfolio-frontend</div>
-                  <div style={{ fontSize: '11px', color: '#334155', marginTop: '4px' }}>Nginx 1.25 Alpine</div>
-                  <div style={{ fontSize: '10px', color: '#475569', marginTop: '6px', lineHeight: 1.4 }}>
+                  <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>Nginx 1.25 Alpine</div>
+                  <div style={{ fontSize: '10px', color: '#cbd5e1', marginTop: '6px', lineHeight: 1.4 }}>
                     • Serves React /dist SPA<br />
                     • Reverse Proxies /api/ ➔ backend:5000<br />
                     • Disables buffering for SSE
@@ -610,12 +610,12 @@ docs/`
                   boxShadow: '0 8px 20px rgba(167, 139, 250, 0.15)'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '20px' }}>⚙️</span>
+                    <span style={{ color: "#a78bfa", display: "inline-flex" }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></span>
                     <span style={{ fontSize: '10px', background: '#7c3aed', color: '#ffffff', padding: '2px 8px', borderRadius: '10px', fontWeight: 800 }}>PORT 5000</span>
                   </div>
                   <div style={{ fontWeight: 800, fontSize: '15px', color: '#a78bfa' }}>portfolio-backend</div>
-                  <div style={{ fontSize: '11px', color: '#334155', marginTop: '4px' }}>Node.js 20 Alpine Express</div>
-                  <div style={{ fontSize: '10px', color: '#475569', marginTop: '6px', lineHeight: 1.4 }}>
+                  <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>Node.js 20 Alpine Express</div>
+                  <div style={{ fontSize: '10px', color: '#cbd5e1', marginTop: '6px', lineHeight: 1.4 }}>
                     • Task REST APIs + Auth Gate<br />
                     • EventEmitter Async Engine<br />
                     • Healthcheck: GET / (every 20s)
@@ -636,11 +636,11 @@ docs/`
                   boxShadow: '0 8px 20px rgba(74, 222, 128, 0.15)'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '20px' }}>🍃</span>
+                    <span style={{ color: "#4ade80", display: "inline-flex" }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></span>
                     <span style={{ fontSize: '10px', background: '#16a34a', color: '#ffffff', padding: '2px 8px', borderRadius: '10px', fontWeight: 800 }}>PORT 27017</span>
                   </div>
                   <div style={{ fontWeight: 800, fontSize: '15px', color: '#4ade80' }}>portfolio-mongo</div>
-                  <div style={{ fontSize: '11px', color: '#334155', marginTop: '4px' }}>MongoDB 7.0 Engine</div>
+                  <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>MongoDB 7.0 Engine</div>
                   <div style={{
                     marginTop: '8px',
                     padding: '6px 8px',
@@ -650,7 +650,7 @@ docs/`
                     fontSize: '10px',
                     color: '#86efac'
                   }}>
-                    💾 Named Volume: <strong>portfolio_mongo_data</strong>
+                    Named Volume: <strong>portfolio_mongo_data</strong>
                   </div>
                 </div>
               </div>
@@ -714,7 +714,20 @@ docs/`
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <span style={{ fontSize: '24px' }}>{service.icon}</span>
+                          <div style={{
+  width: '40px',
+  height: '40px',
+  borderRadius: '10px',
+  background: service.id === 'frontend' ? '#e0f2fe' : service.id === 'backend' ? '#ede9fe' : '#dcfce7',
+  color: service.id === 'frontend' ? '#0284c7' : service.id === 'backend' ? '#7c3aed' : '#16a34a',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
+}}>
+  {service.id === 'frontend' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>}
+  {service.id === 'backend' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>}
+  {service.id === 'mongo' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>}
+</div>
                           <div>
                             <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#0f172a' }}>
                               {service.name}
@@ -1078,7 +1091,19 @@ docs/`
                     transition: 'all 0.15s ease'
                   }}
                 >
-                  <span style={{ fontSize: '20px', marginTop: '2px' }}>{item.icon}</span>
+                  <div style={{
+  width: '32px',
+  height: '32px',
+  borderRadius: '8px',
+  background: '#f1f5f9',
+  color: '#4f46e5',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0
+}}>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+</div>
                   <div>
                     <div style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '12px', color: '#0f172a' }}>
                       {item.title}
@@ -1209,7 +1234,7 @@ docs/`
               <div style={{ fontSize: '20px', fontWeight: 800, color: '#4f46e5', marginTop: '4px' }}>
                 {containerInfo?.memory?.heapUsedMb ? `${containerInfo.memory.heapUsedMb} MB` : '42.8 MB'}
               </div>
-              <div style={{ fontSize: '12px', color: '#334155', marginTop: '4px' }}>
+              <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>
                 Total Allocated: {containerInfo?.memory?.heapTotalMb || '64.5'} MB
               </div>
             </div>
@@ -1225,7 +1250,7 @@ docs/`
               <div style={{ fontSize: '20px', fontWeight: 800, color: '#38bdf8', marginTop: '4px' }}>
                 {containerInfo?.memory?.rssMb ? `${containerInfo.memory.rssMb} MB` : '78.2 MB'}
               </div>
-              <div style={{ fontSize: '12px', color: '#334155', marginTop: '4px' }}>
+              <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>
                 External Buffers: {containerInfo?.memory?.externalMb || '2.1'} MB
               </div>
             </div>
@@ -1241,7 +1266,7 @@ docs/`
               <div style={{ fontSize: '20px', fontWeight: 800, color: '#4ade80', marginTop: '4px' }}>
                 {containerInfo?.runtime?.uptimeSeconds ? `${containerInfo.runtime.uptimeSeconds}s` : 'Healthy'}
               </div>
-              <div style={{ fontSize: '12px', color: '#334155', marginTop: '4px' }}>
+              <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>
                 Container PID: {containerInfo?.runtime?.pid || '1 (init)'}
               </div>
             </div>

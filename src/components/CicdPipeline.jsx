@@ -296,7 +296,7 @@ Please fix the failing assertion and push a commit to trigger a new run.
           right: '24px',
           background: '#1E293B',
           border: `1px solid ${toast.type === 'error' ? '#f87171' : toast.type === 'info' ? '#60a5fa' : '#4ade80'}`,
-          color: '#F8F6F1',
+          color: '#0f172a',
           padding: '12px 20px',
           borderRadius: '10px',
           boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
@@ -311,11 +311,11 @@ Please fix the failing assertion and push a commit to trigger a new run.
 
       {/* Header & Status Banner */}
       <div style={{
-        background: 'rgba(30,41,59,0.8)',
+        background: '#ffffff',
         borderRadius: '14px',
         padding: '1.75rem 2rem',
         marginBottom: '1.25rem',
-        border: '1px solid rgba(212,185,150,0.12)',
+        border: '1px solid #e2e8f0',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -324,11 +324,11 @@ Please fix the failing assertion and push a commit to trigger a new run.
       }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-            <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: '#F8F6F1', fontFamily: "'Playfair Display', Georgia, serif" }}>
+            <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: '#0f172a', fontFamily: 'inherit' }}>
               CI/CD Pipeline — GitHub Actions
             </h2>
           </div>
-          <p style={{ margin: 0, fontSize: '13px', color: '#64748B', lineHeight: 1.6, maxWidth: '600px' }}>
+          <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.6, maxWidth: '600px' }}>
             Automated Continuous Integration pipeline with GitHub Actions, Jest unit testing, Supertest API verification, and ESLint code quality gates.
           </p>
         </div>
@@ -338,10 +338,10 @@ Please fix the failing assertion and push a commit to trigger a new run.
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
-          background: 'rgba(255,255,255,0.04)',
+          background: '#f8fafc',
           padding: '10px 18px',
           borderRadius: '10px',
-          border: '1px solid rgba(255,255,255,0.08)'
+          border: '1px solid #e2e8f0'
         }}>
           <div style={{
             width: '10px',
@@ -352,7 +352,7 @@ Please fix the failing assertion and push a commit to trigger a new run.
             animation: pipelineState === 'running' ? 'pulse 1s infinite' : 'none'
           }} />
           <div>
-            <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <div style={{ fontSize: '10px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               Workflow Status
             </div>
             <div style={{
@@ -390,11 +390,11 @@ Please fix the failing assertion and push a commit to trigger a new run.
             style={{
               padding: '9px 18px',
               borderRadius: '10px',
-              border: activeTab === t.key ? '1px solid rgba(212,185,150,0.35)' : '1px solid rgba(255,255,255,0.08)',
-              background: activeTab === t.key ? 'rgba(212,185,150,0.15)' : 'rgba(30,41,59,0.5)',
-              color: activeTab === t.key ? '#F8F6F1' : '#94A3B8',
+              border: activeTab === t.key ? '1px solid #c7d2fe' : '1px solid #e2e8f0',
+              background: activeTab === t.key ? '#ede9fe' : '#ffffff',
+              color: activeTab === t.key ? '#4f46e5' : '#475569',
               fontWeight: 700,
-              fontSize: '13px',
+              fontSize: '13.5px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -417,17 +417,17 @@ Please fix the failing assertion and push a commit to trigger a new run.
             alignItems: 'center',
             flexWrap: 'wrap',
             gap: '12px',
-            background: 'rgba(30, 41, 59, 0.7)',
+            background: '#ffffff',
             padding: '16px 20px',
             borderRadius: '14px',
-            border: '1px solid rgba(212, 185, 150, 0.15)',
+            border: '1px solid #e2e8f0',
             marginBottom: '20px'
           }}>
             <div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#F8F6F1' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>
                 Pipeline Test Execution Simulator
               </div>
-              <div style={{ fontSize: '12px', color: '#94A3B8' }}>
+              <div style={{ fontSize: '12px', color: '#475569' }}>
                 Simulate a real commit push, broken test assertion failure, or fixed green pipeline run.
               </div>
             </div>
@@ -437,9 +437,9 @@ Please fix the failing assertion and push a commit to trigger a new run.
                 onClick={() => runSimulation('healthy')}
                 disabled={pipelineState === 'running'}
                 style={{
-                  background: 'rgba(16,185,129,0.2)',
-                  color: '#4ade80',
-                  border: '1px solid rgba(74,222,128,0.4)',
+                  background: '#dcfce7',
+                  color: '#166534',
+                  border: '1px solid #86efac',
                   padding: '9px 16px',
                   borderRadius: '8px',
                   fontWeight: 700,
@@ -459,9 +459,9 @@ Please fix the failing assertion and push a commit to trigger a new run.
                 onClick={() => runSimulation('broken')}
                 disabled={pipelineState === 'running'}
                 style={{
-                  background: 'rgba(239,68,68,0.2)',
-                  color: '#f87171',
-                  border: '1px solid rgba(248,113,113,0.4)',
+                  background: '#fee2e2',
+                  color: '#991b1b',
+                  border: '1px solid #fca5a5',
                   padding: '9px 16px',
                   borderRadius: '8px',
                   fontWeight: 700,
@@ -487,9 +487,9 @@ Please fix the failing assertion and push a commit to trigger a new run.
                 }}
                 disabled={pipelineState === 'running'}
                 style={{
-                  background: 'rgba(99,102,241,0.2)',
-                  color: '#a5b4fc',
-                  border: '1px solid rgba(165,180,252,0.4)',
+                  background: '#f1f5f9',
+                  color: '#334155',
+                  border: '1px solid #cbd5e1',
                   padding: '9px 16px',
                   borderRadius: '8px',
                   fontWeight: 700,
@@ -527,24 +527,24 @@ Please fix the failing assertion and push a commit to trigger a new run.
               let statusLabel = 'PENDING';
 
               if (isFailed) {
-                badgeBg = 'rgba(239, 68, 68, 0.2)';
-                badgeColor = '#f87171';
-                badgeBorder = 'rgba(248, 113, 113, 0.35)';
+                badgeBg = '#fee2e2';
+                badgeColor = '#991b1b';
+                badgeBorder = '#fca5a5';
                 statusLabel = 'FAILED';
               } else if (isPassed) {
-                badgeBg = 'rgba(16, 185, 129, 0.2)';
-                badgeColor = '#4ade80';
-                badgeBorder = 'rgba(74, 222, 128, 0.35)';
+                badgeBg = '#dcfce7';
+                badgeColor = '#166534';
+                badgeBorder = '#86efac';
                 statusLabel = 'PASSED';
               } else if (isCurrent) {
-                badgeBg = 'rgba(56, 189, 248, 0.2)';
-                badgeColor = '#38bdf8';
-                badgeBorder = 'rgba(56, 189, 248, 0.35)';
+                badgeBg = '#e0f2fe';
+                badgeColor = '#0369a1';
+                badgeBorder = '#7dd3fc';
                 statusLabel = 'RUNNING';
               } else if (isSkipped) {
-                badgeBg = 'rgba(255, 255, 255, 0.04)';
+                badgeBg = '#f1f5f9';
                 badgeColor = '#64748b';
-                badgeBorder = 'rgba(255, 255, 255, 0.08)';
+                badgeBorder = '#e2e8f0';
                 statusLabel = 'SKIPPED';
               }
 
@@ -552,7 +552,7 @@ Please fix the failing assertion and push a commit to trigger a new run.
                 <div
                   key={step.id}
                   style={{
-                    background: 'rgba(30, 41, 59, 0.7)',
+                    background: '#ffffff',
                     border: `1px solid ${isFailed ? 'rgba(248,113,113,0.5)' : isPassed ? 'rgba(74,222,128,0.3)' : isCurrent ? 'rgba(56,189,248,0.5)' : 'rgba(212,185,150,0.12)'}`,
                     borderRadius: '12px',
                     padding: '16px',
@@ -568,7 +568,7 @@ Please fix the failing assertion and push a commit to trigger a new run.
                     <span style={{
                       fontSize: '11px',
                       fontWeight: 800,
-                      color: '#94a3b8',
+                      color: '#475569',
                       background: 'rgba(255,255,255,0.06)',
                       padding: '2px 8px',
                       borderRadius: '6px'
@@ -590,17 +590,17 @@ Please fix the failing assertion and push a commit to trigger a new run.
                   </div>
 
                   <div>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#F8F6F1', marginBottom: '6px' }}>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
                       {step.name}
                     </div>
-                    <code style={{ fontSize: '11px', color: '#94a3b8', background: 'rgba(15,23,42,0.6)', padding: '3px 7px', borderRadius: '4px', wordBreak: 'break-all', display: 'inline-block' }}>
+                    <code style={{ fontSize: '11px', color: '#475569', background: '#f8fafc', padding: '3px 7px', borderRadius: '4px', wordBreak: 'break-all', display: 'inline-block' }}>
                       {step.command}
                     </code>
                   </div>
 
                   <div style={{ fontSize: '11px', color: '#64748b', display: 'flex', justifyContent: 'space-between' }}>
                     <span>Duration:</span>
-                    <strong style={{ color: '#cbd5e1' }}>{step.duration}</strong>
+                    <strong style={{ color: '#334155' }}>{step.duration}</strong>
                   </div>
                 </div>
               );
@@ -609,8 +609,8 @@ Please fix the failing assertion and push a commit to trigger a new run.
 
           {/* Repository & Trigger Metadata Card */}
           <div style={{
-            background: 'rgba(30, 41, 59, 0.7)',
-            border: '1px solid rgba(212, 185, 150, 0.15)',
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
             borderRadius: '14px',
             padding: '18px 22px',
             display: 'grid',
@@ -618,13 +618,13 @@ Please fix the failing assertion and push a commit to trigger a new run.
             gap: '16px'
           }}>
             <div>
-              <div style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>GitHub Repository</div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#F8F6F1', marginTop: '4px' }}>
+              <div style={{ fontSize: '12px', color: '#475569', fontWeight: 600 }}>GitHub Repository</div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', marginTop: '4px' }}>
                 <a
                   href="https://github.com/Utsav-047/MyPortfolio"
                   target="_blank"
                   rel="noreferrer"
-                  style={{ color: '#D4B996', textDecoration: 'none' }}
+                  style={{ color: '#4f46e5', textDecoration: 'none' }}
                 >
                   Utsav-047/MyPortfolio ↗
                 </a>
@@ -632,21 +632,21 @@ Please fix the failing assertion and push a commit to trigger a new run.
             </div>
 
             <div>
-              <div style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>Trigger Event &amp; Branch</div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#F8F6F1', marginTop: '4px' }}>
-                <code style={{ background: 'rgba(15,23,42,0.6)', padding: '2px 6px', borderRadius: '4px', color: '#cbd5e1' }}>push</code> on <code style={{ background: 'rgba(15,23,42,0.6)', padding: '2px 6px', borderRadius: '4px', color: '#cbd5e1' }}>origin/main</code>
+              <div style={{ fontSize: '12px', color: '#475569', fontWeight: 600 }}>Trigger Event &amp; Branch</div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', marginTop: '4px' }}>
+                <code style={{ background: '#f8fafc', padding: '2px 6px', borderRadius: '4px', color: '#334155' }}>push</code> on <code style={{ background: '#f8fafc', padding: '2px 6px', borderRadius: '4px', color: '#334155' }}>origin/main</code>
               </div>
             </div>
 
             <div>
-              <div style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>Commit Hash (SHA)</div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#F8F6F1', marginTop: '4px' }}>
-                <code style={{ background: 'rgba(15,23,42,0.6)', padding: '2px 6px', borderRadius: '4px', color: '#D4B996' }}>{commitSha}</code> ({testScenario === 'broken' ? 'Deliberate Failure' : 'Verified CI Green'})
+              <div style={{ fontSize: '12px', color: '#475569', fontWeight: 600 }}>Commit Hash (SHA)</div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', marginTop: '4px' }}>
+                <code style={{ background: '#f8fafc', padding: '2px 6px', borderRadius: '4px', color: '#4f46e5' }}>{commitSha}</code> ({testScenario === 'broken' ? 'Deliberate Failure' : 'Verified CI Green'})
               </div>
             </div>
 
             <div>
-              <div style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>README CI Status Badge</div>
+              <div style={{ fontSize: '12px', color: '#475569', fontWeight: 600 }}>README CI Status Badge</div>
               <div style={{ marginTop: '4px' }}>
                 <span style={{
                   display: 'inline-flex',
@@ -679,7 +679,7 @@ Please fix the failing assertion and push a commit to trigger a new run.
             flexWrap: 'wrap',
             gap: '10px'
           }}>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: '#F8F6F1' }}>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>
               Execution Console Output ({testScenario === 'broken' ? 'Run #43 - FAILED' : 'Run #42 - PASSED'})
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
@@ -747,11 +747,11 @@ Please fix the failing assertion and push a commit to trigger a new run.
             gap: '10px'
           }}>
             <div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#F8F6F1' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>
                 GitHub Actions Workflow Configuration
               </div>
-              <div style={{ fontSize: '12px', color: '#94A3B8' }}>
-                File Location: <code style={{ color: '#D4B996' }}>.github/workflows/ci.yml</code>
+              <div style={{ fontSize: '12px', color: '#475569' }}>
+                File Location: <code style={{ color: '#4f46e5' }}>.github/workflows/ci.yml</code>
               </div>
             </div>
 
@@ -759,7 +759,7 @@ Please fix the failing assertion and push a commit to trigger a new run.
               onClick={copyYaml}
               style={{
                 background: 'rgba(212,185,150,0.2)',
-                color: '#F8F6F1',
+                color: '#0f172a',
                 border: '1px solid rgba(212,185,150,0.3)',
                 padding: '8px 16px',
                 borderRadius: '8px',
@@ -796,19 +796,19 @@ Please fix the failing assertion and push a commit to trigger a new run.
       {activeTab === 'analysis' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{
-            background: 'rgba(30, 41, 59, 0.7)',
-            border: '1px solid rgba(212, 185, 150, 0.15)',
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
             borderRadius: '12px',
             padding: '20px'
           }}>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 800, color: '#F8F6F1' }}>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
               Key Question 1: What is the difference between CI and CD, and which does Practical 12 demonstrate?
             </h3>
-            <p style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#cbd5e1', lineHeight: 1.6 }}>
-              <strong style={{ color: '#F8F6F1' }}>Continuous Integration (CI)</strong> is the automated practice of integrating code changes into a shared repository frequently (often multiple times per day). Each commit triggers an automated build and test pipeline to immediately detect syntax errors, broken tests, and integration conflicts.
+            <p style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#334155', lineHeight: 1.6 }}>
+              <strong style={{ color: '#0f172a' }}>Continuous Integration (CI)</strong> is the automated practice of integrating code changes into a shared repository frequently (often multiple times per day). Each commit triggers an automated build and test pipeline to immediately detect syntax errors, broken tests, and integration conflicts.
             </p>
-            <p style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#cbd5e1', lineHeight: 1.6 }}>
-              <strong style={{ color: '#F8F6F1' }}>Continuous Delivery (CD)</strong> automatically stages tested code releases so they are always in a deployable state. <strong style={{ color: '#F8F6F1' }}>Continuous Deployment</strong> goes one step further by automatically pushing green builds directly to production environments (e.g. DockerHub, AWS, Vercel).
+            <p style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#334155', lineHeight: 1.6 }}>
+              <strong style={{ color: '#0f172a' }}>Continuous Delivery (CD)</strong> automatically stages tested code releases so they are always in a deployable state. <strong style={{ color: '#0f172a' }}>Continuous Deployment</strong> goes one step further by automatically pushing green builds directly to production environments (e.g. DockerHub, AWS, Vercel).
             </p>
             <div style={{
               background: 'rgba(16, 185, 129, 0.12)',
@@ -816,7 +816,7 @@ Please fix the failing assertion and push a commit to trigger a new run.
               padding: '10px 14px',
               borderRadius: '4px',
               fontSize: '13px',
-              color: '#4ade80',
+              color: '#166534',
               fontWeight: 600
             }}>
               <strong>Practical 12 Conclusion:</strong> This practical demonstrates <strong>Continuous Integration (CI)</strong> — automatically pulling code, installing dependencies, running ESLint and Jest/Supertest suites on push, and reporting pass/fail status without pushing to a live production hosting target.
@@ -824,32 +824,32 @@ Please fix the failing assertion and push a commit to trigger a new run.
           </div>
 
           <div style={{
-            background: 'rgba(30, 41, 59, 0.7)',
-            border: '1px solid rgba(212, 185, 150, 0.15)',
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
             borderRadius: '12px',
             padding: '20px'
           }}>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 800, color: '#F8F6F1' }}>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
               Key Question 2: Why does running tests automatically on every push catch problems earlier than testing manually before release?
             </h3>
-            <ul style={{ margin: '0 0 0 18px', padding: 0, fontSize: '14px', color: '#cbd5e1', lineHeight: 1.7 }}>
-              <li><strong style={{ color: '#F8F6F1' }}>Immediate Root Cause Isolation:</strong> The offending change is tied directly to the exact commit SHA that introduced it, drastically reducing debugging time from hours to seconds.</li>
-              <li><strong style={{ color: '#F8F6F1' }}>Eliminates "Works on My Machine" Syndrome:</strong> Tests execute in a clean, pristine containerized Ubuntu runner with isolated Node.js environments.</li>
-              <li><strong style={{ color: '#F8F6F1' }}>Prevents Merge Pollution:</strong> Pull Request checks can enforce branch protection rules preventing broken code from ever reaching the <code>main</code> branch.</li>
+            <ul style={{ margin: '0 0 0 18px', padding: 0, fontSize: '14px', color: '#334155', lineHeight: 1.7 }}>
+              <li><strong style={{ color: '#0f172a' }}>Immediate Root Cause Isolation:</strong> The offending change is tied directly to the exact commit SHA that introduced it, drastically reducing debugging time from hours to seconds.</li>
+              <li><strong style={{ color: '#0f172a' }}>Eliminates "Works on My Machine" Syndrome:</strong> Tests execute in a clean, pristine containerized Ubuntu runner with isolated Node.js environments.</li>
+              <li><strong style={{ color: '#0f172a' }}>Prevents Merge Pollution:</strong> Pull Request checks can enforce branch protection rules preventing broken code from ever reaching the <code>main</code> branch.</li>
             </ul>
           </div>
 
           <div style={{
-            background: 'rgba(30, 41, 59, 0.7)',
-            border: '1px solid rgba(212, 185, 150, 0.15)',
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
             borderRadius: '12px',
             padding: '20px'
           }}>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 800, color: '#F8F6F1' }}>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
               Key Question 3: What happens if the test file path is incorrect? Would it fail at the same step?
             </h3>
-            <p style={{ margin: '0', fontSize: '14px', color: '#cbd5e1', lineHeight: 1.6 }}>
-              If the test path is incorrect, Jest exits with <em>"No tests found related to files matching..."</em> or exit code 1 depending on <code>--passWithNoTests</code>. While it fails in the <code>npm test</code> step, the failure log specifically states a <strong style={{ color: '#F8F6F1' }}>configuration / path error</strong> rather than an <strong style={{ color: '#F8F6F1' }}>assertion expectation mismatch</strong> (e.g. <code>expect(received).toBe(expected)</code>).
+            <p style={{ margin: '0', fontSize: '14px', color: '#334155', lineHeight: 1.6 }}>
+              If the test path is incorrect, Jest exits with <em>"No tests found related to files matching..."</em> or exit code 1 depending on <code>--passWithNoTests</code>. While it fails in the <code>npm test</code> step, the failure log specifically states a <strong style={{ color: '#0f172a' }}>configuration / path error</strong> rather than an <strong style={{ color: '#0f172a' }}>assertion expectation mismatch</strong> (e.g. <code>expect(received).toBe(expected)</code>).
             </p>
           </div>
         </div>
@@ -859,16 +859,16 @@ Please fix the failing assertion and push a commit to trigger a new run.
       {activeTab === 'checklist' && (
         <div>
           <div style={{
-            background: 'rgba(30, 41, 59, 0.7)',
+            background: '#ffffff',
             border: '1px solid rgba(212, 185, 150, 0.2)',
             borderRadius: '12px',
             padding: '16px 20px',
             marginBottom: '20px'
           }}>
-            <div style={{ fontSize: '15px', fontWeight: 800, color: '#F8F6F1', marginBottom: '4px' }}>
+            <div style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>
               Required Screenshots for Practical 12 Lab Journal Submission
             </div>
-            <div style={{ fontSize: '13px', color: '#94A3B8' }}>
+            <div style={{ fontSize: '13px', color: '#475569' }}>
               Here is the exact checklist of screenshots to take for your lab report and journal evaluation:
             </div>
           </div>
@@ -915,7 +915,7 @@ Please fix the failing assertion and push a commit to trigger a new run.
               <div
                 key={item.num}
                 style={{
-                  background: 'rgba(30, 41, 59, 0.7)',
+                  background: '#ffffff',
                   border: '1px solid rgba(212, 185, 150, 0.12)',
                   borderRadius: '12px',
                   padding: '16px 20px',
@@ -929,7 +929,7 @@ Please fix the failing assertion and push a commit to trigger a new run.
                   height: '32px',
                   borderRadius: '50%',
                   background: 'rgba(212, 185, 150, 0.2)',
-                  color: '#D4B996',
+                  color: '#4f46e5',
                   border: '1px solid rgba(212, 185, 150, 0.3)',
                   display: 'flex',
                   alignItems: 'center',
@@ -941,10 +941,10 @@ Please fix the failing assertion and push a commit to trigger a new run.
                   {item.num}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#F8F6F1' }}>
+                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>
                     {item.title}
                   </div>
-                  <div style={{ fontSize: '13px', color: '#94a3b8', margin: '4px 0 8px 0', lineHeight: 1.5 }}>
+                  <div style={{ fontSize: '13px', color: '#475569', margin: '4px 0 8px 0', lineHeight: 1.5 }}>
                     {item.desc}
                   </div>
                   <code style={{
@@ -952,7 +952,7 @@ Please fix the failing assertion and push a commit to trigger a new run.
                     background: 'rgba(15, 23, 42, 0.6)',
                     padding: '3px 8px',
                     borderRadius: '6px',
-                    color: '#cbd5e1'
+                    color: '#334155'
                   }}>
                     {item.cmd}
                   </code>
