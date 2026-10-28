@@ -1,4 +1,4 @@
-name: CI Pipeline
+﻿name: CI Pipeline
 
 on:
   push:
@@ -15,10 +15,10 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 18.x
+      - name: Set up Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: 'npm'
 
       - name: Install Frontend Dependencies
@@ -35,10 +35,10 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 18.x
+      - name: Set up Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: 'npm'
 
       - name: Install Frontend & Backend Dependencies
@@ -47,6 +47,10 @@ jobs:
           cd backend && npm install
 
       - name: Execute Automated Test Suite (Jest & Supertest)
+        env:
+          NODE_ENV: test
+          JWT_SECRET: utsav_myportfolio_super_secure_jwt_secret_2026
+          PORT: 5000
         run: |
           cd backend
           npm test
