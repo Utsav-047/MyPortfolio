@@ -228,4 +228,13 @@ React Frontend (Task Form & Copilot Studio)
 3. **Human-in-the-Loop**: All AI outputs are editable suggestions. The user maintains full editorial control.
 4. **PII Sanitization**: Sensitive credential patterns are sanitized before prompt payloads are dispatched to external models.
 
+---
+
+## 🌐 Live Production Deployments
+
+- **Frontend Application**: [https://myportfolio-frontend-6xmm.onrender.com](https://myportfolio-frontend-6xmm.onrender.com)
+- **Backend API & Microservices**: [https://myportfolio-8zei.onrender.com](https://myportfolio-8zei.onrender.com)
+- **Direct Contact Delivery**: Messages delivered directly to `utsavpatel788190@gmail.com` via FormSubmit AJAX service
+- **Hardened Architecture**: Task Manager frontend UI is streamlined strictly to Task Board and AI Copilot Studio; infrastructure services (Docker container mesh, in-memory caching engine, SSE streams) execute securely on the backend.
+
 
