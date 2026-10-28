@@ -6,13 +6,19 @@ const {
   getTaskById,
   createTask,
   updateTask,
-  deleteTask
+  deleteTask,
+  getCacheStats,
+  clearCache
 } = require('../controllers/taskController');
 
 const router = express.Router();
 
 // All task routes are protected — require a valid JWT (Google Auth)
 router.use(protect);
+
+// In-Memory Cache Monitoring & Manual Flush endpoints (mounted before :id)
+router.get('/cache/stats', getCacheStats);
+router.delete('/cache', clearCache);
 
 router.get('/', getAllTasks);
 router.get('/:id', validateTaskId, getTaskById);

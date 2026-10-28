@@ -3,6 +3,21 @@ import LoadingFallback from './components/LoadingFallback';
 import Footer from './components/Footer';
 import GoogleAuthBtn from './components/GoogleAuthBtn';
 import AuthGate from './components/AuthGate';
+import BrandLogo from './components/BrandLogo';
+
+// ============================================================================
+// Practical 8: Performance Optimization & Route-Level Dynamic Code Splitting
+// Converting static imports to React.lazy() chunks
+// ============================================================================
+const Home = lazy(() => import('./components/Home'));
+const About = lazy(() => import('./components/About'));
+const Skills = lazy(() => import('./components/Skills'));
+const Projects = lazy(() => import('./components/Projects'));
+const TaskManager = lazy(() => import('./components/TaskManager'));
+const Practical4 = lazy(() => import('./components/Practical4'));
+const Practical5 = lazy(() => import('./components/Practical5'));
+const Practical6 = lazy(() => import('./components/Practical6'));
+const Contact = lazy(() => import('./components/Contact'));
 
 // ============================================================================
 // Practical 8: Performance Optimization & Route-Level Dynamic Code Splitting
@@ -159,7 +174,28 @@ function App() {
       case 'taskmanager':
         return (
           <AuthGate onAuthChange={setAuthUser}>
-            <TaskManager color={profile.themeColor} />
+            <TaskManager color={profile.themeColor} initialTab="tasks" />
+          </AuthGate>
+        );
+      case 'practical4':
+        return <Practical4 />;
+      case 'practical5':
+        return <Practical5 />;
+      case 'practical6':
+        return <Practical6 />;
+      case 'caching':
+      case 'caching-optimization':
+        return (
+          <AuthGate onAuthChange={setAuthUser}>
+            <TaskManager color={profile.themeColor} initialTab="caching" />
+          </AuthGate>
+        );
+      case 'docker':
+      case 'containerization':
+      case 'docker-compose':
+        return (
+          <AuthGate onAuthChange={setAuthUser}>
+            <TaskManager color={profile.themeColor} initialTab="docker" />
           </AuthGate>
         );
       case 'practical4':
@@ -203,10 +239,10 @@ function App() {
           <button 
             className="brand-logo" 
             onClick={() => setCurrentPage('home')}
-            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            title="Utsav Patel Portfolio"
           >
-            <span className="brand-dot" style={{ backgroundColor: profile.themeColor }}></span>
-            {profile.name ? profile.name.toLowerCase().replace(/\s+/g, '') + '.dev' : 'portfolio.dev'}
+            <BrandLogo color={profile.themeColor} />
           </button>
           
           <nav className="nav-menu">
@@ -235,7 +271,7 @@ function App() {
               Projects
             </button>
             <button 
-              className={`nav-item-link ${currentPage === 'taskmanager' ? 'active' : ''}`}
+              className={`nav-item-link ${currentPage === 'taskmanager' || currentPage === 'caching' ? 'active' : ''}`}
               onClick={() => setCurrentPage('taskmanager')}
             >
               Task Manager

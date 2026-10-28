@@ -47,87 +47,93 @@ body {
   flex-direction: column;
 }
 
-/* --- HEADER NAVIGATION (Matches Screenshot 1 Nav style) --- */
+/* --- HEADER NAVIGATION (Polished Modern Glassmorphism) --- */
 .app-header {
   position: sticky;
   top: 0;
-  background-color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-light);
-  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+  z-index: 1000;
   width: 100%;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
 }
 
 .header-wrapper {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 16px 24px;
+  padding: 12px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
 }
 
 .brand-logo {
   font-size: 18px;
-  font-weight: 800;
-  color: var(--text-primary);
   text-decoration: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  transition: transform 0.2s ease;
 }
 
-.brand-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--theme-color);
+.brand-logo:hover {
+  transform: translateY(-1px);
+}
+
+.brand-logo-emblem {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.brand-logo:hover .brand-logo-emblem {
+  transform: rotate(-3deg) scale(1.05);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.38) !important;
 }
 
 .nav-menu {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
-@media (max-width: 600px) {
-  .nav-menu {
+@media (max-width: 820px) {
+  .header-wrapper {
+    flex-direction: column;
+    padding: 12px 16px;
     gap: 12px;
+  }
+  .nav-menu {
+    gap: 8px;
+    justify-content: center;
+    width: 100%;
   }
 }
 
 .nav-item-link {
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 600;
-  color: var(--text-secondary);
-  background: none;
+  color: #475569;
+  background: transparent;
   border: none;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 6px 12px;
+  border-radius: 8px;
   transition: all 0.2s ease;
   position: relative;
 }
 
 .nav-item-link:hover {
-  color: var(--theme-color);
+  color: #0f172a;
+  background-color: #f1f5f9;
 }
 
 .nav-item-link.active {
-  color: var(--theme-color);
+  color: #4338ca;
+  background-color: #e0e7ff;
   font-weight: 700;
-}
-
-.nav-item-link.active::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 8px;
-  right: 8px;
-  height: 2px;
-  background-color: var(--theme-color);
-  border-radius: 1px;
 }
 
 /* Contact Button inside navbar */
@@ -136,23 +142,24 @@ body {
   font-size: 13px;
   font-weight: 700;
   color: #ffffff;
-  background-color: var(--theme-color);
-  border: 1px solid var(--theme-color);
-  padding: 8px 16px;
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+  border: 1px solid rgba(79, 70, 229, 0.3);
+  padding: 8px 18px;
   border-radius: 9999px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 10px rgba(var(--theme-color-rgb), 0.15);
+  box-shadow: 0 3px 10px rgba(79, 70, 229, 0.25);
 }
 
 .nav-contact-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(var(--theme-color-rgb), 0.25);
+  box-shadow: 0 5px 14px rgba(79, 70, 229, 0.35);
+  background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
 }
 
 .nav-contact-btn.active {
-  background-color: var(--text-primary);
-  border-color: var(--text-primary);
+  background: #0f172a;
+  border-color: #0f172a;
 }
 
 /* --- MAIN PAGE VIEW CONTENT --- */

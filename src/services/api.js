@@ -1,17 +1,20 @@
-
-//  MyPortfolio Practical 6 Central API Client Service
-
+// Central API Client Service for Task Manager & Role-Based Access
 
 // Use VITE_API_URL env var for production; fallback to localhost for local dev
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 /**
- * Returns the Authorization header object if a JWT token is stored in localStorage.
- * This token is obtained after Google Sign-In and is required for all task endpoints.
+ * Returns the Authorization and Role headers.
  */
 function getAuthHeaders() {
   const token = localStorage.getItem('auth_token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  const user = (() => {
+    try { return JSON.parse(localStorage.getItem('auth_user')); } catch { return null; }
+  })();
+  const headers = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (user?.role) headers['x-user-role'] = user.role;
+  return headers;
 }
 
 /**
@@ -22,6 +25,10 @@ async function handleResponse(response) {
   const data = isJson ? await response.json() : null;
 
   if (!response.ok) {
+    // If token invalid / expired, dispatch session event
+    if (response.status === 401) {
+      window.dispatchEvent(new CustomEvent('auth_unauthorized', { detail: data }));
+    }
     const error = (data && (data.message || data.error)) || `HTTP Error ${response.status}`;
     const errObj = new Error(error);
     errObj.status = response.status;
@@ -34,14 +41,14 @@ async function handleResponse(response) {
 }
 
 /**
- * Fetch paginated tasks from backend (Default 5 items per page).
- * Requires: Authorization Bearer token (Google Auth).
+ * Fetch paginated tasks from backend.
  */
-export async function getTasks(page = 1, limit = 5, priority = '', search = '', status = 'all') {
+export async function getTasks(page = 1, limit = 5, priority = '', search = '', status = 'all', assignedTo = 'all') {
   let url = `${BASE_URL}/api/tasks?page=${page}&limit=${limit}`;
   if (priority && priority !== 'all') url += `&priority=${encodeURIComponent(priority)}`;
   if (search) url += `&search=${encodeURIComponent(search)}`;
   if (status && status !== 'all') url += `&status=${encodeURIComponent(status)}`;
+  if (assignedTo && assignedTo !== 'all') url += `&assignedTo=${encodeURIComponent(assignedTo)}`;
 
   const response = await fetch(url, {
     headers: { ...getAuthHeaders() }
@@ -51,7 +58,6 @@ export async function getTasks(page = 1, limit = 5, priority = '', search = '', 
 
 /**
  * Fetch single task by ID.
- * Requires: Authorization Bearer token.
  */
 export async function getTaskById(id) {
   const response = await fetch(`${BASE_URL}/api/tasks/${id}`, {
@@ -62,7 +68,6 @@ export async function getTaskById(id) {
 
 /**
  * Create a new Task (POST /api/tasks).
- * Requires: Authorization Bearer token.
  */
 export async function createTask(taskData) {
   const response = await fetch(`${BASE_URL}/api/tasks`, {
@@ -75,7 +80,6 @@ export async function createTask(taskData) {
 
 /**
  * Update an existing Task (PUT /api/tasks/:id).
- * Requires: Authorization Bearer token.
  */
 export async function updateTask(id, taskData) {
   const response = await fetch(`${BASE_URL}/api/tasks/${id}`, {
@@ -88,7 +92,6 @@ export async function updateTask(id, taskData) {
 
 /**
  * Delete a Task by ID (DELETE /api/tasks/:id).
- * Requires: Authorization Bearer token.
  */
 export async function deleteTask(id) {
   const response = await fetch(`${BASE_URL}/api/tasks/${id}`, {
@@ -99,10 +102,177 @@ export async function deleteTask(id) {
 }
 
 /**
- * Check MongoDB & Express Backend status (no auth required).
+ * Get Team Members list for assignment dropdown.
+ */
+export async function getTeamMembers() {
+  const response = await fetch(`${BASE_URL}/api/auth/team`, {
+    headers: { ...getAuthHeaders() }
+  });
+  return handleResponse(response);
+}
+
+/**
+ * Switch User Role (PATCH /api/auth/role).
+ */
+export async function updateUserRole(role) {
+  const response = await fetch(`${BASE_URL}/api/auth/role`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify({ role })
+  });
+  return handleResponse(response);
+}
+
+/**
+ * Check MongoDB & Express Backend status.
  */
 export async function getDbStatus() {
   const response = await fetch(`${BASE_URL}/api/db-status`);
+  return handleResponse(response);
+}
+
+/**
+ * Fetch in-memory cache statistics (hits, misses, cached keys, TTL)
+ */
+export async function getCacheStats() {
+  const response = await fetch(`${BASE_URL}/api/tasks/cache/stats`, {
+    headers: { ...getAuthHeaders() }
+  });
+  return handleResponse(response);
+}
+
+/**
+ * Manually flush in-memory task cache
+ */
+export async function clearCache() {
+  const response = await fetch(`${BASE_URL}/api/tasks/cache`, {
+    method: 'DELETE',
+    headers: { ...getAuthHeaders() }
+  });
+  return handleResponse(response);
+}
+
+/**
+ * Fetch tasks with round-trip latency measurement and cache header analysis
+ */
+export async function benchmarkTasksFetch(page = 1, limit = 5) {
+  const startTime = performance.now();
+  const response = await fetch(`${BASE_URL}/api/tasks?page=${page}&limit=${limit}`, {
+    headers: { ...getAuthHeaders() }
+  });
+  const latency = Math.round(performance.now() - startTime);
+  const cacheStatus = response.headers.get('x-cache') || 'UNKNOWN';
+  const data = await handleResponse(response);
+  return {
+    latency,
+    cacheStatus,
+    data
+  };
+}
+
+// ============================================================================
+// Asynchronous Processing & Event-Driven Architecture API Methods
+// ============================================================================
+
+export function getEventsStreamUrl() {
+  return `${BASE_URL}/api/events/stream`;
+}
+
+export async function getEventLogs() {
+  const response = await fetch(`${BASE_URL}/api/events/logs`);
+  return handleResponse(response);
+}
+
+export async function getEventMetrics() {
+  const response = await fetch(`${BASE_URL}/api/events/metrics`);
+  return handleResponse(response);
+}
+
+export async function dispatchAsyncJob(type, payload = {}) {
+  const startTime = performance.now();
+  const response = await fetch(`${BASE_URL}/api/events/jobs/dispatch`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders()
+    },
+    body: JSON.stringify({ type, payload })
+  });
+  const clientRoundtripMs = Math.round(performance.now() - startTime);
+  const data = await handleResponse(response);
+  return {
+    clientRoundtripMs,
+    ...data
+  };
+}
+
+export async function getAllJobs() {
+  const response = await fetch(`${BASE_URL}/api/events/jobs`);
+  return handleResponse(response);
+}
+
+export async function getJobStatus(jobId) {
+  const response = await fetch(`${BASE_URL}/api/events/jobs/${jobId}`);
+  return handleResponse(response);
+}
+
+export async function getContainerInfo() {
+  const response = await fetch(`${BASE_URL}/api/system/container-info`);
+  return handleResponse(response);
+}
+
+// ── Practical 13: External AI API Service Integration ─────────────────────
+
+/**
+ * Request AI-generated description from backend (never calls OpenAI directly from browser)
+ */
+export async function generateTaskDescription(title, context = '', simulateFailure = false) {
+  const response = await fetch(`${BASE_URL}/api/ai/generate-description`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders()
+    },
+    body: JSON.stringify({ title, context, simulateFailure })
+  });
+  return handleResponse(response);
+}
+
+/**
+ * Request AI priority suggestion based on title & description
+ */
+export async function suggestTaskPriority(title, description = '') {
+  const response = await fetch(`${BASE_URL}/api/ai/suggest-priority`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders()
+    },
+    body: JSON.stringify({ title, description })
+  });
+  return handleResponse(response);
+}
+
+/**
+ * Request AI subtask breakdown
+ */
+export async function breakdownTaskIntoSteps(title) {
+  const response = await fetch(`${BASE_URL}/api/ai/breakdown`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders()
+    },
+    body: JSON.stringify({ title })
+  });
+  return handleResponse(response);
+}
+
+/**
+ * Fetch AI server configuration & Responsible AI telemetry
+ */
+export async function getAiStatus() {
+  const response = await fetch(`${BASE_URL}/api/ai/status`);
   return handleResponse(response);
 }
 
@@ -113,5 +283,25 @@ export default {
   createTask,
   updateTask,
   deleteTask,
-  getDbStatus
+  getTeamMembers,
+  updateUserRole,
+  getDbStatus,
+  getCacheStats,
+  clearCache,
+  benchmarkTasksFetch,
+  getEventsStreamUrl,
+  getEventLogs,
+  getEventMetrics,
+  dispatchAsyncJob,
+  getAllJobs,
+  getJobStatus,
+  getContainerInfo,
+  generateTaskDescription,
+  suggestTaskPriority,
+  breakdownTaskIntoSteps,
+  getAiStatus
 };
+
+
+
+

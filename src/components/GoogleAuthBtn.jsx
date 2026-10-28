@@ -55,57 +55,57 @@ function GoogleAuthBtn() {
 
   if (user) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '3px 8px 3px 4px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '30px' }}>
         {user.avatar ? (
           <img
             src={user.avatar}
             alt={user.name}
             style={{
-              width: '32px',
-              height: '32px',
+              width: '28px',
+              height: '28px',
               borderRadius: '50%',
-              border: '2px solid #4f46e5',
+              border: '1.5px solid #4f46e5',
               objectFit: 'cover'
             }}
           />
         ) : (
           <div
             style={{
-              width: '32px',
-              height: '32px',
+              width: '28px',
+              height: '28px',
               borderRadius: '50%',
-              background: '#4f46e5',
+              background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '700',
-              fontSize: '14px'
+              fontSize: '12px'
             }}
           >
             {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
           </div>
         )}
-        <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-          <span style={{ fontSize: '13px', fontWeight: '700', color: '#0f172a' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15, maxWidth: '140px' }}>
+          <span style={{ fontSize: '12px', fontWeight: '700', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={user.name}>
             {user.name}
           </span>
-          <span style={{ fontSize: '11px', color: '#64748b' }}>
+          <span style={{ fontSize: '10px', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={user.email}>
             {user.email}
           </span>
         </div>
         <button
           onClick={handleLogout}
           style={{
-            background: '#f1f5f9',
+            background: '#ffffff',
             color: '#dc2626',
             border: '1px solid #fecaca',
-            padding: '5px 10px',
-            borderRadius: '6px',
-            fontSize: '12px',
+            padding: '4px 9px',
+            borderRadius: '16px',
+            fontSize: '11px',
             fontWeight: '600',
             cursor: 'pointer',
-            marginLeft: '4px'
+            transition: 'all 0.2s'
           }}
           title="Sign out from Google Account"
         >

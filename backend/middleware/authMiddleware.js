@@ -1,19 +1,21 @@
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+const User = require('../models/User');
 
 /**
  * protect — JWT Authentication Middleware
  *
  * Reads the `Authorization: Bearer <token>` header, verifies the JWT,
- * and attaches the decoded payload as `req.user`.
+ * and attaches the decoded payload as `req.user` with resolved role.
  * Returns 401 if the token is missing, expired, or invalid.
  */
-const protect = (req, res, next) => {
+const protect = async (req, res, next) => {
   const authHeader = req.headers['authorization'] || req.headers['Authorization'];
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
       error: 'Unauthorized',
-      message: 'Access denied. Please sign in with Google to use the Task Manager.'
+      message: 'Access denied. Please sign in to use the Task Manager.'
     });
   }
 

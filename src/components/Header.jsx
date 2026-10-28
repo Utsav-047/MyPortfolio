@@ -1,4 +1,6 @@
 
+import BrandLogo from './BrandLogo';
+
 function Header({ name, title, bio, stats, color }) {
   const handleScrollTo = (id) => {
     const element = document.getElementById(id);
@@ -21,9 +23,8 @@ function Header({ name, title, bio, stats, color }) {
       <div className="hero-layout">
         {/* Left Side: Personal Info & CTAs */}
         <div className="hero-left">
-          <a href="#" className="hero-logo-btn" onClick={(e) => { e.preventDefault(); handleScrollTo('home'); }}>
-            <span className="hero-logo-dot" style={{ backgroundColor: color }}></span>
-            {name ? name.toLowerCase() + '.dev' : 'portfolio.dev'}
+          <a href="#" className="hero-logo-btn" onClick={(e) => { e.preventDefault(); handleScrollTo('home'); }} style={{ textDecoration: 'none', marginBottom: '20px' }}>
+            <BrandLogo size="medium" color={color} />
           </a>
           
           <h1 className="hero-name-big">{name || 'Your Name'}</h1>

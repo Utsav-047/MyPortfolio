@@ -1,39 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleLogin, googleLogout } from '@react-oauth/google';
+import { updateUserRole } from '../services/api';
 
 const API_BASE = 'http://localhost:5000';
 
 /**
  * AuthGate
  *
- * Wraps the Task Manager with a premium authentication layer.
- * If the user is not signed in via Google, shows a beautiful login splash.
- * After successful Google auth, renders the protected children (Task Manager).
- *
- * Props:
- *  - children: React node (the TaskManager component)
- *  - onAuthChange: optional callback(user | null) to notify parent on login/logout
+ * Wraps the Task Manager with a role-aware authentication layer.
+ * Supports Manager & Employee roles, live role switching, Google Auth,
+ * and demo credentials for evaluation.
  */
 function AuthGate({ children, onAuthChange }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState(null);
   const [mounted, setMounted] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('manager'); // 'manager' | 'employee'
+  const [switchingRole, setSwitchingRole] = useState(false);
 
-  // Rehydrate session from localStorage on mount
+  // Rehydrate session from localStorage on mount & listen to 401 events
   useEffect(() => {
     const savedUser = localStorage.getItem('auth_user');
     if (savedUser) {
       try {
         const parsed = JSON.parse(savedUser);
+        if (!parsed.role) parsed.role = 'manager';
         setUser(parsed);
         if (onAuthChange) onAuthChange(parsed);
       } catch {
         localStorage.removeItem('auth_user');
       }
     }
-    // Small delay so the entrance animation plays
+
+    const handleUnauthorized = () => {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user');
+      setUser(null);
+      if (onAuthChange) onAuthChange(null);
+      setAuthError('Your session has expired or the token was invalid. Please sign in again.');
+    };
+
+    window.addEventListener('auth_unauthorized', handleUnauthorized);
     setTimeout(() => setMounted(true), 50);
+
+    return () => {
+      window.removeEventListener('auth_unauthorized', handleUnauthorized);
+    };
   }, []);
 
   const handleLoginSuccess = async (credentialResponse) => {
@@ -43,20 +56,94 @@ function AuthGate({ children, onAuthChange }) {
       const res = await fetch(`${API_BASE}/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ credential: credentialResponse.credential })
+        body: JSON.stringify({
+          credential: credentialResponse.credential,
+          role: selectedRole
+        })
       });
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || 'Authentication failed');
 
+      const userData = { ...data.user, role: data.user.role || selectedRole };
       localStorage.setItem('auth_token', data.token);
-      localStorage.setItem('auth_user', JSON.stringify(data.user));
-      setUser(data.user);
-      if (onAuthChange) onAuthChange(data.user);
+      localStorage.setItem('auth_user', JSON.stringify(userData));
+      setUser(userData);
+      if (onAuthChange) onAuthChange(userData);
     } catch (err) {
       setAuthError(err.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDemoLogin = async (roleToUse) => {
+    setLoading(true);
+    setAuthError(null);
+    try {
+      const email = roleToUse === 'manager' ? 'utsavpatel788190@gmail.com' : 'rahul.sharma@company.dev';
+      const name = roleToUse === 'manager' ? 'Utsav Patel (Manager)' : 'Rahul Sharma (Employee)';
+
+      const res = await fetch(`${API_BASE}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          password: 'Password123!',
+          role: roleToUse
+        })
+      });
+      let data = await res.json();
+
+      if (!res.ok) {
+        // If already exists, login
+        const loginRes = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            password: 'Password123!'
+          })
+        });
+        data = await loginRes.json();
+        if (!loginRes.ok) throw new Error(data.message || 'Demo sign in failed');
+      }
+
+      const userData = { ...data.user, role: roleToUse };
+      localStorage.setItem('auth_token', data.token);
+      localStorage.setItem('auth_user', JSON.stringify(userData));
+      setUser(userData);
+      if (onAuthChange) onAuthChange(userData);
+    } catch (err) {
+      setAuthError(err.message || 'Demo login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleRole = async () => {
+    if (!user) return;
+    const newRole = user.role === 'manager' ? 'employee' : 'manager';
+    setSwitchingRole(true);
+    try {
+      await updateUserRole(newRole);
+      const updatedUser = { ...user, role: newRole };
+      localStorage.setItem('auth_user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      if (onAuthChange) onAuthChange(updatedUser);
+      // Notify components to re-fetch tasks with new role
+      window.dispatchEvent(new CustomEvent('role_changed', { detail: newRole }));
+    } catch (e) {
+      console.error('Failed to switch role on backend:', e);
+      // Fallback update locally
+      const updatedUser = { ...user, role: newRole };
+      localStorage.setItem('auth_user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      if (onAuthChange) onAuthChange(updatedUser);
+      window.dispatchEvent(new CustomEvent('role_changed', { detail: newRole }));
+    } finally {
+      setSwitchingRole(false);
     }
   };
 
@@ -68,66 +155,115 @@ function AuthGate({ children, onAuthChange }) {
     if (onAuthChange) onAuthChange(null);
   };
 
-  // ── If authenticated, render children with a logout control ──
+  // ── If authenticated, render children with role session banner & role switcher ──
   if (user) {
+    const isManager = (user.role || 'manager') === 'manager';
+
     return (
       <div style={{ width: '100%' }}>
-        {/* Slim user bar at the top of the Task Manager */}
+        {/* User bar with active Role Badge and Switcher */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '10px 20px',
-          marginBottom: '16px',
-          background: 'linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%)',
-          borderRadius: '14px',
-          border: '1px solid #c7d2fe',
+          padding: '12px 20px',
+          marginBottom: '18px',
+          background: isManager
+            ? 'linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%)'
+            : 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+          borderRadius: '16px',
+          border: `1.5px solid ${isManager ? '#c7d2fe' : '#bbf7d0'}`,
           flexWrap: 'wrap',
-          gap: '10px'
+          gap: '12px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* User Info & Role Badge */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <div style={{
-              width: '8px', height: '8px', borderRadius: '50%',
+              width: '10px', height: '10px', borderRadius: '50%',
               background: '#10b981', boxShadow: '0 0 8px #10b981'
             }} />
-            <span style={{ fontSize: '13px', fontWeight: '600', color: '#3730a3' }}>
-              🔐 Authenticated Session
-            </span>
+            
             {user.avatar ? (
               <img
                 src={user.avatar}
                 alt={user.name}
-                style={{ width: '28px', height: '28px', borderRadius: '50%', border: '2px solid #6366f1', objectFit: 'cover' }}
+                style={{
+                  width: '34px', height: '34px', borderRadius: '50%',
+                  border: `2px solid ${isManager ? '#6366f1' : '#10b981'}`,
+                  objectFit: 'cover'
+                }}
               />
             ) : (
               <div style={{
-                width: '28px', height: '28px', borderRadius: '50%',
-                background: '#4f46e5', color: '#fff', display: 'flex',
+                width: '34px', height: '34px', borderRadius: '50%',
+                background: isManager ? '#4f46e5' : '#059669',
+                color: '#fff', display: 'flex',
                 alignItems: 'center', justifyContent: 'center',
-                fontWeight: '700', fontSize: '12px'
+                fontWeight: '700', fontSize: '14px'
               }}>
                 {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
               </div>
             )}
+
             <div style={{ lineHeight: 1.3 }}>
-              <div style={{ fontSize: '13px', fontWeight: '700', color: '#0f172a' }}>{user.name}</div>
-              <div style={{ fontSize: '11px', color: '#64748b' }}>{user.email}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '14px', fontWeight: '800', color: '#0f172a' }}>
+                  {user.name}
+                </span>
+                <span style={{
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  padding: '3px 9px',
+                  borderRadius: '9999px',
+                  background: isManager ? '#4338ca' : '#047857',
+                  color: '#ffffff',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.1)'
+                }}>
+                  {isManager ? '👑 Manager Role' : '💼 Employee Role'}
+                </span>
+              </div>
+              <div style={{ fontSize: '12px', color: '#64748b' }}>{user.email}</div>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{
-              fontSize: '11px', background: '#dcfce7', color: '#166534',
-              padding: '3px 10px', borderRadius: '9999px', fontWeight: '600'
-            }}>
-              ✅ Your private tasks — visible only to you
-            </span>
+
+          {/* Role Switcher & Action Controls */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <button
+              onClick={handleToggleRole}
+              disabled={switchingRole}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: isManager ? '#ede9fe' : '#e0e7ff',
+                color: isManager ? '#5b21b6' : '#3730a3',
+                border: `1px solid ${isManager ? '#c4b5fd' : '#c7d2fe'}`,
+                padding: '7px 14px',
+                borderRadius: '10px',
+                fontSize: '12px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              title="Toggle role between Manager (assigner) and Employee (assigned tasks)"
+            >
+              🔄 {switchingRole ? 'Switching...' : (isManager ? 'Switch to Employee Mode' : 'Switch to Manager Mode')}
+            </button>
+
             <button
               onClick={handleLogout}
               style={{
-                background: '#fef2f2', color: '#dc2626',
+                background: '#fef2f2',
+                color: '#dc2626',
                 border: '1px solid #fecaca',
-                padding: '5px 14px', borderRadius: '8px',
-                fontSize: '12px', fontWeight: '600', cursor: 'pointer',
+                padding: '7px 14px',
+                borderRadius: '10px',
+                fontSize: '12px',
+                fontWeight: '600',
+                cursor: 'pointer',
                 transition: 'background 0.2s'
               }}
               onMouseOver={e => e.target.style.background = '#fee2e2'}
@@ -138,8 +274,8 @@ function AuthGate({ children, onAuthChange }) {
           </div>
         </div>
 
-        {/* Protected content */}
-        {children}
+        {/* Render Task Manager */}
+        {React.cloneElement(children, { userRole: user.role || 'manager', currentUser: user })}
       </div>
     );
   }
@@ -163,8 +299,8 @@ function AuthGate({ children, onAuthChange }) {
           background: #ffffff;
           border: 1px solid #e2e8f0;
           border-radius: 24px;
-          padding: 52px 48px;
-          max-width: 520px;
+          padding: 44px 40px;
+          max-width: 560px;
           width: 100%;
           text-align: center;
           box-shadow:
@@ -176,72 +312,129 @@ function AuthGate({ children, onAuthChange }) {
         }
 
         .ag-lock-icon {
-          width: 80px;
-          height: 80px;
+          width: 72px;
+          height: 72px;
           background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-          border-radius: 22px;
+          border-radius: 20px;
           display: flex;
           align-items: center;
           justify-content: center;
-          margin: 0 auto 28px auto;
-          font-size: 36px;
+          margin: 0 auto 20px auto;
+          font-size: 32px;
           box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35);
-          animation: ag-float 3s ease-in-out infinite;
-        }
-
-        @keyframes ag-float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-6px); }
         }
 
         .ag-gate-title {
-          font-size: 28px;
+          font-size: 26px;
           font-weight: 800;
           color: #0f172a;
-          margin: 0 0 12px 0;
+          margin: 0 0 8px 0;
           letter-spacing: -0.5px;
         }
 
         .ag-gate-subtitle {
-          font-size: 15px;
+          font-size: 14px;
           color: #64748b;
-          line-height: 1.6;
-          margin: 0 0 32px 0;
+          line-height: 1.5;
+          margin: 0 0 24px 0;
         }
 
-        .ag-features {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          margin-bottom: 36px;
+        .ag-role-selector {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          margin-bottom: 24px;
+        }
+
+        .ag-role-card {
+          border: 2px solid #e2e8f0;
+          border-radius: 14px;
+          padding: 14px;
+          cursor: pointer;
+          transition: all 0.2s;
           text-align: left;
         }
 
-        .ag-feature-row {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
-          border-radius: 10px;
-          padding: 10px 14px;
-          font-size: 13px;
-          color: #334155;
-          font-weight: 500;
+        .ag-role-card.active-manager {
+          border-color: #4f46e5;
+          background: #f5f3ff;
         }
 
-        .ag-feature-icon {
-          font-size: 18px;
-          width: 30px;
-          text-align: center;
-          flex-shrink: 0;
+        .ag-role-card.active-employee {
+          border-color: #10b981;
+          background: #f0fdf4;
         }
+
+        .ag-role-header {
+          font-size: 14px;
+          font-weight: 800;
+          margin-bottom: 4px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .ag-role-desc {
+          font-size: 12px;
+          color: #64748b;
+          line-height: 1.4;
+        }
+
+        .ag-demo-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          margin-bottom: 20px;
+        }
+
+        .ag-demo-btn {
+          border: none;
+          padding: 11px 14px;
+          border-radius: 12px;
+          font-size: 13px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .ag-demo-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .ag-demo-mgr {
+          background: #4f46e5;
+          color: #ffffff;
+        }
+
+        .ag-demo-emp {
+          background: #059669;
+          color: #ffffff;
+        }
+
+        .ag-divider-or {
+          display: flex;
+          align-items: center;
+          text-align: center;
+          color: #94a3b8;
+          font-size: 12px;
+          margin: 18px 0;
+        }
+
+        .ag-divider-or::before, .ag-divider-or::after {
+          content: '';
+          flex: 1;
+          border-bottom: 1px solid #e2e8f0;
+        }
+
+        .ag-divider-or:not(:empty)::before { margin-right: .5em; }
+        .ag-divider-or:not(:empty)::after { margin-left: .5em; }
 
         .ag-google-wrapper {
           display: flex;
           justify-content: center;
-          margin-bottom: 16px;
-          transform: scale(1.08);
+          margin-bottom: 12px;
+          transform: scale(1.05);
           transform-origin: center;
         }
 
@@ -255,82 +448,68 @@ function AuthGate({ children, onAuthChange }) {
           color: #dc2626;
           font-weight: 500;
         }
-
-        .ag-loading-text {
-          font-size: 14px;
-          color: #6366f1;
-          font-weight: 600;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-        }
-
-        .ag-spinner {
-          width: 18px;
-          height: 18px;
-          border: 2px solid #c7d2fe;
-          border-top-color: #4f46e5;
-          border-radius: 50%;
-          animation: ag-spin 0.7s linear infinite;
-        }
-
-        @keyframes ag-spin {
-          to { transform: rotate(360deg); }
-        }
-
-        .ag-footer-note {
-          margin-top: 24px;
-          font-size: 12px;
-          color: #94a3b8;
-          line-height: 1.5;
-        }
-
-        .ag-divider {
-          border: none;
-          border-top: 1px solid #f1f5f9;
-          margin: 28px 0;
-        }
       `}</style>
 
       <div className="ag-gate-wrapper">
         <div className="ag-gate-card">
-          {/* Lock Icon */}
           <div className="ag-lock-icon">🔐</div>
 
-          <h2 className="ag-gate-title">Sign in to Task Manager</h2>
+          <h2 className="ag-gate-title">Role-Based Task Manager</h2>
           <p className="ag-gate-subtitle">
-            Your personal task workspace is protected.<br />
-            Sign in with Google to access your private tasks.
+            Sign in as a <strong>Manager</strong> to assign tasks to your team, or as an <strong>Employee</strong> to track and complete your assigned work.
           </p>
 
-          {/* Feature Highlights */}
-          <div className="ag-features">
-            <div className="ag-feature-row">
-              <span className="ag-feature-icon">👤</span>
-              <span><strong>User-wise isolation</strong> — your tasks are private and only visible to you</span>
+          {/* Role Selection Tabs */}
+          <div className="ag-role-selector">
+            <div
+              className={`ag-role-card ${selectedRole === 'manager' ? 'active-manager' : ''}`}
+              onClick={() => setSelectedRole('manager')}
+            >
+              <div className="ag-role-header" style={{ color: '#4338ca' }}>
+                👑 Manager
+              </div>
+              <div className="ag-role-desc">
+                Assign tasks to employees, monitor team progress, edit & reassign work.
+              </div>
             </div>
-            <div className="ag-feature-row">
-              <span className="ag-feature-icon">📥</span>
-              <span><strong>Per-task download</strong> — export any task as JSON with a download timestamp</span>
-            </div>
-            <div className="ag-feature-row">
-              <span className="ag-feature-icon">🍃</span>
-              <span><strong>MongoDB persistence</strong> — your data survives page refreshes</span>
-            </div>
-            <div className="ag-feature-row">
-              <span className="ag-feature-icon">⚡</span>
-              <span><strong>Optimistic UI</strong> — instant feedback before server confirmation</span>
+
+            <div
+              className={`ag-role-card ${selectedRole === 'employee' ? 'active-employee' : ''}`}
+              onClick={() => setSelectedRole('employee')}
+            >
+              <div className="ag-role-header" style={{ color: '#047857' }}>
+                💼 Employee
+              </div>
+              <div className="ag-role-desc">
+                View your assigned tasks, update progress, mark completed.
+              </div>
             </div>
           </div>
 
-          <hr className="ag-divider" />
+          {/* Quick Demo Logins */}
+          <div className="ag-demo-grid">
+            <button
+              className="ag-demo-btn ag-demo-mgr"
+              onClick={() => handleDemoLogin('manager')}
+              disabled={loading}
+            >
+              👑 Demo as Manager
+            </button>
+            <button
+              className="ag-demo-btn ag-demo-emp"
+              onClick={() => handleDemoLogin('employee')}
+              disabled={loading}
+            >
+              💼 Demo as Employee
+            </button>
+          </div>
 
-          {/* Google Sign-In Button */}
+          <div className="ag-divider-or">or sign in with Google ({selectedRole.toUpperCase()})</div>
+
+          {/* Google Sign-In */}
           {loading ? (
-            <div className="ag-loading-text">
-              <span className="ag-spinner" />
-              Verifying your Google account...
+            <div style={{ padding: '10px', color: '#6366f1', fontWeight: 600, fontSize: '13px' }}>
+              Authenticating session...
             </div>
           ) : (
             <div className="ag-google-wrapper">
@@ -341,7 +520,7 @@ function AuthGate({ children, onAuthChange }) {
                 theme="filled_blue"
                 size="large"
                 text="signin_with"
-                width="300"
+                width="280"
               />
             </div>
           )}
@@ -351,11 +530,6 @@ function AuthGate({ children, onAuthChange }) {
               ⚠️ {authError}
             </div>
           )}
-
-          <p className="ag-footer-note">
-            🔒 We only use your Google profile (name, email, avatar) to identify your session.<br />
-            No passwords are stored. Session is secured with JWT.
-          </p>
         </div>
       </div>
     </>

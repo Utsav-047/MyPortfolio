@@ -1,4 +1,15 @@
 import { useState, useEffect } from 'react';
+import { 
+  PythonLogo, 
+  ReactLogo, 
+  JavaScriptLogo, 
+  TensorFlowLogo, 
+  HTMLLogo, 
+  MySQLLogo, 
+  GitLogo, 
+  OpenCVLogo,
+  NodeLogo
+} from './TechLogos';
 
 function Home({ name, title, bio, color, onNavigate }) {
   // Typewriter effect for roles
@@ -31,6 +42,21 @@ function Home({ name, title, bio, color, onNavigate }) {
 
     return () => clearTimeout(timeout);
   }, [charIndex, isDeleting, roleIndex]);
+
+  const techStackItems = [
+    { name: 'Python', Logo: PythonLogo },
+    { name: 'React', Logo: ReactLogo },
+    { name: 'JavaScript', Logo: JavaScriptLogo },
+    { name: 'TensorFlow', Logo: TensorFlowLogo },
+    { name: 'HTML/CSS', Logo: HTMLLogo },
+    { name: 'MySQL', Logo: MySQLLogo },
+    { name: 'Git', Logo: GitLogo },
+    { name: 'OpenCV', Logo: OpenCVLogo },
+    { name: 'Node.js', Logo: NodeLogo },
+  ];
+
+  // Repeat for continuous smooth marquee loop
+  const marqueeItems = [...techStackItems, ...techStackItems];
 
   return (
     <div className="page-view">
@@ -103,35 +129,32 @@ function Home({ name, title, bio, color, onNavigate }) {
             </button>
           </div>
 
-          {/* Scroll-down tech stack marquee */}
+          {/* Scroll-down tech stack marquee with Real SVG Brand Logos */}
           <div className="hero-tech-marquee">
-            <div className="marquee-label">Tech Stack</div>
+            <div className="marquee-label">Core Technologies</div>
             <div className="marquee-track">
               <div className="marquee-inner">
-                {[
-                  { name: 'Python', emoji: '🐍' },
-                  { name: 'React', emoji: '⚛️' },
-                  { name: 'JavaScript', emoji: '📜' },
-                  { name: 'TensorFlow', emoji: '🔥' },
-                  { name: 'HTML/CSS', emoji: '🎨' },
-                  { name: 'MySQL', emoji: '🗄️' },
-                  { name: 'Git', emoji: '📦' },
-                  { name: 'OpenCV', emoji: '👁️' },
-                  // Duplicate for seamless loop
-                  { name: 'Python', emoji: '🐍' },
-                  { name: 'React', emoji: '⚛️' },
-                  { name: 'JavaScript', emoji: '📜' },
-                  { name: 'TensorFlow', emoji: '🔥' },
-                  { name: 'HTML/CSS', emoji: '🎨' },
-                  { name: 'MySQL', emoji: '🗄️' },
-                  { name: 'Git', emoji: '📦' },
-                  { name: 'OpenCV', emoji: '👁️' },
-                ].map((tech, idx) => (
-                  <div key={idx} className="marquee-chip" style={{ borderColor: `${color}20` }}>
-                    <span>{tech.emoji}</span>
-                    <span>{tech.name}</span>
-                  </div>
-                ))}
+                {marqueeItems.map((tech, idx) => {
+                  const Icon = tech.Logo;
+                  return (
+                    <div 
+                      key={idx} 
+                      className="marquee-chip" 
+                      style={{ 
+                        borderColor: '#e2e8f0',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 16px',
+                        background: '#ffffff'
+                      }}
+                    >
+                      <Icon size={18} />
+                      <span style={{ fontWeight: 600, fontSize: '13px', color: '#1e293b' }}>{tech.name}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
