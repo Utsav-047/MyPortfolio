@@ -372,7 +372,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
 
     try {
       await updateTask(taskId, { status: nextStatus, completed: nextCompleted });
-      const toastTitle = nextStatus === 'completed' ? '🎉 Task Completed' : (targetStatus === 'reopen' ? '🔄 Task Reopened' : '⚡ Task In Progress');
+      const toastTitle = nextStatus === 'completed' ? 'Task Completed' : (targetStatus === 'reopen' ? 'Task Reopened' : 'Task In Progress');
       addToast('success', toastTitle, `Task #${taskId} is now ${nextStatus.toUpperCase()}`);
       fetchPaginatedTasks(pagination.page, statusFilter, searchQuery, assigneeFilter, role);
     } catch (err) {
@@ -434,10 +434,10 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
   const getStatusBadge = (status, completed) => {
     const s = status || (completed ? 'completed' : 'pending');
     switch (s) {
-      case 'completed': return { bg: '#d1fae5', color: '#065f46', label: '✅ COMPLETED' };
-      case 'in_progress': return { bg: '#e0f2fe', color: '#0369a1', label: '⚡ IN PROGRESS' };
+      case 'completed': return { bg: '#d1fae5', color: '#065f46', label: 'COMPLETED' };
+      case 'in_progress': return { bg: '#e0f2fe', color: '#0369a1', label: 'IN PROGRESS' };
       case 'pending':
-      default: return { bg: '#fef3c7', color: '#92400e', label: '⏳ PENDING' };
+      default: return { bg: '#fef3c7', color: '#92400e', label: 'PENDING' };
     }
   };
 
@@ -754,7 +754,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
         <div className="tm-modal-overlay">
           <div className="tm-modal-box">
             <h3 style={{ margin: '0 0 10px 0', color: '#991b1b', fontSize: '18px' }}>
-              🗑️ Delete Task Confirmation
+              Delete Task Confirmation
             </h3>
             <p style={{ fontSize: '14px', color: '#475569', margin: '0 0 20px 0', lineHeight: 1.5 }}>
               Are you sure you want to delete task <strong>"{taskToDelete.title}"</strong>? This will permanently remove the document from MongoDB.
@@ -860,7 +860,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
               transition: 'all 0.15s ease'
             }}
           >
-            <span>⚡</span> In-Memory Caching &amp; Optimization
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> In-Memory Caching &amp; Optimization
             <span style={{
               fontSize: '11px',
               padding: '2px 8px',
@@ -1046,9 +1046,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
           {/* Form */}
           <div className="tm-card">
             <h3 className="tm-card-title">
-              {editingTask
-                ? `✏️ Edit Task`
-                : (isManager ? '➕ Assign New Task' : '➕ Create Personal Task')}
+              {editingTask ? 'Edit Task' : (isManager ? 'Assign New Task' : 'Create Personal Task')}
             </h3>
             <form onSubmit={handleSubmit} className="tm-form">
               <div>
@@ -1084,7 +1082,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                     opacity: !formTitle.trim() ? 0.6 : 1
                   }}
                 >
-                  <span>{aiGenerating ? '⏳' : '✨'}</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center' }}>{aiGenerating ? <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'><circle cx='12' cy='12' r='10'/><polyline points='12 6 12 12 16 14'/></svg> : <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'><path d='m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z'/></svg>}</span>
                   <span>{aiGenerating ? 'Generating with AI...' : 'Auto-Generate Description & Priority'}</span>
                 </button>
               </div>
@@ -1102,7 +1100,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <span>✨ <strong>AI Suggestion ({aiSuggestionMeta.source}):</strong> You can edit or refine this description before saving.</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'><path d='m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z'/></svg> <strong>AI Suggestion ({aiSuggestionMeta.source}):</strong> You can edit or refine this description before saving.</span>
                   <button
                     type="button"
                     onClick={() => setAiSuggestionMeta(null)}
@@ -1208,10 +1206,10 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
               {/* Filter Tabs: All, Pending, In Progress, Completed */}
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 {[
-                  { key: 'all', label: 'All Tasks', icon: '📋' },
-                  { key: 'pending', label: 'Pending', icon: '⏳' },
-                  { key: 'in_progress', label: 'In Progress', icon: '⚡' },
-                  { key: 'completed', label: 'Completed', icon: '✅' }
+                  { key: 'all', label: 'All Tasks', iconType: 'all' },
+                  { key: 'pending', label: 'Pending', iconType: 'pending' },
+                  { key: 'in_progress', label: 'In Progress', iconType: 'progress' },
+                  { key: 'completed', label: 'Completed', iconType: 'completed' }
                 ].map(tab => (
                   <button
                     key={tab.key}
@@ -1303,7 +1301,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                     whiteSpace: 'nowrap'
                   }}
                 >
-                  <span>🔍</span> Search
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><svg width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2.2'><circle cx='11' cy='11' r='8'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg> Search</span>
                 </button>
                 {searchQuery && (
                   <button
@@ -1580,7 +1578,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                 margin: '0 auto 16px auto'
               }} />
               <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 800, color: '#1e293b' }}>
-                ⚡ Lazy-Loading In-Memory Caching &amp; Optimization Suite...
+                Lazy-Loading In-Memory Caching &amp; Optimization Suite...
               </h3>
               <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
                 Dynamically importing split code bundle with <code>React.lazy()</code> and <code>&lt;Suspense&gt;</code> inside Task Manager
@@ -1613,7 +1611,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                 margin: '0 auto 16px auto'
               }} />
               <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 800, color: '#1e293b' }}>
-                📡 Lazy-Loading Asynchronous &amp; Event-Driven Suite...
+                Lazy-Loading Asynchronous &amp; Event-Driven Suite...
               </h3>
               <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
                 Dynamically importing split code bundle with <code>React.lazy()</code> and <code>&lt;Suspense&gt;</code> inside Task Manager
@@ -1646,7 +1644,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                 margin: '0 auto 16px auto'
               }} />
               <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 800, color: '#1e293b' }}>
-                🐳 Lazy-Loading Docker &amp; Containerization Suite...
+                Lazy-Loading Docker &amp; Containerization Suite...
               </h3>
               <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
                 Dynamically importing split code bundle with <code>React.lazy()</code> and <code>&lt;Suspense&gt;</code> inside Task Manager
@@ -1679,7 +1677,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                 margin: '0 auto 16px auto'
               }} />
               <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 800, color: '#1e293b' }}>
-                🚀 Lazy-Loading CI/CD Pipeline &amp; GitHub Actions Suite...
+                Lazy-Loading CI/CD Pipeline &amp; GitHub Actions Suite...
               </h3>
               <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
                 Dynamically importing split code bundle with <code>React.lazy()</code> and <code>&lt;Suspense&gt;</code> inside Task Manager
@@ -1712,7 +1710,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
                 margin: '0 auto 16px auto'
               }} />
               <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 800, color: '#1e293b' }}>
-                ✨ Lazy-Loading AI Assistant &amp; LLM Copilot Suite...
+                Lazy-Loading AI Assistant &amp; LLM Copilot Suite...
               </h3>
               <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
                 Dynamically importing split code bundle with <code>React.lazy()</code> and <code>&lt;Suspense&gt;</code> inside Task Manager

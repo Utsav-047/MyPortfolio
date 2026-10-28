@@ -27,7 +27,10 @@ const protect = async (req, res, next) => {
       return res.status(500).json({ error: 'Server Error', message: 'JWT_SECRET is not configured.' });
     }
     const decoded = jwt.verify(token, secret);
-    req.user = decoded; // { id, email, googleId }
+    // Attach decoded user and ensure role is present (support active role switcher header)
+    const headerRole = req.headers['x-user-role'];
+    decoded.role = (headerRole === 'manager' || headerRole === 'employee') ? headerRole : (decoded.role || 'manager');
+    req.user = decoded; // { id, email, googleId, role, name }
     next();
   } catch (err) {
     const message =

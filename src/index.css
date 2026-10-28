@@ -47,16 +47,16 @@ body {
   flex-direction: column;
 }
 
-/* --- HEADER NAVIGATION (Polished Modern Glassmorphism) --- */
+/* --- HEADER NAVIGATION (Polished Solid Background to Prevent Text Bleed) --- */
 .app-header {
   position: sticky;
   top: 0;
-  background-color: #ffffff;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
   border-bottom: 1px solid #e2e8f0;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
-  z-index: 1000;
+  z-index: 9999;
   width: 100%;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
 }
 
 .header-wrapper {
@@ -162,6 +162,20 @@ body {
 }
 
 /* --- MAIN PAGE VIEW CONTENT --- */
+
+/* Single-Page Continuous Scroll View */
+.portfolio-scroll-view {
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+  width: 100%;
+}
+
+.portfolio-section {
+  scroll-margin-top: 84px;
+  width: 100%;
+}
+
 .portfolio-content {
   max-width: 1100px;
   width: 100%;

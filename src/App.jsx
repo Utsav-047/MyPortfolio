@@ -91,10 +91,52 @@ function App() {
     ]
   });
 
-  // 2. Active Page Routing State ('home' | 'about' | 'skills' | 'projects' | 'taskmanager' | 'practical8' | 'contact')
-  const [currentPage, setCurrentPage] = useState('home');
+  // 2. Active View State ('portfolio' | 'taskmanager') and active section on scroll
+  const [viewMode, setViewMode] = useState('portfolio');
+  const [activeSection, setActiveSection] = useState('home');
+  const [taskManagerInitialTab, setTaskManagerInitialTab] = useState('tasks');
 
-  // 3. Inject dynamic CSS Custom Properties for themes
+  // 3. Smooth scroll handler to navigate between portfolio sections
+  const scrollToSection = (sectionId) => {
+    if (viewMode !== 'portfolio') {
+      setViewMode('portfolio');
+      setActiveSection(sectionId);
+      setTimeout(() => {
+        const el = document.getElementById(sectionId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 120);
+    } else {
+      setActiveSection(sectionId);
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
+  // 4. Scroll spy listener to highlight active section in navbar dynamically
+  useEffect(() => {
+    if (viewMode !== 'portfolio') return;
+    const sections = ['home', 'about', 'skills', 'projects', 'contact'];
+    
+    const handleScroll = () => {
+      const scrollPos = window.scrollY + 200;
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const el = document.getElementById(sections[i]);
+        if (el && el.offsetTop <= scrollPos) {
+          setActiveSection(sections[i]);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [viewMode]);
+
+  // 5. Inject dynamic CSS Custom Properties for themes
   useEffect(() => {
     const hexToRgb = (hex) => {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -110,27 +152,40 @@ function App() {
     document.documentElement.style.setProperty('--theme-color-light', `rgba(${rgb}, 0.08)`);
   }, [profile.themeColor]);
 
-  // Scroll to top on page change
+  // Scroll to top when switching to taskmanager
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [currentPage]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [viewMode]);
 
-  // 4. Render active page component (all code-split via React.lazy)
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'home':
-        return (
+  // 6. Render main content: either the single-page scrollable portfolio or the Task Manager workspace
+  const renderContent = () => {
+    if (viewMode === 'taskmanager') {
+      return (
+        <AuthGate onAuthChange={setAuthUser}>
+          <TaskManager color={profile.themeColor} initialTab={taskManagerInitialTab} />
+        </AuthGate>
+      );
+    }
+
+    if (viewMode === 'practical4') return <Practical4 />;
+    if (viewMode === 'practical5') return <Practical5 />;
+    if (viewMode === 'practical6') return <Practical6 />;
+
+    // Default: Complete, seamlessly scrollable single-page developer portfolio
+    return (
+      <div className="portfolio-scroll-view">
+        <section id="home" className="portfolio-section">
           <Home 
             name={profile.name} 
             title={profile.title} 
             bio={profile.bio} 
             stats={profile.stats} 
             color={profile.themeColor} 
-            onNavigate={setCurrentPage}
+            onNavigate={scrollToSection}
           />
-        );
-      case 'about':
-        return (
+        </section>
+
+        <section id="about" className="portfolio-section">
           <About 
             aboutTitle={profile.aboutTitle}
             aboutBio={profile.aboutBio} 
@@ -141,52 +196,23 @@ function App() {
             badges={profile.badges}
             color={profile.themeColor}
           />
-        );
-      case 'skills':
-        return (
+        </section>
+
+        <section id="skills" className="portfolio-section">
           <Skills 
             skillList={profile.skills} 
             color={profile.themeColor} 
           />
-        );
-      case 'projects':
-        return (
+        </section>
+
+        <section id="projects" className="portfolio-section">
           <Projects 
             projects={profile.projects} 
             color={profile.themeColor} 
           />
-        );
-      case 'taskmanager':
-        return (
-          <AuthGate onAuthChange={setAuthUser}>
-            <TaskManager color={profile.themeColor} initialTab="tasks" />
-          </AuthGate>
-        );
-      case 'caching':
-      case 'caching-optimization':
-      case 'lazy':
-      case 'practical8':
-        return (
-          <AuthGate onAuthChange={setAuthUser}>
-            <TaskManager color={profile.themeColor} initialTab="caching" />
-          </AuthGate>
-        );
-      case 'docker':
-      case 'containerization':
-      case 'docker-compose':
-        return (
-          <AuthGate onAuthChange={setAuthUser}>
-            <TaskManager color={profile.themeColor} initialTab="docker" />
-          </AuthGate>
-        );
-      case 'practical4':
-        return <Practical4 />;
-      case 'practical5':
-        return <Practical5 />;
-      case 'practical6':
-        return <Practical6 />;
-      case 'contact':
-        return (
+        </section>
+
+        <section id="contact" className="portfolio-section">
           <Contact 
             email={profile.email} 
             phone={profile.phone}
@@ -195,19 +221,9 @@ function App() {
             linkedin={profile.linkedin} 
             color={profile.themeColor}
           />
-        );
-      default:
-        return (
-          <Home 
-            name={profile.name} 
-            title={profile.title} 
-            bio={profile.bio} 
-            stats={profile.stats} 
-            color={profile.themeColor} 
-            onNavigate={setCurrentPage}
-          />
-        );
-    }
+        </section>
+      </div>
+    );
   };
 
   return (
@@ -217,7 +233,7 @@ function App() {
         <div className="header-wrapper">
           <button 
             className="brand-logo" 
-            onClick={() => setCurrentPage('home')}
+            onClick={() => scrollToSection('home')}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
             title="Utsav Patel Portfolio"
           >
@@ -226,40 +242,43 @@ function App() {
           
           <nav className="nav-menu">
             <button 
-              className={`nav-item-link ${currentPage === 'home' ? 'active' : ''}`}
-              onClick={() => setCurrentPage('home')}
+              className={`nav-item-link ${viewMode === 'portfolio' && activeSection === 'home' ? 'active' : ''}`}
+              onClick={() => scrollToSection('home')}
             >
               Home
             </button>
             <button 
-              className={`nav-item-link ${currentPage === 'about' ? 'active' : ''}`}
-              onClick={() => setCurrentPage('about')}
+              className={`nav-item-link ${viewMode === 'portfolio' && activeSection === 'about' ? 'active' : ''}`}
+              onClick={() => scrollToSection('about')}
             >
               About
             </button>
             <button 
-              className={`nav-item-link ${currentPage === 'skills' ? 'active' : ''}`}
-              onClick={() => setCurrentPage('skills')}
+              className={`nav-item-link ${viewMode === 'portfolio' && activeSection === 'skills' ? 'active' : ''}`}
+              onClick={() => scrollToSection('skills')}
             >
               Skills
             </button>
             <button 
-              className={`nav-item-link ${currentPage === 'projects' ? 'active' : ''}`}
-              onClick={() => setCurrentPage('projects')}
+              className={`nav-item-link ${viewMode === 'portfolio' && activeSection === 'projects' ? 'active' : ''}`}
+              onClick={() => scrollToSection('projects')}
             >
               Projects
             </button>
             <button 
-              className={`nav-item-link ${currentPage === 'taskmanager' || currentPage === 'caching' ? 'active' : ''}`}
-              onClick={() => setCurrentPage('taskmanager')}
+              className={`nav-item-link ${viewMode === 'taskmanager' ? 'active' : ''}`}
+              onClick={() => {
+                setTaskManagerInitialTab('tasks');
+                setViewMode('taskmanager');
+              }}
             >
               Task Manager
             </button>
             
             <button 
-              className={`nav-contact-btn ${currentPage === 'contact' ? 'active' : ''}`}
+              className={`nav-contact-btn ${viewMode === 'portfolio' && activeSection === 'contact' ? 'active' : ''}`}
               style={{ backgroundColor: profile.themeColor }}
-              onClick={() => setCurrentPage('contact')}
+              onClick={() => scrollToSection('contact')}
             >
               Contact Me
             </button>
@@ -268,7 +287,7 @@ function App() {
         </div>
       </header>
 
-      {/* Main Page Routing Wrapper with Suspense */}
+      {/* Main Content with Suspense */}
       <main className="portfolio-content">
         <Suspense fallback={
           <LoadingFallback 
@@ -276,10 +295,10 @@ function App() {
             subtitle="Fetching split JavaScript bundle with React.lazy() & Suspense" 
           />
         }>
-          {renderPage()}
+          {renderContent()}
         </Suspense>
 
-        {/* Footer (Remains rendered at the bottom of all pages) */}
+        {/* Footer (Remains rendered at the bottom of all views) */}
         <Footer 
           name={profile.name} 
           tagline={profile.bio}
@@ -289,7 +308,14 @@ function App() {
           github={profile.github} 
           linkedin={profile.linkedin} 
           color={profile.themeColor}
-          onNavigate={setCurrentPage}
+          onNavigate={(target) => {
+            if (target === 'taskmanager') {
+              setTaskManagerInitialTab('tasks');
+              setViewMode('taskmanager');
+            } else {
+              scrollToSection(target);
+            }
+          }}
         />
       </main>
     </div>

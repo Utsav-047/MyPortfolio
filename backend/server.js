@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 //  MyPortfolio Task Manager API Server (Practical 5: Mongoose & MongoDB)
 // ============================================================
 
@@ -23,16 +23,27 @@ const PORT = process.env.PORT || 5000;
 // Connect to MongoDB Atlas / Local
 connectDB();
 
-// 1. CORS - allow local dev, configured CLIENT_URL, and render/vercel subdomains
+// 1. CORS - allow local dev on any port (localhost / 127.0.0.1), configured CLIENT_URL, and render/vercel subdomains
 const allowedOrigins = [
   'http://localhost:3000',
+  'http://localhost:4173',
   'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5175',
+  'http://127.0.0.1:4173',
+  'http://127.0.0.1:5173',
   process.env.CLIENT_URL
 ].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
+    // Allow non-browser requests or same-origin
     if (!origin) return callback(null, true);
+    // Allow any localhost / 127.0.0.1 port (dev servers, preview servers, etc.)
+    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      return callback(null, true);
+    }
+    // Allow configured origins and production subdomains
     if (
       allowedOrigins.includes(origin) ||
       origin.endsWith('.onrender.com') ||
@@ -42,8 +53,9 @@ app.use(cors({
     }
     return callback(new Error('Blocked by CORS policy: ' + origin));
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-user-role'],
+  exposedHeaders: ['X-Cache'],
   credentials: true
 }));
 
