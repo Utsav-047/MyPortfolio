@@ -14,10 +14,6 @@ import {
 // Component-Level Dynamic Code Splitting (React.lazy & Suspense)
 // Dynamically imported on demand inside Task Manager
 // ============================================================================
-const CachingOptimization = lazy(() => import('./CachingOptimization'));
-const AsyncEventDriven = lazy(() => import('./AsyncEventDriven'));
-const DockerContainerization = lazy(() => import('./DockerContainerization'));
-const CicdPipeline = lazy(() => import('./CicdPipeline'));
 const AiAssistant = lazy(() => import('./AiAssistant'));
 
 
@@ -54,7 +50,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
   const [taskToDelete, setTaskToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Sub-module navigation within TaskManager: 'tasks' | 'caching' | 'async'
+  // Sub-module navigation within TaskManager: 'tasks' | 'ai'
   const [activeModule, setActiveModule] = useState(initialTab || 'tasks');
 
   useEffect(() => {
@@ -826,7 +822,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
           <button
             onClick={() => setActiveModule('tasks')}
             style={{
-              padding: '10px 20px',
+              padding: '10px 22px',
               borderRadius: '10px',
               border: activeModule === 'tasks' ? 'none' : '1px solid #e2e8f0',
               background: activeModule === 'tasks' ? color : '#f8fafc',
@@ -844,129 +840,9 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
           </button>
 
           <button
-            onClick={() => setActiveModule('caching')}
-            style={{
-              padding: '10px 20px',
-              borderRadius: '10px',
-              border: activeModule === 'caching' ? 'none' : '1px solid #e2e8f0',
-              background: activeModule === 'caching' ? color : '#f8fafc',
-              color: activeModule === 'caching' ? '#ffffff' : '#475569',
-              fontWeight: 700,
-              fontSize: '14px',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.15s ease'
-            }}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> In-Memory Caching &amp; Optimization
-            <span style={{
-              fontSize: '11px',
-              padding: '2px 8px',
-              borderRadius: '12px',
-              background: activeModule === 'caching' ? 'rgba(255,255,255,0.25)' : '#ede9fe',
-              color: activeModule === 'caching' ? '#ffffff' : '#4f46e5',
-              fontWeight: 800
-            }}>
-              Lazy Chunk
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveModule('async')}
-            style={{
-              padding: '10px 20px',
-              borderRadius: '10px',
-              border: activeModule === 'async' ? 'none' : '1px solid #e2e8f0',
-              background: activeModule === 'async' ? color : '#f8fafc',
-              color: activeModule === 'async' ? '#ffffff' : '#475569',
-              fontWeight: 700,
-              fontSize: '14px',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.15s ease'
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg> Async Event Engine
-            <span style={{
-              fontSize: '11px',
-              padding: '2px 8px',
-              borderRadius: '12px',
-              background: activeModule === 'async' ? 'rgba(255,255,255,0.25)' : '#dcfce7',
-              color: activeModule === 'async' ? '#ffffff' : '#166534',
-              fontWeight: 800
-            }}>
-              SSE Stream
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveModule('docker')}
-            style={{
-              padding: '10px 20px',
-              borderRadius: '10px',
-              border: activeModule === 'docker' ? 'none' : '1px solid #e2e8f0',
-              background: activeModule === 'docker' ? color : '#f8fafc',
-              color: activeModule === 'docker' ? '#ffffff' : '#475569',
-              fontWeight: 700,
-              fontSize: '14px',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.15s ease'
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" /></svg> Docker &amp; Containers
-            <span style={{
-              fontSize: '11px',
-              padding: '2px 8px',
-              borderRadius: '12px',
-              background: activeModule === 'docker' ? 'rgba(255,255,255,0.25)' : '#e0f2fe',
-              color: activeModule === 'docker' ? '#ffffff' : '#0284c7',
-              fontWeight: 800
-            }}>
-              Compose v3.8
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveModule('cicd')}
-            style={{
-              padding: '10px 20px',
-              borderRadius: '10px',
-              border: activeModule === 'cicd' ? 'none' : '1px solid #e2e8f0',
-              background: activeModule === 'cicd' ? color : '#f8fafc',
-              color: activeModule === 'cicd' ? '#ffffff' : '#475569',
-              fontWeight: 700,
-              fontSize: '14px',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.15s ease'
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" /></svg> CI/CD Pipeline
-            <span style={{
-              fontSize: '11px',
-              padding: '2px 8px',
-              borderRadius: '12px',
-              background: activeModule === 'cicd' ? 'rgba(255,255,255,0.25)' : '#ede9fe',
-              color: activeModule === 'cicd' ? '#ffffff' : '#4f46e5',
-              fontWeight: 800
-            }}>
-              Actions v4
-            </span>
-          </button>
-
-          <button
             onClick={() => setActiveModule('ai')}
             style={{
-              padding: '10px 20px',
+              padding: '10px 22px',
               borderRadius: '10px',
               border: activeModule === 'ai' ? 'none' : '1px solid #e2e8f0',
               background: activeModule === 'ai' ? color : '#f8fafc',
@@ -980,7 +856,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
               transition: 'all 0.15s ease'
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg> AI Copilot
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg> AI Copilot Chat &amp; Studio
             <span style={{
               fontSize: '11px',
               padding: '2px 8px',
@@ -1556,139 +1432,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
           </>
         )}
 
-        {/* ── Sub-Module 2: In-Memory Caching & Query Optimization (Lazy-Loaded) ── */}
-        {activeModule === 'caching' && (
-          <Suspense fallback={
-            <div style={{
-              background: '#ffffff',
-              border: '1px solid #e2e8f0',
-              borderRadius: '16px',
-              padding: '3.5rem 2rem',
-              textAlign: 'center',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
-              margin: '10px 0'
-            }}>
-              <div style={{
-                width: '42px',
-                height: '42px',
-                border: '3px solid #e2e8f0',
-                borderTopColor: color,
-                borderRadius: '50%',
-                animation: 'spin 0.8s linear infinite',
-                margin: '0 auto 16px auto'
-              }} />
-              <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 800, color: '#1e293b' }}>
-                Lazy-Loading In-Memory Caching &amp; Optimization Suite...
-              </h3>
-              <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
-                Dynamically importing split code bundle with <code>React.lazy()</code> and <code>&lt;Suspense&gt;</code> inside Task Manager
-              </p>
-            </div>
-          }>
-            <CachingOptimization color={color} />
-          </Suspense>
-        )}
-
-        {/* ── Sub-Module 3: Asynchronous Processing & Event-Driven Engine (Lazy-Loaded) ── */}
-        {activeModule === 'async' && (
-          <Suspense fallback={
-            <div style={{
-              background: '#ffffff',
-              border: '1px solid #e2e8f0',
-              borderRadius: '16px',
-              padding: '3.5rem 2rem',
-              textAlign: 'center',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
-              margin: '10px 0'
-            }}>
-              <div style={{
-                width: '42px',
-                height: '42px',
-                border: '3px solid #e2e8f0',
-                borderTopColor: color,
-                borderRadius: '50%',
-                animation: 'spin 0.8s linear infinite',
-                margin: '0 auto 16px auto'
-              }} />
-              <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 800, color: '#1e293b' }}>
-                Lazy-Loading Asynchronous &amp; Event-Driven Suite...
-              </h3>
-              <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
-                Dynamically importing split code bundle with <code>React.lazy()</code> and <code>&lt;Suspense&gt;</code> inside Task Manager
-              </p>
-            </div>
-          }>
-            <AsyncEventDriven color={color} />
-          </Suspense>
-        )}
-
-        {/* ── Sub-Module 4: Containerization with Docker & Docker Compose (Lazy-Loaded) ── */}
-        {activeModule === 'docker' && (
-          <Suspense fallback={
-            <div style={{
-              background: '#ffffff',
-              border: '1px solid #e2e8f0',
-              borderRadius: '16px',
-              padding: '3.5rem 2rem',
-              textAlign: 'center',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
-              margin: '10px 0'
-            }}>
-              <div style={{
-                width: '42px',
-                height: '42px',
-                border: '3px solid #e2e8f0',
-                borderTopColor: color,
-                borderRadius: '50%',
-                animation: 'spin 0.8s linear infinite',
-                margin: '0 auto 16px auto'
-              }} />
-              <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 800, color: '#1e293b' }}>
-                Lazy-Loading Docker &amp; Containerization Suite...
-              </h3>
-              <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
-                Dynamically importing split code bundle with <code>React.lazy()</code> and <code>&lt;Suspense&gt;</code> inside Task Manager
-              </p>
-            </div>
-          }>
-            <DockerContainerization color={color} />
-          </Suspense>
-        )}
-
-        {/* ── Sub-Module 5: CI/CD Pipeline with GitHub Actions (Lazy-Loaded) ── */}
-        {activeModule === 'cicd' && (
-          <Suspense fallback={
-            <div style={{
-              background: '#ffffff',
-              border: '1px solid #e2e8f0',
-              borderRadius: '16px',
-              padding: '3.5rem 2rem',
-              textAlign: 'center',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
-              margin: '10px 0'
-            }}>
-              <div style={{
-                width: '42px',
-                height: '42px',
-                border: '3px solid #e2e8f0',
-                borderTopColor: color,
-                borderRadius: '50%',
-                animation: 'spin 0.8s linear infinite',
-                margin: '0 auto 16px auto'
-              }} />
-              <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 800, color: '#1e293b' }}>
-                Lazy-Loading CI/CD Pipeline &amp; GitHub Actions Suite...
-              </h3>
-              <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
-                Dynamically importing split code bundle with <code>React.lazy()</code> and <code>&lt;Suspense&gt;</code> inside Task Manager
-              </p>
-            </div>
-          }>
-            <CicdPipeline color={color} />
-          </Suspense>
-        )}
-
-        {/* ── Sub-Module 6: AI API Integration & Responsible Copilot (Lazy-Loaded) ── */}
+        {/* ── Sub-Module: AI Assistant & LLM Copilot (Lazy-Loaded) ── */}
         {activeModule === 'ai' && (
           <Suspense fallback={
             <div style={{
