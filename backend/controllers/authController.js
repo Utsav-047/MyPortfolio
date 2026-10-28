@@ -12,7 +12,8 @@ const memoryUsers = [];
 
 // Helper: Sign JWT Token
 const generateToken = (payload, expiresIn = '1h') => {
-  const secret = process.env.JWT_SECRET || 'utsav_portfolio_jwt_secret_key_2026';
+  const secret = process.env.JWT_SECRET;
+  if (!secret) throw new Error('JWT_SECRET environment variable is not set');
   return jwt.sign(payload, secret, { expiresIn });
 };
 
@@ -222,14 +223,10 @@ const googleLogin = async (req, res, next) => {
       });
       payload = ticket.getPayload();
     } catch (verifyErr) {
-      const decoded = jwt.decode(credential);
-      if (!decoded || !decoded.sub) {
-        return res.status(401).json({
-          error: 'Authentication Error',
-          message: 'Invalid Google credential token'
-        });
-      }
-      payload = decoded;
+      return res.status(401).json({
+        error: 'Authentication Error',
+        message: 'Invalid Google credential token. Please try signing in again.'
+      });
     }
 
     const { sub: googleId, name, email, picture: avatar } = payload;

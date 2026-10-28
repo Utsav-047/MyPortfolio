@@ -20,7 +20,10 @@ const protect = (req, res, next) => {
   const token = authHeader.split(' ')[1];
 
   try {
-    const secret = process.env.JWT_SECRET || 'utsav_portfolio_jwt_secret_key_2026';
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      return res.status(500).json({ error: 'Server Error', message: 'JWT_SECRET is not configured.' });
+    }
     const decoded = jwt.verify(token, secret);
     req.user = decoded; // { id, email, googleId }
     next();

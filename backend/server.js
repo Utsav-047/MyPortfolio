@@ -20,8 +20,13 @@ const PORT = process.env.PORT || 5000;
 // Connect to MongoDB Atlas / Local
 connectDB();
 
-// 1. CORS
-app.use(cors());
+// 1. CORS — restrict to known frontend origin
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
 // 2. Body Parser
 app.use(express.json());

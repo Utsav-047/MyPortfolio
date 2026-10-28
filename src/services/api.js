@@ -2,7 +2,8 @@
 //  MyPortfolio Practical 6 Central API Client Service
 
 
-const BASE_URL = 'http://localhost:5000';
+// Use VITE_API_URL env var for production; fallback to localhost for local dev
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 /**
  * Returns the Authorization header object if a JWT token is stored in localStorage.
