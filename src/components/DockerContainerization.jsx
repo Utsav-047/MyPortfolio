@@ -299,7 +299,7 @@ docs/`
       network: 'portfolio_bridge_network',
       status: 'healthy',
       containerSize: '24.8 MB (Multi-Stage)',
-      icon: '🌐',
+      iconType: 'globe',
       envVars: ['NODE_ENV=production', 'PORT=80'],
       health: 'Passing (HTTP 200 GET /)'
     },
@@ -313,7 +313,7 @@ docs/`
       network: 'portfolio_bridge_network',
       status: containerInfo ? 'healthy' : 'online',
       containerSize: '142 MB',
-      icon: '⚙️',
+      iconType: 'server',
       envVars: ['PORT=5000', 'NODE_ENV=production', 'MONGO_URI=mongodb://mongo:27017/portfolio_db'],
       health: 'Passing (HTTP 200 GET /)'
     },
@@ -327,7 +327,7 @@ docs/`
       network: 'portfolio_bridge_network',
       status: dbStatus?.status === 'online' ? 'healthy' : 'active',
       containerSize: '685 MB',
-      icon: '🍃',
+      iconType: 'database',
       envVars: ['MONGO_INITDB_DATABASE=portfolio_db'],
       volume: 'portfolio_mongo_data -> /data/db',
       health: 'Passing (mongosh ping OK)'
@@ -368,12 +368,12 @@ docs/`
 
       {/* Hero Header Card */}
       <div style={{
-        background: 'linear-gradient(135deg, #091e3a 0%, #0f172a 50%, #1e1b4b 100%)',
-        borderRadius: '20px',
-        padding: '28px 32px',
-        color: '#ffffff',
-        border: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: '0 12px 30px rgba(0,0,0,0.15)',
+        background: '#ffffff',
+        borderRadius: '16px',
+        padding: '1.75rem 2rem',
+        color: '#0f172a',
+        border: '1px solid #e2e8f0',
+        boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
         position: 'relative',
         overflow: 'hidden'
       }}>
@@ -406,7 +406,7 @@ docs/`
                 fontWeight: 800,
                 letterSpacing: '0.5px'
               }}>
-                🐳 PRACTICAL COMPILATION: CONTAINERIZATION
+                CONTAINER ARCHITECTURE
               </span>
               <span style={{
                 background: 'rgba(74, 222, 128, 0.15)',
@@ -420,10 +420,10 @@ docs/`
               </span>
             </div>
 
-            <h2 style={{ margin: '0 0 10px 0', fontSize: '26px', fontWeight: 800, color: '#f8fafc' }}>
+            <h2 style={{ margin: '0 0 10px 0', fontSize: '26px', fontWeight: 800, color: '#0f172a' }}>
               Containerization with Docker &amp; Docker Compose
             </h2>
-            <p style={{ margin: 0, fontSize: '14px', color: '#94a3b8', maxWidth: '780px', lineHeight: 1.6 }}>
+            <p style={{ margin: 0, fontSize: '14px', color: '#475569', maxWidth: '780px', lineHeight: 1.6 }}>
               Production-grade multi-tier container architecture orchestrating an optimized multi-stage React (Vite + Nginx) frontend, Node.js Express microservice backend, and persistent MongoDB database connected via an isolated Docker bridge network.
             </p>
           </div>
@@ -441,7 +441,7 @@ docs/`
               border: '1px solid rgba(255,255,255,0.08)',
               textAlign: 'center'
             }}>
-              <div style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Containers</div>
+              <div style={{ fontSize: '11px', color: '#475569', textTransform: 'uppercase', fontWeight: 700 }}>Containers</div>
               <div style={{ fontSize: '18px', fontWeight: 800, color: '#38bdf8', marginTop: '2px' }}>3 Active</div>
             </div>
             <div style={{
@@ -451,7 +451,7 @@ docs/`
               border: '1px solid rgba(255,255,255,0.08)',
               textAlign: 'center'
             }}>
-              <div style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Network</div>
+              <div style={{ fontSize: '11px', color: '#475569', textTransform: 'uppercase', fontWeight: 700 }}>Network</div>
               <div style={{ fontSize: '18px', fontWeight: 800, color: '#a78bfa', marginTop: '2px' }}>Bridge</div>
             </div>
             <div style={{
@@ -461,7 +461,7 @@ docs/`
               border: '1px solid rgba(255,255,255,0.08)',
               textAlign: 'center'
             }}>
-              <div style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Storage</div>
+              <div style={{ fontSize: '11px', color: '#475569', textTransform: 'uppercase', fontWeight: 700 }}>Storage</div>
               <div style={{ fontSize: '18px', fontWeight: 800, color: '#4ade80', marginTop: '2px' }}>Named Vol</div>
             </div>
           </div>
@@ -477,10 +477,10 @@ docs/`
         flexWrap: 'wrap'
       }}>
         {[
-          { id: 'overview', label: '🐳 Container Architecture & Mesh', icon: '📐' },
-          { id: 'dockerfiles', label: '📄 Dockerfile & Compose Specs', icon: '📝' },
-          { id: 'cli', label: '💻 Interactive CLI & Terminal', icon: '⌨️' },
-          { id: 'metrics', label: '⚡ Live Telemetry & Resource Monitor', icon: '📊' }
+          { id: 'overview', label: 'Container Architecture & Mesh' },
+          { id: 'dockerfiles', label: 'Dockerfile & Compose Specs' },
+          { id: 'cli', label: 'Interactive CLI & Terminal' },
+          { id: 'metrics', label: 'Live Telemetry & Resource Monitor' }
         ].map(tab => (
           <button
             key={tab.id}
@@ -501,7 +501,7 @@ docs/`
               transition: 'all 0.15s ease'
             }}
           >
-            <span>{tab.icon}</span>
+            
             {tab.label}
           </button>
         ))}
@@ -512,18 +512,18 @@ docs/`
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* Visual Architecture Diagram Card */}
           <div style={{
-            background: 'rgba(30, 41, 59, 0.7)',
+            background: '#ffffff',
             borderRadius: '16px',
             padding: '24px',
-            border: '1px solid rgba(212, 185, 150, 0.15)',
+            border: '1px solid #e2e8f0',
             boxShadow: '0 4px 20px rgba(0,0,0,0.25)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
               <div>
-                <h3 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: 800, color: '#F8F6F1' }}>
+                <h3 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>
                   Multi-Container Orchestration Mesh
                 </h3>
-                <p style={{ margin: 0, fontSize: '13px', color: '#94A3B8' }}>
+                <p style={{ margin: 0, fontSize: '13px', color: '#475569' }}>
                   How Docker Compose encapsulates frontend, backend, and database in isolated environments with private DNS routing.
                 </p>
               </div>
@@ -565,14 +565,14 @@ docs/`
                   textAlign: 'center'
                 }}>
                   <div style={{ fontSize: '24px', marginBottom: '6px' }}>💻</div>
-                  <div style={{ fontWeight: 800, fontSize: '14px', color: '#f8fafc' }}>Client Browser</div>
-                  <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>Host Port: 3000</div>
+                  <div style={{ fontWeight: 800, fontSize: '14px', color: '#0f172a' }}>Client Browser</div>
+                  <div style={{ fontSize: '11px', color: '#475569', marginTop: '4px' }}>Host Port: 3000</div>
                   <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>HTTP Requests</div>
                 </div>
 
                 {/* Arrow */}
                 <div style={{ textAlign: 'center', color: '#38bdf8', fontWeight: 800, fontSize: '18px' }}>
-                  ➔<div style={{ fontSize: '10px', color: '#94a3b8' }}>:3000</div>
+                  ➔<div style={{ fontSize: '10px', color: '#475569' }}>:3000</div>
                 </div>
 
                 {/* 2. Frontend Container */}
@@ -588,8 +588,8 @@ docs/`
                     <span style={{ fontSize: '10px', background: '#0284c7', color: '#ffffff', padding: '2px 8px', borderRadius: '10px', fontWeight: 800 }}>PORT 80</span>
                   </div>
                   <div style={{ fontWeight: 800, fontSize: '15px', color: '#38bdf8' }}>portfolio-frontend</div>
-                  <div style={{ fontSize: '11px', color: '#cbd5e1', marginTop: '4px' }}>Nginx 1.25 Alpine</div>
-                  <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '6px', lineHeight: 1.4 }}>
+                  <div style={{ fontSize: '11px', color: '#334155', marginTop: '4px' }}>Nginx 1.25 Alpine</div>
+                  <div style={{ fontSize: '10px', color: '#475569', marginTop: '6px', lineHeight: 1.4 }}>
                     • Serves React /dist SPA<br />
                     • Reverse Proxies /api/ ➔ backend:5000<br />
                     • Disables buffering for SSE
@@ -598,7 +598,7 @@ docs/`
 
                 {/* Arrow */}
                 <div style={{ textAlign: 'center', color: '#a78bfa', fontWeight: 800, fontSize: '18px' }}>
-                  ➔<div style={{ fontSize: '10px', color: '#94a3b8' }}>DNS: backend:5000</div>
+                  ➔<div style={{ fontSize: '10px', color: '#475569' }}>DNS: backend:5000</div>
                 </div>
 
                 {/* 3. Backend Container */}
@@ -614,8 +614,8 @@ docs/`
                     <span style={{ fontSize: '10px', background: '#7c3aed', color: '#ffffff', padding: '2px 8px', borderRadius: '10px', fontWeight: 800 }}>PORT 5000</span>
                   </div>
                   <div style={{ fontWeight: 800, fontSize: '15px', color: '#a78bfa' }}>portfolio-backend</div>
-                  <div style={{ fontSize: '11px', color: '#cbd5e1', marginTop: '4px' }}>Node.js 20 Alpine Express</div>
-                  <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '6px', lineHeight: 1.4 }}>
+                  <div style={{ fontSize: '11px', color: '#334155', marginTop: '4px' }}>Node.js 20 Alpine Express</div>
+                  <div style={{ fontSize: '10px', color: '#475569', marginTop: '6px', lineHeight: 1.4 }}>
                     • Task REST APIs + Auth Gate<br />
                     • EventEmitter Async Engine<br />
                     • Healthcheck: GET / (every 20s)
@@ -624,7 +624,7 @@ docs/`
 
                 {/* Arrow */}
                 <div style={{ textAlign: 'center', color: '#4ade80', fontWeight: 800, fontSize: '18px' }}>
-                  ➔<div style={{ fontSize: '10px', color: '#94a3b8' }}>DNS: mongo:27017</div>
+                  ➔<div style={{ fontSize: '10px', color: '#475569' }}>DNS: mongo:27017</div>
                 </div>
 
                 {/* 4. MongoDB Container */}
@@ -640,7 +640,7 @@ docs/`
                     <span style={{ fontSize: '10px', background: '#16a34a', color: '#ffffff', padding: '2px 8px', borderRadius: '10px', fontWeight: 800 }}>PORT 27017</span>
                   </div>
                   <div style={{ fontWeight: 800, fontSize: '15px', color: '#4ade80' }}>portfolio-mongo</div>
-                  <div style={{ fontSize: '11px', color: '#cbd5e1', marginTop: '4px' }}>MongoDB 7.0 Engine</div>
+                  <div style={{ fontSize: '11px', color: '#334155', marginTop: '4px' }}>MongoDB 7.0 Engine</div>
                   <div style={{
                     marginTop: '8px',
                     padding: '6px 8px',
@@ -660,7 +660,7 @@ docs/`
           {/* Service Cards Grid */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <h3 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: '#F8F6F1' }}>
+              <h3 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: '#0f172a' }}>
                 Defined Docker Services ({services.length})
               </h3>
               <div style={{ display: 'flex', gap: '6px' }}>
@@ -673,9 +673,9 @@ docs/`
                       style={{
                         padding: '5px 14px',
                         borderRadius: '20px',
-                        border: active ? '1px solid #D4B996' : '1px solid rgba(255, 255, 255, 0.08)',
-                        background: active ? 'rgba(212, 185, 150, 0.16)' : 'rgba(255, 255, 255, 0.04)',
-                        color: active ? '#D4B996' : '#94A3B8',
+                        border: active ? '1px solid #c7d2fe' : '1px solid #e2e8f0',
+                        background: active ? '#ede9fe' : '#f8fafc',
+                        color: active ? '#4f46e5' : '#475569',
                         fontSize: '12px',
                         fontWeight: 600,
                         cursor: 'pointer',
@@ -701,8 +701,8 @@ docs/`
                   <div
                     key={service.id}
                     style={{
-                      background: 'rgba(30, 41, 59, 0.7)',
-                      border: '1px solid rgba(212, 185, 150, 0.12)',
+                      background: '#ffffff',
+                      border: '1px solid #e2e8f0',
                       borderRadius: '16px',
                       padding: '20px',
                       boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
@@ -716,10 +716,10 @@ docs/`
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                           <span style={{ fontSize: '24px' }}>{service.icon}</span>
                           <div>
-                            <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#F8F6F1' }}>
+                            <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#0f172a' }}>
                               {service.name}
                             </h4>
-                            <span style={{ fontSize: '12px', color: '#94A3B8' }}>{service.role}</span>
+                            <span style={{ fontSize: '12px', color: '#475569' }}>{service.role}</span>
                           </div>
                         </div>
                         <span style={{
@@ -740,8 +740,8 @@ docs/`
                       </div>
 
                       <div style={{
-                        background: 'rgba(15, 23, 42, 0.65)',
-                        border: '1px solid rgba(255, 255, 255, 0.06)',
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
                         borderRadius: '10px',
                         padding: '12px',
                         fontSize: '12px',
@@ -751,25 +751,25 @@ docs/`
                         marginTop: '12px'
                       }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ color: '#94A3B8' }}>Stack:</span>
-                          <span style={{ fontWeight: 600, color: '#F8F6F1' }}>{service.technology}</span>
+                          <span style={{ color: '#475569' }}>Stack:</span>
+                          <span style={{ fontWeight: 600, color: '#0f172a' }}>{service.technology}</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ color: '#94A3B8' }}>Port Bind:</span>
+                          <span style={{ color: '#475569' }}>Port Bind:</span>
                           <span style={{ fontWeight: 700, color: '#60a5fa', fontFamily: 'monospace' }}>{service.ports}</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ color: '#94A3B8' }}>Image Size:</span>
+                          <span style={{ color: '#475569' }}>Image Size:</span>
                           <span style={{ fontWeight: 700, color: '#4ade80' }}>{service.containerSize}</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ color: '#94A3B8' }}>Healthcheck:</span>
+                          <span style={{ color: '#475569' }}>Healthcheck:</span>
                           <span style={{ fontWeight: 600, color: '#86efac' }}>{service.health}</span>
                         </div>
                         {service.volume && (
                           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ color: '#94A3B8' }}>Storage Volume:</span>
-                            <span style={{ fontWeight: 700, color: '#D4B996', fontFamily: 'monospace' }}>{service.volume}</span>
+                            <span style={{ color: '#475569' }}>Storage Volume:</span>
+                            <span style={{ fontWeight: 700, color: '#4f46e5', fontFamily: 'monospace' }}>{service.volume}</span>
                           </div>
                         )}
                       </div>
@@ -783,9 +783,9 @@ docs/`
                           flex: 1,
                           padding: '8px 12px',
                           borderRadius: '8px',
-                          border: '1px solid rgba(255, 255, 255, 0.12)',
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          color: '#F8F6F1',
+                          border: '1px solid #cbd5e1',
+                          background: '#f1f5f9',
+                          color: '#0f172a',
                           fontSize: '12px',
                           fontWeight: 600,
                           cursor: 'pointer',
@@ -807,8 +807,8 @@ docs/`
                           padding: '8px 14px',
                           borderRadius: '8px',
                           border: 'none',
-                          background: '#D4B996',
-                          color: '#0F172A',
+                          background: '#4f46e5',
+                          color: '#ffffff',
                           fontSize: '12px',
                           fontWeight: 700,
                           cursor: 'pointer',
@@ -825,20 +825,20 @@ docs/`
 
           {/* Multi-Stage Build Comparison Card */}
           <div style={{
-            background: 'rgba(30, 41, 59, 0.7)',
-            border: '1px solid rgba(212, 185, 150, 0.12)',
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
             borderRadius: '16px',
             padding: '24px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-              <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(212, 185, 150, 0.12)', color: '#D4B996', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(212, 185, 150, 0.12)', color: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
               </div>
-              <h3 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: '#F8F6F1' }}>
+              <h3 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: '#0f172a' }}>
                 Optimization Advantage: Multi-Stage Docker Build
               </h3>
             </div>
-            <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#94A3B8', lineHeight: 1.5 }}>
+            <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#475569', lineHeight: 1.5 }}>
               By separating the Node.js compiler environment from the final Nginx serving layer, we eliminate the entire Node runtime and heavy <code>node_modules</code> directory from the production image.
             </p>
 
@@ -848,20 +848,20 @@ docs/`
               gap: '16px'
             }}>
               <div style={{
-                background: 'rgba(15, 23, 42, 0.65)',
+                background: '#f8fafc',
                 borderRadius: '12px',
                 padding: '16px',
                 border: '1px solid rgba(239, 68, 68, 0.25)'
               }}>
                 <div style={{ fontSize: '11px', color: '#f87171', fontWeight: 800, textTransform: 'uppercase' }}>Standard Single-Stage (Node)</div>
                 <div style={{ fontSize: '24px', fontWeight: 800, color: '#f87171', marginTop: '4px' }}>~850 MB</div>
-                <div style={{ fontSize: '12px', color: '#94A3B8', marginTop: '6px' }}>
+                <div style={{ fontSize: '12px', color: '#475569', marginTop: '6px' }}>
                   Includes npm devDependencies, compilers, source code, and full Node runtime.
                 </div>
               </div>
 
               <div style={{
-                background: 'rgba(15, 23, 42, 0.65)',
+                background: '#f8fafc',
                 borderRadius: '12px',
                 padding: '16px',
                 border: '1px solid rgba(74, 222, 128, 0.35)',
@@ -869,20 +869,20 @@ docs/`
               }}>
                 <div style={{ fontSize: '11px', color: '#4ade80', fontWeight: 800, textTransform: 'uppercase' }}>Our Multi-Stage Nginx Build</div>
                 <div style={{ fontSize: '24px', fontWeight: 800, color: '#4ade80', marginTop: '4px' }}>~24.8 MB</div>
-                <div style={{ fontSize: '12px', color: '#94A3B8', marginTop: '6px' }}>
+                <div style={{ fontSize: '12px', color: '#475569', marginTop: '6px' }}>
                   <strong style={{ color: '#4ade80' }}>97.1% Size Reduction!</strong> Only minified HTML/JS/CSS served on Alpine Nginx.
                 </div>
               </div>
 
               <div style={{
-                background: 'rgba(15, 23, 42, 0.65)',
+                background: '#f8fafc',
                 borderRadius: '12px',
                 padding: '16px',
                 border: '1px solid rgba(212, 185, 150, 0.25)'
               }}>
-                <div style={{ fontSize: '11px', color: '#D4B996', fontWeight: 800, textTransform: 'uppercase' }}>Security &amp; Attack Surface</div>
-                <div style={{ fontSize: '24px', fontWeight: 800, color: '#D4B996', marginTop: '4px' }}>Zero Node Vulns</div>
-                <div style={{ fontSize: '12px', color: '#94A3B8', marginTop: '6px' }}>
+                <div style={{ fontSize: '11px', color: '#4f46e5', fontWeight: 800, textTransform: 'uppercase' }}>Security &amp; Attack Surface</div>
+                <div style={{ fontSize: '24px', fontWeight: 800, color: '#4f46e5', marginTop: '4px' }}>Zero Node Vulns</div>
+                <div style={{ fontSize: '12px', color: '#475569', marginTop: '6px' }}>
                   No package managers, compilers, or shell interpreters exposed in production.
                 </div>
               </div>
@@ -898,14 +898,14 @@ docs/`
           <div style={{
             display: 'flex',
             gap: '8px',
-            background: 'rgba(30, 41, 59, 0.7)',
+            background: '#ffffff',
             padding: '10px 14px',
             borderRadius: '14px',
-            border: '1px solid rgba(212, 185, 150, 0.12)',
+            border: '1px solid #e2e8f0',
             overflowX: 'auto',
             alignItems: 'center'
           }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginRight: '6px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', marginRight: '6px' }}>
               Configuration Files:
             </span>
             {Object.keys(codeFiles).map(key => {
@@ -930,7 +930,7 @@ docs/`
                     whiteSpace: 'nowrap'
                   }}
                 >
-                  <span>{key === 'compose' ? '🐙' : key === 'frontend' ? '🌐' : key === 'backend' ? '⚙️' : key === 'nginx' ? '🔀' : '🚫'}</span>
+                  
                   {file.name}
                 </button>
               );
@@ -964,7 +964,7 @@ docs/`
                     <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
                   </div>
                   <div>
-                    <span style={{ color: '#f8fafc', fontWeight: 800, fontSize: '15px' }}>
+                    <span style={{ color: '#0f172a', fontWeight: 800, fontSize: '15px' }}>
                       {codeFiles[selectedFile].name}
                     </span>
                     <span style={{
@@ -1003,10 +1003,10 @@ docs/`
 
               {/* Description banner */}
               <div style={{
-                background: 'rgba(30, 41, 59, 0.5)',
+                background: '#f8fafc',
                 padding: '10px 20px',
                 borderBottom: '1px solid #1e293b',
-                color: '#94a3b8',
+                color: '#475569',
                 fontSize: '12px'
               }}>
                 ℹ️ {codeFiles[selectedFile].description}
@@ -1035,16 +1035,16 @@ docs/`
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Command Quick Launcher Buttons */}
           <div style={{
-            background: 'rgba(30, 41, 59, 0.7)',
+            background: '#ffffff',
             borderRadius: '16px',
             padding: '20px',
-            border: '1px solid rgba(212, 185, 150, 0.15)',
+            border: '1px solid #e2e8f0',
             boxShadow: '0 4px 20px rgba(0,0,0,0.25)'
           }}>
-            <h3 style={{ margin: '0 0 6px 0', fontSize: '16px', fontWeight: 800, color: '#F8F6F1' }}>
+            <h3 style={{ margin: '0 0 6px 0', fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
               Docker CLI Command Simulator
             </h3>
-            <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#94A3B8' }}>
+            <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#475569' }}>
               Click any standard Docker Compose operational command below to simulate container execution inside the embedded terminal:
             </p>
 
@@ -1054,13 +1054,13 @@ docs/`
               gap: '10px'
             }}>
               {[
-                { key: 'up', title: 'docker compose up -d', subtitle: 'Build & launch all 3 services detached', icon: '🚀' },
-                { key: 'ps', title: 'docker compose ps', subtitle: 'List running containers & ports', icon: '📋' },
-                { key: 'stats', title: 'docker stats', subtitle: 'Display real-time container CPU/RAM', icon: '📊' },
-                { key: 'logs_backend', title: 'docker logs backend', subtitle: 'Stream Node API and Mongoose logs', icon: '🪵' },
-                { key: 'logs_frontend', title: 'docker logs frontend', subtitle: 'Inspect Nginx reverse proxy access', icon: '🌐' },
-                { key: 'exec', title: 'docker compose exec', subtitle: 'Run commands inside container environment', icon: '💻' },
-                { key: 'down', title: 'docker compose down', subtitle: 'Safely stop & destroy containers', icon: '🛑' }
+                { key: 'up', title: 'docker compose up -d', subtitle: 'Build & launch all 3 services detached', iconType: 'rocket' },
+                { key: 'ps', title: 'docker compose ps', subtitle: 'List running containers & ports', iconType: 'list' },
+                { key: 'stats', title: 'docker stats', subtitle: 'Display real-time container CPU/RAM', iconType: 'barChart' },
+                { key: 'logs_backend', title: 'docker logs backend', subtitle: 'Stream Node API and Mongoose logs', iconType: 'terminal' },
+                { key: 'logs_frontend', title: 'docker logs frontend', subtitle: 'Inspect Nginx reverse proxy access', iconType: 'globe' },
+                { key: 'exec', title: 'docker compose exec', subtitle: 'Run commands inside container environment', iconType: 'cpu' },
+                { key: 'down', title: 'docker compose down', subtitle: 'Safely stop & destroy containers', iconType: 'stop' }
               ].map(item => (
                 <button
                   key={item.key}
@@ -1112,7 +1112,7 @@ docs/`
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444' }} />
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} />
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981' }} />
-                <span style={{ color: '#94a3b8', fontSize: '12px', fontFamily: 'monospace', marginLeft: '6px' }}>
+                <span style={{ color: '#475569', fontSize: '12px', fontFamily: 'monospace', marginLeft: '6px' }}>
                   bash - portfolio@docker-engine:~/MyPortfolio
                 </span>
               </div>
@@ -1147,7 +1147,7 @@ docs/`
                     </div>
                   ) : (
                     <div style={{
-                      color: '#cbd5e1',
+                      color: '#334155',
                       whiteSpace: 'pre-wrap',
                       marginTop: '4px',
                       paddingLeft: '12px',
@@ -1183,14 +1183,14 @@ docs/`
             gap: '16px'
           }}>
             <div style={{
-              background: 'rgba(30, 41, 59, 0.7)',
+              background: '#ffffff',
               borderRadius: '14px',
               padding: '18px',
-              border: '1px solid rgba(212, 185, 150, 0.15)',
+              border: '1px solid #e2e8f0',
               boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
             }}>
-              <div style={{ fontSize: '11px', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700 }}>Container Environment</div>
-              <div style={{ fontSize: '20px', fontWeight: 800, color: '#F8F6F1', marginTop: '4px' }}>
+              <div style={{ fontSize: '11px', color: '#475569', textTransform: 'uppercase', fontWeight: 700 }}>Container Environment</div>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a', marginTop: '4px' }}>
                 {containerInfo?.runtime?.environment ? containerInfo.runtime.environment.toUpperCase() : 'PRODUCTION'}
               </div>
               <div style={{ fontSize: '12px', color: '#4ade80', marginTop: '4px' }}>
@@ -1199,49 +1199,49 @@ docs/`
             </div>
 
             <div style={{
-              background: 'rgba(30, 41, 59, 0.7)',
+              background: '#ffffff',
               borderRadius: '14px',
               padding: '18px',
-              border: '1px solid rgba(212, 185, 150, 0.15)',
+              border: '1px solid #e2e8f0',
               boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
             }}>
-              <div style={{ fontSize: '11px', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700 }}>Backend Heap Memory</div>
-              <div style={{ fontSize: '20px', fontWeight: 800, color: '#D4B996', marginTop: '4px' }}>
+              <div style={{ fontSize: '11px', color: '#475569', textTransform: 'uppercase', fontWeight: 700 }}>Backend Heap Memory</div>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: '#4f46e5', marginTop: '4px' }}>
                 {containerInfo?.memory?.heapUsedMb ? `${containerInfo.memory.heapUsedMb} MB` : '42.8 MB'}
               </div>
-              <div style={{ fontSize: '12px', color: '#cbd5e1', marginTop: '4px' }}>
+              <div style={{ fontSize: '12px', color: '#334155', marginTop: '4px' }}>
                 Total Allocated: {containerInfo?.memory?.heapTotalMb || '64.5'} MB
               </div>
             </div>
 
             <div style={{
-              background: 'rgba(30, 41, 59, 0.7)',
+              background: '#ffffff',
               borderRadius: '14px',
               padding: '18px',
-              border: '1px solid rgba(212, 185, 150, 0.15)',
+              border: '1px solid #e2e8f0',
               boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
             }}>
-              <div style={{ fontSize: '11px', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700 }}>Container RSS (Resident)</div>
+              <div style={{ fontSize: '11px', color: '#475569', textTransform: 'uppercase', fontWeight: 700 }}>Container RSS (Resident)</div>
               <div style={{ fontSize: '20px', fontWeight: 800, color: '#38bdf8', marginTop: '4px' }}>
                 {containerInfo?.memory?.rssMb ? `${containerInfo.memory.rssMb} MB` : '78.2 MB'}
               </div>
-              <div style={{ fontSize: '12px', color: '#cbd5e1', marginTop: '4px' }}>
+              <div style={{ fontSize: '12px', color: '#334155', marginTop: '4px' }}>
                 External Buffers: {containerInfo?.memory?.externalMb || '2.1'} MB
               </div>
             </div>
 
             <div style={{
-              background: 'rgba(30, 41, 59, 0.7)',
+              background: '#ffffff',
               borderRadius: '14px',
               padding: '18px',
-              border: '1px solid rgba(212, 185, 150, 0.15)',
+              border: '1px solid #e2e8f0',
               boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
             }}>
-              <div style={{ fontSize: '11px', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700 }}>Uptime &amp; PID</div>
+              <div style={{ fontSize: '11px', color: '#475569', textTransform: 'uppercase', fontWeight: 700 }}>Uptime &amp; PID</div>
               <div style={{ fontSize: '20px', fontWeight: 800, color: '#4ade80', marginTop: '4px' }}>
                 {containerInfo?.runtime?.uptimeSeconds ? `${containerInfo.runtime.uptimeSeconds}s` : 'Healthy'}
               </div>
-              <div style={{ fontSize: '12px', color: '#cbd5e1', marginTop: '4px' }}>
+              <div style={{ fontSize: '12px', color: '#334155', marginTop: '4px' }}>
                 Container PID: {containerInfo?.runtime?.pid || '1 (init)'}
               </div>
             </div>
@@ -1249,13 +1249,13 @@ docs/`
 
           {/* Docker Network & Volume Inspection */}
           <div style={{
-            background: 'rgba(30, 41, 59, 0.7)',
+            background: '#ffffff',
             borderRadius: '16px',
             padding: '24px',
-            border: '1px solid rgba(212, 185, 150, 0.15)',
+            border: '1px solid #e2e8f0',
             boxShadow: '0 4px 20px rgba(0,0,0,0.25)'
           }}>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: '17px', fontWeight: 800, color: '#F8F6F1' }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '17px', fontWeight: 800, color: '#0f172a' }}>
               Docker Network &amp; Storage Volume Details
             </h3>
 
@@ -1269,16 +1269,16 @@ docs/`
                 background: 'rgba(15, 23, 42, 0.6)',
                 borderRadius: '12px',
                 padding: '16px',
-                border: '1px solid rgba(212, 185, 150, 0.12)'
+                border: '1px solid #e2e8f0'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <div style={{ fontWeight: 800, fontSize: '14px', color: '#F8F6F1' }}>portfolio_bridge_network</div>
+                  <div style={{ fontWeight: 800, fontSize: '14px', color: '#0f172a' }}>portfolio_bridge_network</div>
                 </div>
-                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '12px', color: '#cbd5e1', lineHeight: 1.8 }}>
-                  <li><strong style={{ color: '#F8F6F1' }}>Driver:</strong> bridge</li>
-                  <li><strong style={{ color: '#F8F6F1' }}>Subnet:</strong> 172.28.0.0/16 (automatic isolated subnet)</li>
-                  <li><strong style={{ color: '#F8F6F1' }}>Internal DNS:</strong> 127.0.0.11 embedded Docker resolver</li>
-                  <li><strong style={{ color: '#F8F6F1' }}>Resolution:</strong> <code style={{ color: '#D4B996' }}>frontend</code>, <code style={{ color: '#D4B996' }}>backend</code>, <code style={{ color: '#D4B996' }}>mongo</code> by service name</li>
+                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '12px', color: '#334155', lineHeight: 1.8 }}>
+                  <li><strong style={{ color: '#0f172a' }}>Driver:</strong> bridge</li>
+                  <li><strong style={{ color: '#0f172a' }}>Subnet:</strong> 172.28.0.0/16 (automatic isolated subnet)</li>
+                  <li><strong style={{ color: '#0f172a' }}>Internal DNS:</strong> 127.0.0.11 embedded Docker resolver</li>
+                  <li><strong style={{ color: '#0f172a' }}>Resolution:</strong> <code style={{ color: '#4f46e5' }}>frontend</code>, <code style={{ color: '#4f46e5' }}>backend</code>, <code style={{ color: '#4f46e5' }}>mongo</code> by service name</li>
                 </ul>
               </div>
 
@@ -1287,16 +1287,16 @@ docs/`
                 background: 'rgba(15, 23, 42, 0.6)',
                 borderRadius: '12px',
                 padding: '16px',
-                border: '1px solid rgba(212, 185, 150, 0.12)'
+                border: '1px solid #e2e8f0'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <div style={{ fontWeight: 800, fontSize: '14px', color: '#F8F6F1' }}>portfolio_mongo_data</div>
+                  <div style={{ fontWeight: 800, fontSize: '14px', color: '#0f172a' }}>portfolio_mongo_data</div>
                 </div>
-                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '12px', color: '#cbd5e1', lineHeight: 1.8 }}>
-                  <li><strong style={{ color: '#F8F6F1' }}>Driver:</strong> local</li>
-                  <li><strong style={{ color: '#F8F6F1' }}>Host Mount:</strong> /var/lib/docker/volumes/portfolio_mongo_data/_data</li>
-                  <li><strong style={{ color: '#F8F6F1' }}>Container Mount:</strong> /data/db</li>
-                  <li><strong style={{ color: '#F8F6F1' }}>Persistence:</strong> Survives <code style={{ color: '#D4B996' }}>docker compose down</code>, container rebuilds, and restarts</li>
+                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '12px', color: '#334155', lineHeight: 1.8 }}>
+                  <li><strong style={{ color: '#0f172a' }}>Driver:</strong> local</li>
+                  <li><strong style={{ color: '#0f172a' }}>Host Mount:</strong> /var/lib/docker/volumes/portfolio_mongo_data/_data</li>
+                  <li><strong style={{ color: '#0f172a' }}>Container Mount:</strong> /data/db</li>
+                  <li><strong style={{ color: '#0f172a' }}>Persistence:</strong> Survives <code style={{ color: '#4f46e5' }}>docker compose down</code>, container rebuilds, and restarts</li>
                 </ul>
               </div>
             </div>
