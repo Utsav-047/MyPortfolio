@@ -138,7 +138,7 @@ Open `http://localhost:5173` in your browser.
 
 ---
 
-## 🚀 Practical 12: Automated CI/CD Pipeline with GitHub Actions
+## 🚀 Automated CI/CD Pipeline with GitHub Actions
 
 ### Objective
 Automate code quality validation, dependency installation, and API testing using a Continuous Integration pipeline configured with GitHub Actions.
@@ -191,7 +191,7 @@ npm test
 
 ---
 
-## ✨ Practical 13: AI API Integration into a Web Application
+## ✨ AI API Integration into a Web Application
 
 ### Objective
 Integrate an external AI service (OpenAI `gpt-4o-mini` / Gemini `gemini-1.5-flash`) into the Task Management application with secure server-side API key management, graceful degradation without application crash, and Responsible AI governance.
