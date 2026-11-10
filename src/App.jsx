@@ -266,7 +266,7 @@ function App() {
             >
               Contact Me
             </button>
-            <GoogleAuthBtn />
+            {viewMode === 'taskmanager' && <GoogleAuthBtn />}
           </nav>
         </div>
       </header>
