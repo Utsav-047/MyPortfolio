@@ -6,7 +6,7 @@ import AuthGate from './components/AuthGate';
 import BrandLogo from './components/BrandLogo';
 
 // ============================================================================
-// Practical 8: Performance Optimization & Route-Level Dynamic Code Splitting
+// Performance Optimization & Route-Level Dynamic Code Splitting
 // Converting static imports to React.lazy() chunks
 // ============================================================================
 const Home = lazy(() => import('./components/Home'));
@@ -21,74 +21,45 @@ const Contact = lazy(() => import('./components/Contact'));
 
 function App() {
   // Lifted auth state — shared between GoogleAuthBtn (navbar) and AuthGate (task manager)
-  const [authUser, setAuthUser] = useState(() => {
+  const [, setAuthUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem('auth_user')); } catch { return null; }
   });
+
+  // Dark / Light Mode Toggle State
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('portfolio_theme');
+    if (saved === 'dark' || saved === 'light') return saved;
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    return 'light';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('portfolio_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
 
   // 1. Core Profile State (Utsav Patel's details)
   const [profile] = useState({
     name: 'Utsav Patel',
-    title: 'AI & ML Student & Web Developer',
-    bio: 'I am a 3rd year AI & ML student at CSPIT, passionate about Web Development, Artificial Intelligence, and Machine Learning. I love building intelligent, clean interfaces that bridge the gap between machine learning and human interaction.',
+    title: 'AI & ML Student • Full-Stack Web Developer',
+    bio: '3rd-year B.Tech AI & ML student at CSPIT, Charusat University. Experienced in computer vision, applied machine learning pipelines, and modern full-stack web applications with React and Node.js.',
     aboutTitle: 'AI & ML Developer, Web Tech Enthusiast',
     aboutBio: 'Hey there! I am Utsav Patel, a B.Tech AI & ML student at CSPIT, Charusat. I am passionate about exploring artificial intelligence, training predictive models, and building clean, responsive web applications using modern technologies like React, Node.js, and Python.',
     location: 'Changa, Gujarat, India',
     studies: 'B.Tech AI & ML (3rd Year)',
-    focusArea: 'AI / ML / Web Development',
-    availability: 'Open to Internships',
+    focusArea: 'Computer Vision & Full-Stack Web',
+    availability: 'Open to Summer Internships',
     email: 'utsavpatel788190@gmail.com',
     phone: '+91 9328292343',
     github: 'Utsav-047',
     linkedin: 'https://www.linkedin.com/in/utsav-patel-422789320',
-    themeColor: '#4f46e5',
-    
-    // Quick Stats Fields
-    stats: [
-      { label: 'ML Projects Built', value: '4+' },
-      { label: 'Tech Stack', value: '10+' },
-      { label: 'Experience', value: 'Student' },
-      { label: 'Academic CGPA', value: '7.44' }
-    ],
-
-    // Floating Image Badges
-    badges: ['AI & ML Student', 'Web Developer'],
-
-    // Skills grouped
-    skills: [
-      { name: 'Python', category: 'AI & Machine Learning', level: 'Expert', percentage: 92, icon: 'python' },
-      { name: 'Machine Learning', category: 'AI & Machine Learning', level: 'Expert', percentage: 88, icon: 'sklearn' },
-      { name: 'Deep Learning', category: 'AI & Machine Learning', level: 'Advanced', percentage: 78, icon: 'tensorflow' },
-      { name: 'OpenCV', category: 'AI & Machine Learning', level: 'Advanced', percentage: 82, icon: 'opencv' },
-      { name: 'React JS', category: 'Web & Databases', level: 'Advanced', percentage: 85, icon: 'react' },
-      { name: 'JavaScript', category: 'Web & Databases', level: 'Expert', percentage: 88, icon: 'javascript' },
-      { name: 'HTML & CSS', category: 'Web & Databases', level: 'Expert', percentage: 90, icon: 'html' },
-      { name: 'SQL / MySQL', category: 'Web & Databases', level: 'Advanced', percentage: 80, icon: 'mysql' }
-    ],
-
-    // Projects Grid
-    projects: [
-      {
-        title: 'Smart Attendance System',
-        description: 'Real-time face recognition based attendance system using OpenCV and Python.',
-        tags: ['Python', 'OpenCV', 'Tkinter'],
-        link: 'https://github.com/Utsav-047',
-        icon: '🧠'
-      },
-      {
-        title: 'BAJA RuleBot',
-        description: 'AI-powered rule bot trained on BAJA SAE regulations for mechanical engineers.',
-        tags: ['NLP', 'Python', 'LlamaIndex'],
-        link: 'https://github.com/Utsav-047',
-        icon: '🤖'
-      },
-      {
-        title: 'AI Personal Finance Tracker',
-        description: 'Personal finance expense manager with automated categorization using machine learning.',
-        tags: ['React', 'Express', 'Chart.js'],
-        link: 'https://github.com/Utsav-047',
-        icon: '💰'
-      }
-    ]
+    themeColor: '#2563eb'
   });
 
   // 2. Active View State ('portfolio' | 'taskmanager') and active section on scroll
@@ -136,28 +107,12 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [viewMode]);
 
-  // 5. Inject dynamic CSS Custom Properties for themes
-  useEffect(() => {
-    const hexToRgb = (hex) => {
-      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return result
-        ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
-        : '79, 70, 229';
-    };
-
-    const color = profile.themeColor || '#4f46e5';
-    const rgb = hexToRgb(color);
-    document.documentElement.style.setProperty('--theme-color', color);
-    document.documentElement.style.setProperty('--theme-color-rgb', rgb);
-    document.documentElement.style.setProperty('--theme-color-light', `rgba(${rgb}, 0.08)`);
-  }, [profile.themeColor]);
-
   // Scroll to top when switching to taskmanager
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [viewMode]);
 
-  // 6. Render main content: either the single-page scrollable portfolio or the Task Manager workspace
+  // 5. Render main content: either the single-page scrollable portfolio or the Task Manager workspace
   const renderContent = () => {
     if (viewMode === 'taskmanager') {
       return (
@@ -179,7 +134,6 @@ function App() {
             name={profile.name} 
             title={profile.title} 
             bio={profile.bio} 
-            stats={profile.stats} 
             color={profile.themeColor} 
             onNavigate={scrollToSection}
           />
@@ -187,29 +141,20 @@ function App() {
 
         <section id="about" className="portfolio-section">
           <About 
-            aboutTitle={profile.aboutTitle}
             aboutBio={profile.aboutBio} 
             location={profile.location} 
             studies={profile.studies} 
             focusArea={profile.focusArea}
             availability={profile.availability}
-            badges={profile.badges}
-            color={profile.themeColor}
           />
         </section>
 
         <section id="skills" className="portfolio-section">
-          <Skills 
-            skillList={profile.skills} 
-            color={profile.themeColor} 
-          />
+          <Skills />
         </section>
 
         <section id="projects" className="portfolio-section">
-          <Projects 
-            projects={profile.projects} 
-            color={profile.themeColor} 
-          />
+          <Projects />
         </section>
 
         <section id="contact" className="portfolio-section">
@@ -219,7 +164,6 @@ function App() {
             location={profile.location}
             github={profile.github} 
             linkedin={profile.linkedin} 
-            color={profile.themeColor}
           />
         </section>
       </div>
@@ -237,7 +181,7 @@ function App() {
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
             title="Utsav Patel Portfolio"
           >
-            <BrandLogo color={profile.themeColor} />
+            <BrandLogo />
           </button>
           
           <nav className="nav-menu">
@@ -274,10 +218,35 @@ function App() {
             >
               Task Manager
             </button>
+
+            {/* Dark / Light Mode Toggle Button */}
+            <button
+              className="theme-toggle-btn"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              {theme === 'light' ? (
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+              ) : (
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="5"></circle>
+                  <line x1="12" y1="1" x2="12" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="23"></line>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                  <line x1="1" y1="12" x2="3" y2="12"></line>
+                  <line x1="21" y1="12" x2="23" y2="12"></line>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+              )}
+            </button>
             
             <button 
               className={`nav-contact-btn ${viewMode === 'portfolio' && activeSection === 'contact' ? 'active' : ''}`}
-              style={{ backgroundColor: profile.themeColor }}
               onClick={() => scrollToSection('contact')}
             >
               Contact Me
@@ -307,7 +276,6 @@ function App() {
           location={profile.location}
           github={profile.github} 
           linkedin={profile.linkedin} 
-          color={profile.themeColor}
           onNavigate={(target) => {
             if (target === 'taskmanager') {
               setTaskManagerInitialTab('tasks');

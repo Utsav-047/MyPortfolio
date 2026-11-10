@@ -87,8 +87,34 @@ export const NodeLogo = ({ size = 20, className = '' }) => (
   </svg>
 );
 
+export const CppLogo = ({ size = 20, className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 128 128" className={className} style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+    <path fill="#00599C" d="M64 12.8L19.2 38.4v51.2L64 115.2l44.8-25.6V38.4L64 12.8zm23.8 60.8h-7.6v7.6h-4.8v-7.6h-7.6v-4.8h7.6v-7.6h4.8v7.6h7.6v4.8zm16.8 0H97v7.6h-4.8v-7.6h-7.6v-4.8h7.6v-7.6h4.8v7.6h7.6v4.8zM61.8 84.8c-11.4 0-20.7-9.3-20.7-20.8s9.3-20.8 20.7-20.8c5.4 0 10.4 2.1 14.1 5.9l-5.3 5.3c-2.3-2.3-5.5-3.8-8.8-3.8-7 0-12.8 5.8-12.8 13.4s5.8 13.4 12.8 13.4c3.4 0 6.5-1.4 8.8-3.8l5.3 5.3c-3.7 3.8-8.7 5.7-14.1 5.7z"/>
+  </svg>
+);
+
+export const MongoLogo = ({ size = 20, className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 128 128" className={className} style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+    <path fill="#47A248" d="M64.6 1.4c-2.4 1.2-12.3 16.3-17.6 24.6-7.8 12.2-13.6 27.6-13.6 42.8 0 25.1 16.2 46.1 39.5 50.8 1.4.3 2.1-.6 2.1-1.7V6.5c-.3-3.2-8-4.7-10.4-5.1zm2.8 116.5c23.3-4.7 39.5-25.7 39.5-50.8 0-15.2-5.8-30.6-13.6-42.8C88 36 78.1 20.9 75.7 19.7c-2.4.4-6.3 1.9-6.3 5.1v112.5c0 1.1.7 2 2 1.7zM64 126.6c-.6 0-1.1-.3-1.4-.8-1.5-2.5-3.3-5.1-4.7-7.7-1.1-2-1.9-4.2-2.8-6.3 2.6.5 5.5.8 8.9.8s6.3-.3 8.9-.8c-.9 2.1-1.7 4.3-2.8 6.3-1.4 2.6-3.2 5.2-4.7 7.7-.3.5-.8.8-1.4.8z"/>
+  </svg>
+);
+
+export const DockerLogo = ({ size = 20, className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 128 128" className={className} style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+    <path fill="#2496ED" d="M122.2 56.6c-1.4-.9-7.2-4.2-15-1.5-1.6-4.5-5.3-7.5-9.8-9.2l-2.4-.8-1.5 2.1c-3.5 4.8-4.3 11-2.4 16.5-1.8 1-4.4 2.1-7.7 2.1H5.4c-2.6 0-4.8 1.8-5.3 4.4-4.8 24.5 13.9 44.9 41.7 44.9 33.7 0 58.7-19.6 69.2-44.5 9-.4 14.2-6.5 15.6-8.5l1.4-2.1-1.8-1.4zM22.5 47.9h9.8v9.8h-9.8zm12.3 0h9.8v9.8h-9.8zm0-12.3h9.8v9.8h-9.8zm12.3 12.3h9.8v9.8h-9.8zm0-12.3h9.8v9.8h-9.8zm0-12.3h9.8v9.8h-9.8zm12.3 24.6h9.8v9.8h-9.8zm0-12.3h9.8v9.8h-9.8zm12.3 12.3h9.8v9.8h-9.8z"/>
+  </svg>
+);
+
+export const SklearnLogo = ({ size = 20, className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 128 128" className={className} style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+    <path fill="#F7931E" d="M63.945 114.942c-28.965 0-52.642-23.68-52.642-52.645S34.98 9.654 63.945 9.654s52.642 23.678 52.642 52.643-23.678 52.645-52.642 52.645z"/>
+    <path fill="#3499CD" d="M63.945 17.826c-24.622 0-44.47 19.85-44.47 44.471 0 24.623 19.848 44.47 44.47 44.47s44.47-19.847 44.47-44.47-19.848-44.471-44.47-44.471z"/>
+    <path fill="#fff" d="M62.296 40.76l-16.15 9.32v18.64l16.15 9.32 16.15-9.32V50.08z"/>
+  </svg>
+);
+
 // High-tech Concept Vectors (for Machine Learning, Web Dev, Data Analysis)
-export const MLNeuralIcon = ({ size = 24, color = '#6366f1' }) => (
+export const MLNeuralIcon = ({ size = 24, color = '#2563eb' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93"/>
     <circle cx="12" cy="14" r="3"/>
@@ -104,7 +130,7 @@ export const MLNeuralIcon = ({ size = 24, color = '#6366f1' }) => (
   </svg>
 );
 
-export const WebDevIcon = ({ size = 24, color = '#3b82f6' }) => (
+export const WebDevIcon = ({ size = 24, color = '#2563eb' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
     <line x1="8" y1="21" x2="16" y2="21"/>

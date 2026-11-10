@@ -1,30 +1,23 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
-function Contact({ email, phone, location, github, linkedin, color }) {
-  const qaData = [
-    {
-      question: 'What is your current focus?',
-      answer: 'I am currently focusing on building high-performance web applications using React, Node.js, and integrating AI microservices using Python and Machine Learning models.'
-    },
-    {
-      question: 'What are your career goals?',
-      answer: 'I aim to work at the intersection of AI/ML and Frontend Engineering, developing intelligent user interfaces that make machine learning models accessible and useful for everyday users.'
-    },
-    {
-      question: 'Are you open to internships?',
-      answer: 'Yes! I am actively looking for software engineering or AI/ML intern roles. Feel free to contact me via email or LinkedIn!'
-    },
-    {
-      question: 'What are your favorite tools?',
-      answer: 'My favorite stack includes React/Vite, Python for data science, VS Code, Git, and Figma for quick UI prototyping.'
-    }
-  ];
-
-  const [activeQA, setActiveQA] = useState(qaData[0]);
+function Contact({ 
+  email = 'utsavpatel788190@gmail.com', 
+  phone = '+91 9328292343', 
+  location = 'Changa, Gujarat, India', 
+  github = 'Utsav-047', 
+  linkedin = 'https://www.linkedin.com/in/utsav-patel-422789320' 
+}) {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText(email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,7 +27,7 @@ function Contact({ email, phone, location, github, linkedin, color }) {
     setErrorMsg(null);
 
     try {
-      // Send real email directly to Utsav's inbox via FormSubmit AJAX service
+      // 1. Send real email directly to Utsav's inbox via FormSubmit AJAX service
       const res = await fetch('https://formsubmit.co/ajax/utsavpatel788190@gmail.com', {
         method: 'POST',
         headers: {
@@ -45,7 +38,7 @@ function Contact({ email, phone, location, github, linkedin, color }) {
           name: formData.name,
           email: formData.email,
           message: formData.message,
-          _subject: `New Portfolio Message from ${formData.name}`,
+          _subject: `Portfolio Message from ${formData.name}`,
           _captcha: 'false'
         })
       });
@@ -54,7 +47,7 @@ function Contact({ email, phone, location, github, linkedin, color }) {
         throw new Error(`Server returned ${res.status}`);
       }
 
-      // Also record message in backend database
+      // 2. Also record message in backend database
       try {
         const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         await fetch(`${apiBase}/api/contact`, {
@@ -68,10 +61,10 @@ function Contact({ email, phone, location, github, linkedin, color }) {
 
       setSent(true);
       setFormData({ name: '', email: '', message: '' });
-      setTimeout(() => setSent(false), 7000);
+      setTimeout(() => setSent(false), 6000);
     } catch (err) {
       console.error('Failed to deliver message:', err);
-      setErrorMsg('Could not deliver automatically via network. Please click Email Directly below.');
+      setErrorMsg('Network delivery failed. Please send an email directly using the button on the left.');
     } finally {
       setSubmitting(false);
     }
@@ -79,208 +72,184 @@ function Contact({ email, phone, location, github, linkedin, color }) {
 
   return (
     <div className="page-view">
-      <section className="section-card">
-        <div className="section-tag" style={{ color }}>Get In Touch</div>
-        <h2 className="section-title">Contact Me</h2>
-        <p className="section-subtitle">
-          Feel free to reach out for internship opportunities, project collaborations, or just to say hello!
-        </p>
+      <section className="contact-human-section">
+        {/* Header */}
+        <div className="section-header-compact">
+          <span className="section-kicker">Get In Touch</span>
+          <h2 className="section-title-human">Contact &amp; Connect</h2>
+          <p className="contact-header-desc">
+            Whether you have an internship opportunity, project collaboration, or technical inquiry &mdash; my inbox is open.
+          </p>
+        </div>
 
-        <div className="contact-layout">
-          {/* Left Column: Contact Info + Form */}
-          <div className="contact-left">
-            {/* Contact Details Card */}
-            <div className="contact-info-card" style={{ borderTop: `3px solid ${color}` }}>
-              <div className="contact-info-title">
-                <span className="contact-title-icon" style={{ color }}>📬</span>
-                Connect Directly
-              </div>
-              <div className="contact-methods">
-                {email && (
-                  <a href={`mailto:${email}`} className="contact-method-item contact-method-link">
-                    <span className="contact-method-icon" style={{ background: `${color}15`, color }}>✉️</span>
-                    <div>
-                      <div className="contact-method-label">Email</div>
-                      <span className="contact-method-value">{email}</span>
-                    </div>
+        <div className="contact-human-grid">
+          {/* Left Column: Direct Communication Cards */}
+          <div className="contact-info-col">
+            <div className="contact-card-box">
+              <h3 className="contact-box-title">Direct Contact Channels</h3>
+
+              <div className="contact-channel-item">
+                <div className="channel-icon-wrap">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                  </svg>
+                </div>
+                <div className="channel-text">
+                  <span className="channel-label">Email Address</span>
+                  <a href={`mailto:${email}`} className="channel-value email-link">
+                    {email}
                   </a>
-                )}
-                {phone && (
-                  <a href={`tel:${phone}`} className="contact-method-item contact-method-link">
-                    <span className="contact-method-icon" style={{ background: `${color}15`, color }}>📞</span>
-                    <div>
-                      <div className="contact-method-label">Phone</div>
-                      <span className="contact-method-value">{phone}</span>
-                    </div>
-                  </a>
-                )}
-                {location && (
-                  <div className="contact-method-item">
-                    <span className="contact-method-icon" style={{ background: `${color}15`, color }}>📍</span>
-                    <div>
-                      <div className="contact-method-label">Location</div>
-                      <span className="contact-method-value">{location}</span>
-                    </div>
-                  </div>
-                )}
+                </div>
+                <button 
+                  onClick={handleCopyEmail}
+                  className="channel-copy-btn"
+                  title="Copy email to clipboard"
+                >
+                  {copied ? 'Copied!' : 'Copy'}
+                </button>
               </div>
 
-              <div className="contact-social-row">
-                {github && (
-                  <a
-                    href={github.startsWith('http') ? github : `https://github.com/${github}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="contact-social-pill"
-                    style={{ borderColor: `${color}40`, color }}
-                  >
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                    GitHub
+              <div className="contact-channel-item">
+                <div className="channel-icon-wrap">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                  </svg>
+                </div>
+                <div className="channel-text">
+                  <span className="channel-label">Phone &amp; WhatsApp</span>
+                  <a href={`tel:${phone.replace(/\s+/g, '')}`} className="channel-value">
+                    {phone}
                   </a>
-                )}
-                {linkedin && (
-                  <a
-                    href={linkedin.startsWith('http') ? linkedin : `https://linkedin.com/in/${linkedin}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="contact-social-pill"
-                    style={{ borderColor: `${color}40`, color }}
-                  >
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                    </svg>
-                    LinkedIn
-                  </a>
-                )}
+                </div>
+              </div>
+
+              <div className="contact-channel-item">
+                <div className="channel-icon-wrap">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                </div>
+                <div className="channel-text">
+                  <span className="channel-label">Location</span>
+                  <span className="channel-value">{location}</span>
+                </div>
               </div>
             </div>
 
-            {/* Quick Message Form */}
-            <div className="contact-form-card" style={{ borderTop: `3px solid ${color}` }}>
-              <div className="contact-info-title">
-                <span className="contact-title-icon" style={{ color, display: "inline-flex", alignItems: "center" }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
-                Send a Message
-              </div>
-              <form onSubmit={handleSubmit} className="contact-form">
-                <div className="form-group">
-                  <label className="form-label">Your Name</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="e.g. Rahul Sharma"
-                    value={formData.name}
-                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                    required
-                    style={{ borderColor: `${color}40` }}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Your Email</label>
-                  <input
-                    type="email"
-                    className="form-input"
-                    placeholder="e.g. rahul@example.com"
-                    value={formData.email}
-                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                    required
-                    style={{ borderColor: `${color}40` }}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Message</label>
-                  <textarea
-                    className="form-input form-textarea"
-                    placeholder="Write your message here..."
-                    rows="4"
-                    value={formData.message}
-                    onChange={e => setFormData({ ...formData, message: e.target.value })}
-                    required
-                    style={{ borderColor: `${color}40` }}
-                  />
-                </div>
-                {sent && (
-                  <div style={{
-                    background: '#f0fdf4',
-                    border: '1.5px solid #86efac',
-                    color: '#166534',
-                    padding: '12px 16px',
-                    borderRadius: '10px',
-                    fontSize: '13.5px',
-                    fontWeight: 700,
-                    marginBottom: '14px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                    <span>Message sent! Your message was emailed directly to utsavpatel788190@gmail.com.</span>
-                  </div>
-                )}
-
-                {errorMsg && (
-                  <div style={{
-                    background: '#fef2f2',
-                    border: '1px solid #fecaca',
-                    color: '#dc2626',
-                    padding: '12px 16px',
-                    borderRadius: '10px',
-                    fontSize: '13px',
-                    marginBottom: '14px'
-                  }}>
-                    <div>{errorMsg}</div>
-                    <a
-                      href={`mailto:utsavpatel788190@gmail.com?subject=Portfolio%20Inquiry%20from%20${encodeURIComponent(formData.name || 'Visitor')}&body=${encodeURIComponent(formData.message || '')}`}
-                      style={{ color: '#b91c1c', fontWeight: 700, textDecoration: 'underline', marginTop: '6px', display: 'inline-block' }}
-                    >
-                      Click here to send email via your default mail app →
-                    </a>
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  className="btn-primary form-submit-btn"
-                  disabled={submitting}
-                  style={{ backgroundColor: color, borderColor: color, opacity: submitting ? 0.8 : 1, cursor: submitting ? 'wait' : 'pointer' }}
+            {/* Social & Code Profiles */}
+            <div className="contact-card-box">
+              <h3 className="contact-box-title">Professional Profiles</h3>
+              <div className="contact-social-row">
+                <a
+                  href={`https://github.com/${github}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="social-profile-pill"
                 >
-                  {submitting ? 'Sending to utsavpatel788190@gmail.com...' : sent ? '✓ Message Delivered!' : 'Send Message →'}
-                </button>
-              </form>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                  </svg>
+                  <span>GitHub @{github}</span>
+                </a>
+
+                <a
+                  href={linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="social-profile-pill"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                  </svg>
+                  <span>LinkedIn Profile</span>
+                </a>
+              </div>
             </div>
           </div>
 
-          {/* Right Column: Q&A Widget */}
-          <div className="contact-right">
-            <div className="qa-card" style={{ borderTop: `3px solid ${color}` }}>
-              <div className="contact-info-title">
-                <span className="contact-title-icon" style={{ color }}>💬</span>
-                Frequently Asked
-              </div>
-              <p className="qa-intro-text">
-                Click a question to learn more about my background and goals:
+          {/* Right Column: Direct Message Form */}
+          <div className="contact-form-col">
+            <div className="contact-form-card">
+              <h3 className="form-card-title">Send a Direct Message</h3>
+              <p className="form-card-subtitle">
+                Fill out the form below &mdash; messages are delivered straight to my email inbox.
               </p>
-              <div className="qa-options">
-                {qaData.map((qa, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    className={`qa-option-btn ${activeQA === qa ? 'qa-option-active' : ''}`}
-                    style={activeQA === qa ? { borderColor: color, color: color } : {}}
-                    onClick={() => setActiveQA(qa)}
-                  >
-                    {qa.question}
-                  </button>
-                ))}
-              </div>
 
-              {activeQA && (
-                <div className="qa-response-box" style={{ borderLeft: `3px solid ${color}` }}>
-                  <div className="qa-response-question" style={{ color }}>{activeQA.question}</div>
-                  <p className="qa-response-text">{activeQA.answer}</p>
+              {sent && (
+                <div className="contact-success-banner">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span>Thank you! Your message was sent successfully to utsavpatel788190@gmail.com.</span>
                 </div>
               )}
+
+              {errorMsg && (
+                <div className="contact-error-banner">
+                  <span>{errorMsg}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="contact-form-element">
+                <div className="form-field-group">
+                  <label htmlFor="contact-name" className="form-field-label">Your Name *</label>
+                  <input
+                    id="contact-name"
+                    type="text"
+                    required
+                    placeholder="e.g. John Doe"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="form-text-input"
+                  />
+                </div>
+
+                <div className="form-field-group">
+                  <label htmlFor="contact-email" className="form-field-label">Your Email *</label>
+                  <input
+                    id="contact-email"
+                    type="email"
+                    required
+                    placeholder="e.g. john@example.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="form-text-input"
+                  />
+                </div>
+
+                <div className="form-field-group">
+                  <label htmlFor="contact-message" className="form-field-label">Your Message *</label>
+                  <textarea
+                    id="contact-message"
+                    required
+                    rows="5"
+                    placeholder="Write your project details, inquiry, or internship opportunity..."
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="form-text-area"
+                  ></textarea>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="contact-submit-btn"
+                >
+                  {submitting ? (
+                    <span>Delivering Message...</span>
+                  ) : (
+                    <>
+                      <span>Send Message</span>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                      </svg>
+                    </>
+                  )}
+                </button>
+              </form>
             </div>
           </div>
         </div>

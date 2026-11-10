@@ -13,7 +13,7 @@ function GoogleAuthBtn() {
     if (savedUser) {
       try {
         setUser(JSON.parse(savedUser));
-      } catch (e) {
+      } catch {
         localStorage.removeItem('auth_user');
       }
     }
@@ -55,7 +55,15 @@ function GoogleAuthBtn() {
 
   if (user) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '3px 8px 3px 4px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '30px' }}>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '8px', 
+        padding: '3px 8px 3px 4px', 
+        background: 'var(--bg-card-subtle, #f8fafc)', 
+        border: '1px solid var(--border-light, #e2e8f0)', 
+        borderRadius: '30px' 
+      }}>
         {user.avatar ? (
           <img
             src={user.avatar}
@@ -64,7 +72,7 @@ function GoogleAuthBtn() {
               width: '28px',
               height: '28px',
               borderRadius: '50%',
-              border: '1.5px solid #4f46e5',
+              border: '1.5px solid var(--theme-color, #2563eb)',
               objectFit: 'cover'
             }}
           />
@@ -74,7 +82,7 @@ function GoogleAuthBtn() {
               width: '28px',
               height: '28px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
+              background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
@@ -87,19 +95,19 @@ function GoogleAuthBtn() {
           </div>
         )}
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15, maxWidth: '140px' }}>
-          <span style={{ fontSize: '12px', fontWeight: '700', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={user.name}>
+          <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-primary, #0f172a)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={user.name}>
             {user.name}
           </span>
-          <span style={{ fontSize: '10px', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={user.email}>
+          <span style={{ fontSize: '10px', color: 'var(--text-tertiary, #64748b)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={user.email}>
             {user.email}
           </span>
         </div>
         <button
           onClick={handleLogout}
           style={{
-            background: '#ffffff',
-            color: '#dc2626',
-            border: '1px solid #fecaca',
+            background: 'var(--bg-card, #ffffff)',
+            color: '#ef4444',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
             padding: '4px 9px',
             borderRadius: '16px',
             fontSize: '11px',
@@ -118,7 +126,7 @@ function GoogleAuthBtn() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       {loading ? (
-        <span style={{ fontSize: '13px', color: '#64748b' }}>Verifying...</span>
+        <span style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>Verifying...</span>
       ) : (
         <GoogleLogin
           onSuccess={handleLoginSuccess}

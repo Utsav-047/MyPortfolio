@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-// Practical 8 Supplementary Requirement: Heavy component-level lazy loading (Recharts)
-
-
-// Language color mapping (matches GitHub's language colors)
+// Language color mapping (matches GitHub's official colors)
 const LANGUAGE_COLORS = {
   JavaScript: '#f1e05a',
   TypeScript: '#3178c6',
@@ -11,332 +8,411 @@ const LANGUAGE_COLORS = {
   Java: '#b07219',
   'C++': '#f34b7d',
   C: '#555555',
-  'C#': '#178600',
-  Ruby: '#701516',
-  Go: '#00ADD8',
-  Rust: '#dea584',
-  PHP: '#4F5D95',
-  Swift: '#F05138',
-  Kotlin: '#A97BFF',
-  Dart: '#00B4AB',
   HTML: '#e34c26',
   CSS: '#563d7c',
   Shell: '#89e051',
-  R: '#198CE7',
-  Lua: '#000080',
-  Perl: '#0298c3',
-  Scala: '#c22d40',
   'Jupyter Notebook': '#DA5B0B',
-  Vue: '#41b883',
-  SCSS: '#c6538c',
-  Dockerfile: '#384d54',
   Unknown: '#8b949e',
 };
 
-// Fallback curated projects if GitHub API hits rate-limits (HTTP 403) or is offline
-const FALLBACK_PROJECTS = [
+// Rich curated project repository catalog with human-written descriptions and tech tags
+const CURATED_PROJECT_DETAILS = {
+  'myportfolio': {
+    title: 'MyPortfolio & Task Management Hub',
+    description: 'Production-grade full-stack developer portfolio and role-based task management platform. Features JWT authentication, MongoDB Atlas, in-memory caching, SSE streaming, and FormSubmit contact delivery.',
+    tags: ['React 19', 'Node.js', 'Express', 'MongoDB Atlas', 'JWT'],
+    category: 'web',
+    featured: true,
+    liveUrl: 'https://myportfolio-frontend-6xmm.onrender.com'
+  },
+  'smart-attendance-system': {
+    title: 'Smart Attendance System (OpenCV & Python)',
+    description: 'Real-time facial recognition attendance automation software built with OpenCV, Haar Cascades, and Python Tkinter GUI for automated student and workplace presence logging.',
+    tags: ['Python', 'OpenCV', 'Computer Vision', 'Tkinter'],
+    category: 'aiml',
+    featured: true,
+    liveUrl: null
+  },
+  'video-summeriser-and-quiz-generator': {
+    title: 'Video Summarizer & Quiz Generator',
+    description: 'AI-driven educational tool that extracts video transcripts, synthesizes key concepts into structured bullet-point summaries, and automatically generates interactive quizzes for active learning.',
+    tags: ['Python', 'NLP', 'React', 'Transcript API', 'AI'],
+    category: 'aiml',
+    featured: true,
+    liveUrl: null
+  },
+  'baja-rulebot': {
+    title: 'BAJA RuleBot (Conversational AI)',
+    description: 'Intelligent conversational assistant trained on BAJA SAE vehicle engineering rules, compliance standards, and mechanical competition guidelines for automotive student teams.',
+    tags: ['Python', 'NLP', 'LlamaIndex', 'Conversational AI'],
+    category: 'aiml',
+    featured: true,
+    liveUrl: null
+  },
+  'khata-manager': {
+    title: 'Khata Manager (Ledger & Bookkeeping)',
+    description: 'Full-stack bookkeeping and merchant credit management application. Enables small business owners to track credit/debit histories, record payments, and monitor outstanding customer balances.',
+    tags: ['TypeScript', 'React', 'Node.js', 'Express', 'Tailwind'],
+    category: 'web',
+    featured: true,
+    liveUrl: null
+  },
+  'ai-study-assistant': {
+    title: 'AI Study Assistant',
+    description: 'Interactive study companion utilizing language models to answer course questions, break down complex concepts, and generate custom revision cards for students.',
+    tags: ['JavaScript', 'React', 'Node.js', 'AI API'],
+    category: 'aiml',
+    featured: false,
+    liveUrl: null
+  },
+  'ai-personal-finance-tracker': {
+    title: 'AI Personal Finance Tracker',
+    description: 'Expense tracking application with automated transaction categorization, monthly spending forecasting, and interactive data visualization charts.',
+    tags: ['React', 'Express', 'Scikit-Learn', 'Chart.js'],
+    category: 'aiml',
+    featured: true,
+    liveUrl: null
+  }
+};
+
+// Fallback list of curated projects for offline or initial display
+const DEFAULT_PROJECTS = [
   {
     id: 'repo-myportfolio',
     name: 'MyPortfolio',
-    description: 'Modern Full-Stack Developer Portfolio & Task Management Platform with React 19 lazy loading, role-based access control (RBAC), Express.js, MongoDB Atlas, and Google OAuth 2.0.',
+    cleanName: 'MyPortfolio & Task Management Hub',
+    description: CURATED_PROJECT_DETAILS['myportfolio'].description,
+    tags: CURATED_PROJECT_DETAILS['myportfolio'].tags,
+    category: 'web',
+    featured: true,
     language: 'JavaScript',
     stargazers_count: 5,
     forks_count: 1,
-    watchers_count: 5,
-    html_url: 'https://github.com/Utsav-047/MyPortfolio'
+    html_url: 'https://github.com/Utsav-047/MyPortfolio',
+    liveUrl: 'https://myportfolio-frontend-6xmm.onrender.com'
   },
   {
     id: 'repo-smart-attendance',
     name: 'Smart-Attendance-System',
-    description: 'Real-time facial recognition attendance tracker developed with OpenCV, Haar Cascades/dlib, Python, and Tkinter GUI for classroom and workplace automation.',
+    cleanName: 'Smart Attendance System (OpenCV & Python)',
+    description: CURATED_PROJECT_DETAILS['smart-attendance-system'].description,
+    tags: CURATED_PROJECT_DETAILS['smart-attendance-system'].tags,
+    category: 'aiml',
+    featured: true,
+    language: 'Python',
+    stargazers_count: 4,
+    forks_count: 2,
+    html_url: 'https://github.com/Utsav-047',
+    liveUrl: null
+  },
+  {
+    id: 'repo-video-quiz',
+    name: 'VIDEO-SUMMERISER-AND-QUIZ-GENERATOR',
+    cleanName: 'Video Summarizer & Quiz Generator',
+    description: CURATED_PROJECT_DETAILS['video-summeriser-and-quiz-generator'].description,
+    tags: CURATED_PROJECT_DETAILS['video-summeriser-and-quiz-generator'].tags,
+    category: 'aiml',
+    featured: true,
     language: 'Python',
     stargazers_count: 3,
-    forks_count: 2,
-    watchers_count: 3,
-    html_url: 'https://github.com/Utsav-047'
+    forks_count: 1,
+    html_url: 'https://github.com/Utsav-047/VIDEO-SUMMERISER-AND-QUIZ-GENERATOR',
+    liveUrl: null
   },
   {
     id: 'repo-baja-rulebot',
-    name: 'BAJA-RuleBot',
-    description: 'Intelligent conversational AI rule-bot trained on BAJA SAE competition regulations, vehicle technical compliance rules, and mechanical safety handbooks.',
+    name: 'baja-rulebot',
+    cleanName: 'BAJA RuleBot (Conversational AI)',
+    description: CURATED_PROJECT_DETAILS['baja-rulebot'].description,
+    tags: CURATED_PROJECT_DETAILS['baja-rulebot'].tags,
+    category: 'aiml',
+    featured: true,
     language: 'Python',
     stargazers_count: 4,
     forks_count: 1,
-    watchers_count: 4,
-    html_url: 'https://github.com/Utsav-047'
+    html_url: 'https://github.com/Utsav-047/baja-rulebot',
+    liveUrl: null
   },
   {
-    id: 'repo-ai-finance',
-    name: 'AI-Personal-Finance-Tracker',
-    description: 'Personal expense tracker and budgeting engine with automated expense categorization and forecasting using Scikit-Learn, Express, and React visual dashboards.',
-    language: 'JavaScript',
+    id: 'repo-khata-manager',
+    name: 'Khata-manager',
+    cleanName: 'Khata Manager (Ledger & Bookkeeping)',
+    description: CURATED_PROJECT_DETAILS['khata-manager'].description,
+    tags: CURATED_PROJECT_DETAILS['khata-manager'].tags,
+    category: 'web',
+    featured: true,
+    language: 'TypeScript',
     stargazers_count: 3,
     forks_count: 0,
-    watchers_count: 3,
-    html_url: 'https://github.com/Utsav-047'
+    html_url: 'https://github.com/Utsav-047/Khata-manager',
+    liveUrl: null
   },
   {
-    id: 'repo-cv-deeplearning',
-    name: 'Deep-Learning-Computer-Vision',
-    description: 'Convolutional neural networks and deep learning models for image classification, multi-object detection, and facial landmark alignment using PyTorch and OpenCV.',
-    language: 'Python',
+    id: 'repo-ai-study-assistant',
+    name: 'AI-STUDY-ASSISTANT',
+    cleanName: 'AI Study Assistant',
+    description: CURATED_PROJECT_DETAILS['ai-study-assistant'].description,
+    tags: CURATED_PROJECT_DETAILS['ai-study-assistant'].tags,
+    category: 'aiml',
+    featured: false,
+    language: 'JavaScript',
     stargazers_count: 2,
     forks_count: 0,
-    watchers_count: 2,
-    html_url: 'https://github.com/Utsav-047'
-  },
-  {
-    id: 'repo-ml-pipelines',
-    name: 'Machine-Learning-Pipelines',
-    description: 'End-to-end predictive machine learning workflows, feature engineering pipelines, model evaluation metrics, and hyperparameter tuning notebooks.',
-    language: 'Jupyter Notebook',
-    stargazers_count: 2,
-    forks_count: 1,
-    watchers_count: 2,
-    html_url: 'https://github.com/Utsav-047'
+    html_url: 'https://github.com/Utsav-047/AI-STUDY-ASSISTANT',
+    liveUrl: null
   }
 ];
 
-function Projects({ color = '#6366f1' }) {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [dataSource, setDataSource] = useState('live'); // 'live' | 'cache' | 'fallback'
+function Projects() {
+  const [projects, setProjects] = useState(DEFAULT_PROJECTS);
+  const [selectedCategory, setSelectedCategory] = useState('all'); // 'all' | 'featured' | 'aiml' | 'web'
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchProjects = async (forceRefresh = false) => {
-    if (forceRefresh) setRefreshing(true);
-    else setLoading(true);
+  // Helper to enrich raw GitHub repo data with human-written descriptions
+  const enrichRepo = (repo) => {
+    const key = repo.name.toLowerCase();
+    const curated = CURATED_PROJECT_DETAILS[key];
 
-    // 1. Try checking cached data first if not forcing refresh
-    if (!forceRefresh) {
-      try {
-        const cached = localStorage.getItem('utsav_github_repos');
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (parsed && Array.isArray(parsed.data) && parsed.data.length > 0) {
-            if (Date.now() - parsed.timestamp < 30 * 60 * 1000) {
-              setProjects(parsed.data);
-              setDataSource('cache');
-              setLoading(false);
-              return;
-            }
-          }
+    let cleanName = repo.name
+      .replace(/-/g, ' ')
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, l => l.toUpperCase());
+
+    let description = repo.description;
+    let tags = [repo.language || 'Software'];
+    let category = 'web';
+    let featured = false;
+    let liveUrl = repo.homepage || null;
+
+    if (curated) {
+      cleanName = curated.title;
+      description = curated.description;
+      tags = curated.tags;
+      category = curated.category;
+      featured = curated.featured;
+      if (curated.liveUrl) liveUrl = curated.liveUrl;
+    } else {
+      if (!description || description.trim() === '') {
+        if (key.includes('exam') || key.includes('itue')) {
+          description = 'Coursework repository containing academic engineering practical implementations, algorithm solutions, and lab evaluations.';
+          category = 'web';
+        } else if (key.includes('ai') || key.includes('ml')) {
+          description = 'Applied machine learning and artificial intelligence project investigating neural networks, datasets, and predictive modeling.';
+          category = 'aiml';
+        } else {
+          description = 'Software engineering project repository focusing on clean code principles, modular architecture, and modern developer workflows.';
+          category = 'web';
         }
-      } catch (e) {
-        // ignore cache reading error
       }
     }
 
-    // 2. Fetch live from GitHub API
+    return {
+      ...repo,
+      cleanName,
+      description,
+      tags,
+      category,
+      featured,
+      liveUrl
+    };
+  };
+
+  const fetchLiveRepos = async () => {
+    setRefreshing(true);
     try {
-      const response = await fetch(
-        'https://api.github.com/users/Utsav-047/repos?per_page=100&sort=updated'
-      );
-
-      if (!response.ok) {
-        console.warn(`GitHub API returned HTTP ${response.status}. Falling back to curated repositories.`);
-        fallbackToCurated();
-        return;
-      }
-
-      const data = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        const sortedProjects = data
-          .filter((repo) => !repo.fork)
-          .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-
-        setProjects(sortedProjects);
-        setDataSource('live');
-        try {
-          localStorage.setItem('utsav_github_repos', JSON.stringify({
-            data: sortedProjects,
-            timestamp: Date.now()
+      const res = await fetch('https://api.github.com/users/Utsav-047/repos?per_page=100&sort=updated');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          const processed = data
+            .filter(r => !r.fork)
+            .map(enrichRepo)
+            .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+          setProjects(processed);
+          localStorage.setItem('utsav_github_repos_v2', JSON.stringify({
+            data: processed,
+            time: Date.now()
           }));
-        } catch {}
-      } else {
-        fallbackToCurated();
+        }
       }
-    } catch (err) {
-      console.warn('Network error connecting to GitHub API:', err.message);
-      fallbackToCurated();
+    } catch (e) {
+      console.warn('Could not refresh live GitHub repositories:', e);
     } finally {
-      setLoading(false);
       setRefreshing(false);
     }
   };
 
-  const fallbackToCurated = () => {
+  useEffect(() => {
     try {
-      const cached = localStorage.getItem('utsav_github_repos');
+      const cached = localStorage.getItem('utsav_github_repos_v2');
       if (cached) {
         const parsed = JSON.parse(cached);
         if (parsed && Array.isArray(parsed.data) && parsed.data.length > 0) {
           setProjects(parsed.data);
-          setDataSource('cache');
           return;
         }
       }
     } catch {}
 
-    setProjects(FALLBACK_PROJECTS);
-    setDataSource('fallback');
-  };
-
-  useEffect(() => {
-    fetchProjects();
+    fetchLiveRepos();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="page-view">
-        <section className="section-card">
-          <div className="section-tag" style={{ color: color }}>My Work</div>
-          <h2 className="section-title">Projects</h2>
-          <p className="section-subtitle">Loading projects portfolio...</p>
-          <div className="gh-projects-grid">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="gh-project-card gh-skeleton-card">
-                <div className="gh-skeleton-line gh-skeleton-title"></div>
-                <div className="gh-skeleton-line gh-skeleton-desc"></div>
-                <div className="gh-skeleton-line gh-skeleton-desc short"></div>
-                <div className="gh-skeleton-meta"></div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-    );
-  }
+  // Filter projects based on selected filter tab
+  const filteredProjects = projects.filter(p => {
+    if (selectedCategory === 'all') return true;
+    if (selectedCategory === 'featured') return p.featured;
+    if (selectedCategory === 'aiml') return p.category === 'aiml';
+    if (selectedCategory === 'web') return p.category === 'web';
+    return true;
+  });
 
   return (
     <div className="page-view">
-      <section className="section-card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
-          <div>
-            <div className="section-tag" style={{ color: color }}>My Work</div>
-            <h2 className="section-title">Projects</h2>
-            <p className="section-subtitle" style={{ marginBottom: '16px' }}>
-              All public repositories & featured engineering works — showcasing AI, ML, and web applications.
+      <section className="projects-human-section">
+        {/* Section Header */}
+        <div className="projects-header-block">
+          <div className="projects-title-col">
+            <span className="section-kicker">Portfolio &amp; Open Source</span>
+            <h2 className="section-title-human">Featured Engineering Projects</h2>
+            <p className="projects-header-desc">
+              Applied Machine Learning pipelines, Computer Vision systems, and modern Full-Stack web applications built with production best practices.
             </p>
           </div>
 
-          {/* Status & Refresh Control */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '20px',
-              fontSize: '12px',
-              fontWeight: 600,
-              background: dataSource === 'live' ? '#ecfdf5' : '#f8fafc',
-              color: dataSource === 'live' ? '#047857' : '#475569',
-              border: '1px solid #e2e8f0'
-            }}>
-              <span>{dataSource === 'live' ? '🟢' : (dataSource === 'cache' ? '⚡' : '✨')}</span>
-              <span>{dataSource === 'live' ? 'Live GitHub Sync' : (dataSource === 'cache' ? 'Cached Repos' : 'Featured Portfolio')}</span>
-            </span>
-
+          {/* Sync status */}
+          <div className="projects-sync-ctrl">
             <button
-              onClick={() => fetchProjects(true)}
+              onClick={fetchLiveRepos}
               disabled={refreshing}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px',
-                padding: '6px 14px',
-                borderRadius: '8px',
-                border: '1px solid #cbd5e1',
-                background: '#ffffff',
-                color: '#334155',
-                fontSize: '12px',
-                fontWeight: 600,
-                cursor: refreshing ? 'not-allowed' : 'pointer'
-              }}
-              title="Refresh repositories from GitHub API"
+              className="projects-refresh-btn"
+              title="Sync with GitHub API"
             >
-              <span>{refreshing ? '⏳' : '🔄'}</span>
-              <span>{refreshing ? 'Syncing...' : 'Refresh'}</span>
+              <svg 
+                width="14" 
+                height="14" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2.2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                className={refreshing ? 'spin-icon' : ''}
+              >
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+              </svg>
+              <span>{refreshing ? 'Syncing...' : 'Sync GitHub'}</span>
             </button>
           </div>
         </div>
 
-        <div className="gh-projects-grid">
-          {projects.map((project, index) => (
-            <div
-              key={project.id}
-              className="gh-project-card"
-              style={{ animationDelay: `${index * 0.05}s` }}
+        {/* Category Filters */}
+        <div className="projects-filter-bar">
+          <button
+            className={`filter-btn ${selectedCategory === 'all' ? 'active' : ''}`}
+            onClick={() => setSelectedCategory('all')}
+          >
+            All Repositories ({projects.length})
+          </button>
+          <button
+            className={`filter-btn ${selectedCategory === 'featured' ? 'active' : ''}`}
+            onClick={() => setSelectedCategory('featured')}
+          >
+            ⭐ Featured Highlights
+          </button>
+          <button
+            className={`filter-btn ${selectedCategory === 'aiml' ? 'active' : ''}`}
+            onClick={() => setSelectedCategory('aiml')}
+          >
+            🤖 AI, ML &amp; Computer Vision
+          </button>
+          <button
+            className={`filter-btn ${selectedCategory === 'web' ? 'active' : ''}`}
+            onClick={() => setSelectedCategory('web')}
+          >
+            💻 Full-Stack &amp; Web
+          </button>
+        </div>
+
+        {/* Project Cards Grid */}
+        <div className="projects-card-grid">
+          {filteredProjects.map((project, idx) => (
+            <div 
+              key={project.id || idx} 
+              className={`project-human-card ${project.featured ? 'is-featured' : ''}`}
             >
-              {/* Card Header: Repo icon + name */}
-              <div className="gh-card-header">
-                <svg className="gh-repo-icon" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
-                  <path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z" />
-                </svg>
-                <h3 className="gh-card-title">{project.name}</h3>
+              {/* Card Header */}
+              <div className="card-top-row">
+                <div className="card-category-tag">
+                  {project.category === 'aiml' ? 'AI & Machine Learning' : 'Full-Stack Web'}
+                </div>
+
+                <div className="card-metrics-row">
+                  {project.stargazers_count > 0 && (
+                    <span className="metric-chip" title="GitHub Stars">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                      </svg>
+                      {project.stargazers_count}
+                    </span>
+                  )}
+                  {project.language && (
+                    <span className="metric-chip">
+                      <span 
+                        className="lang-color-circle" 
+                        style={{ backgroundColor: LANGUAGE_COLORS[project.language] || '#8b949e' }}
+                      />
+                      {project.language}
+                    </span>
+                  )}
+                </div>
               </div>
 
-              {/* Description */}
-              <p className="gh-card-desc">
-                {project.description || 'No description available.'}
-              </p>
+              {/* Title & Description */}
+              <h3 className="project-title-human">{project.cleanName}</h3>
+              <p className="project-desc-human">{project.description}</p>
 
-              {/* Bottom meta: language, stars, forks, watchers */}
-              <div className="gh-card-meta">
-                {project.language && (
-                  <span className="gh-meta-item gh-meta-lang">
-                    <span
-                      className="gh-lang-dot"
-                      style={{
-                        backgroundColor:
-                          LANGUAGE_COLORS[project.language] ||
-                          LANGUAGE_COLORS['Unknown'],
-                      }}
-                    ></span>
-                    {project.language}
+              {/* Tech Tags */}
+              <div className="project-tags-wrap">
+                {project.tags.map((tag, tIdx) => (
+                  <span key={tIdx} className="project-tech-chip">
+                    {tag}
                   </span>
-                )}
-
-                <span className="gh-meta-item" title="Stars">
-                  <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
-                    <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z" />
-                  </svg>
-                  {project.stargazers_count}
-                </span>
-
-                <span className="gh-meta-item" title="Forks">
-                  <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
-                    <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 0-1.5 0v.878h-3v-.878a2.25 2.25 0 1 0-1.5 0ZM8 1.25a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5Zm-2.75 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5Zm5.5 0a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5ZM8 14a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Zm0-1.5a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
-                  </svg>
-                  {project.forks_count}
-                </span>
-
-                <span className="gh-meta-item" title="Watchers">
-                  <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
-                    <path d="M8 2c1.981 0 3.671.992 4.933 2.078 1.27 1.091 2.187 2.345 2.637 3.023a1.62 1.62 0 0 1 0 1.798c-.45.678-1.367 1.932-2.637 3.023C11.67 13.008 9.981 14 8 14c-1.981 0-3.671-.992-4.933-2.078C1.797 10.831.88 9.577.43 8.899a1.62 1.62 0 0 1 0-1.798c.45-.678 1.367-1.932 2.637-3.023C4.33 2.992 6.019 2 8 2ZM1.679 7.932a.12.12 0 0 0 0 .136c.411.622 1.241 1.75 2.366 2.717C5.176 11.758 6.527 12.5 8 12.5c1.473 0 2.825-.742 3.955-1.715 1.124-.967 1.954-2.096 2.366-2.717a.12.12 0 0 0 0-.136c-.412-.621-1.242-1.75-2.366-2.717C10.824 4.242 9.473 3.5 8 3.5c-1.473 0-2.824.742-3.955 1.715-1.124.967-1.954 2.096-2.366 2.717ZM8 10a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 10Z" />
-                  </svg>
-                  {project.watchers_count}
-                </span>
+                ))}
               </div>
 
-              {/* View on GitHub link */}
-              <a
-                href={project.html_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="gh-view-link"
-              >
-                <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
-                  <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z" />
-                </svg>
-                View GitHub
-              </a>
+              {/* Card Footer Actions */}
+              <div className="project-actions-footer">
+                <a
+                  href={project.html_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="project-action-link"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                  </svg>
+                  <span>Source Code</span>
+                </a>
+
+                {project.liveUrl && (
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="project-action-link live-link"
+                  >
+                    <span>Live Demo</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                      <polyline points="15 3 21 3 21 9"/>
+                      <line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg>
+                  </a>
+                )}
+              </div>
             </div>
           ))}
         </div>
-
-
       </section>
     </div>
   );

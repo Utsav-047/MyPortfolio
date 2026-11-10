@@ -1,168 +1,187 @@
+import React from 'react';
 import profileImg from '../assets/profile.jpeg';
 import { 
-  PythonLogo, 
-  ReactLogo, 
-  TensorFlowLogo, 
-  OpenCVLogo, 
-  MySQLLogo, 
-  JavaScriptLogo,
-  MLNeuralIcon,
-  WebDevIcon,
-  DataAnalysisIcon
+  MLNeuralIcon, 
+  WebDevIcon, 
+  DataAnalysisIcon 
 } from './TechLogos';
 
 function About({ 
-  aboutTitle, 
   aboutBio, 
-  location, 
-  studies, 
-  focusArea, 
-  availability, 
-  color = '#4f46e5'
+  location = 'Changa, Gujarat, India', 
+  studies = 'B.Tech AI & ML (3rd Year)', 
+  focusArea = 'Computer Vision & Full-Stack Web', 
+  availability = 'Open to Internships' 
 }) {
-  const floatingBadges = [
-    { label: 'Python', Logo: PythonLogo, position: 'badge-pos-1' },
-    { label: 'React', Logo: ReactLogo, position: 'badge-pos-2' },
-    { label: 'TensorFlow', Logo: TensorFlowLogo, position: 'badge-pos-3' },
-    { label: 'MySQL', Logo: MySQLLogo, position: 'badge-pos-4' },
-    { label: 'OpenCV', Logo: OpenCVLogo, position: 'badge-pos-5' },
-    { label: 'JavaScript', Logo: JavaScriptLogo, position: 'badge-pos-6' },
-  ];
-
   return (
     <div className="page-view">
-      <section className="section-card">
-        <div className="section-tag" style={{ color }}>Who Am I</div>
-        <h2 className="section-title">About Me</h2>
+      <section className="about-human-section">
+        <div className="section-header-compact">
+          <span className="section-kicker">Background &amp; Profile</span>
+          <h2 className="section-title-human">About Me</h2>
+        </div>
 
-        <div className="about-grid-layout">
-          {/* Left: Circular Photo with Glow Ring + Floating Real SVG Badges */}
-          <div className="about-photo-area">
-            <div className="photo-orbit-container">
-              {/* Glowing ring layers */}
-              <div className="glow-ring ring-outer" style={{ borderColor: `${color}25` }}></div>
-              <div className="glow-ring ring-middle" style={{ borderColor: `${color}40` }}></div>
-              <div className="glow-ring ring-inner" style={{ borderColor: `${color}70` }}></div>
-              
-              {/* The actual photo */}
-              <div className="photo-circle" style={{ boxShadow: `0 0 40px ${color}30, 0 0 80px ${color}15` }}>
-                <img src={profileImg} alt="Utsav Patel" className="photo-img" />
-              </div>
-
-              {/* Floating skill badges with real logos */}
-              {floatingBadges.map((badge, idx) => {
-                const Icon = badge.Logo;
-                return (
-                  <div 
-                    key={idx} 
-                    className={`floating-skill-badge ${badge.position}`}
-                    style={{ 
-                      animationDelay: `${idx * 0.35}s`,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '7px',
-                      padding: '6px 12px',
-                      background: 'rgba(255, 255, 255, 0.95)',
-                      backdropFilter: 'blur(8px)',
-                      boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04)',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '999px'
-                    }}
-                  >
-                    <Icon size={16} />
-                    <span className="floating-badge-label" style={{ fontWeight: 700, fontSize: '12px', color: '#1e293b' }}>
-                      {badge.label}
-                    </span>
-                  </div>
-                );
-              })}
+        <div className="about-human-grid">
+          {/* Left Column: Portrait & Verified Identity Card */}
+          <div className="about-profile-card">
+            <div className="about-portrait-frame">
+              <img src={profileImg} alt="Utsav Patel" className="about-portrait-img" />
+              <div className="about-portrait-overlay"></div>
             </div>
 
-            {/* Status indicator below photo */}
-            <div className="photo-status-pill" style={{ backgroundColor: `${color}12`, color }}>
-              <span className="status-dot-pulse" style={{ backgroundColor: color }}></span>
-              {availability || 'Open to Opportunities'}
+            <div className="about-profile-meta">
+              <h3 className="about-profile-name">Utsav Patel</h3>
+              <p className="about-profile-tagline">AI &amp; ML Student • Web Developer</p>
+              
+              <div className="about-status-indicator">
+                <span className="status-dot-active"></span>
+                <span>{availability}</span>
+              </div>
+
+              <div className="about-quick-specs">
+                <div className="spec-row">
+                  <span className="spec-icon">🎓</span>
+                  <div>
+                    <div className="spec-label">Education</div>
+                    <div className="spec-value">{studies}</div>
+                  </div>
+                </div>
+
+                <div className="spec-row">
+                  <span className="spec-icon">🏛️</span>
+                  <div>
+                    <div className="spec-label">Institution</div>
+                    <div className="spec-value">CSPIT, CHARUSAT</div>
+                  </div>
+                </div>
+
+                <div className="spec-row">
+                  <span className="spec-icon">📍</span>
+                  <div>
+                    <div className="spec-label">Location</div>
+                    <div className="spec-value">{location}</div>
+                  </div>
+                </div>
+
+                <div className="spec-row">
+                  <span className="spec-icon">🎯</span>
+                  <div>
+                    <div className="spec-label">Focus Area</div>
+                    <div className="spec-value">{focusArea}</div>
+                  </div>
+                </div>
+
+                <div className="spec-row">
+                  <span className="spec-icon">📊</span>
+                  <div>
+                    <div className="spec-label">Academic CGPA</div>
+                    <div className="spec-value">7.44 / 10.0</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="about-card-links">
+                <a 
+                  href="https://github.com/Utsav-047" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="profile-link-btn"
+                >
+                  GitHub
+                </a>
+                <a 
+                  href="https://www.linkedin.com/in/utsav-patel-422789320" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="profile-link-btn"
+                >
+                  LinkedIn
+                </a>
+              </div>
             </div>
           </div>
 
-          {/* Right: About Content */}
-          <div className="about-info-area">
-            <h3 className="about-heading-styled">
-              {aboutTitle ? (
-                <>
-                  {aboutTitle.split(',')[0]}
-                  {aboutTitle.includes(',') && (
-                    <span className="about-heading-accent" style={{ color }}>
-                      , {aboutTitle.split(',').slice(1).join(',')}
-                    </span>
-                  )}
-                </>
-              ) : (
-                <>
-                  AI Developer
-                  <span className="about-heading-accent" style={{ color }}>, Data Storyteller</span>
-                </>
-              )}
-            </h3>
-            
-            <p className="about-bio-text">
-              {aboutBio || "Hey there! I'm Utsav, a B.Tech AI & ML student at CHARUSAT. I enjoy building AI-powered applications, full-stack web apps and solving real-world problems using Machine Learning. My passion lies in transforming complex data into meaningful insights and building tools that make a real impact."}
-            </p>
+          {/* Right Column: Bio Narrative, Education, and Engineering Pillars */}
+          <div className="about-details-col">
+            <div className="about-bio-card">
+              <h3 className="about-col-heading">
+                Engineering intelligent systems at the intersection of Machine Learning &amp; Web Development.
+              </h3>
+              <p className="about-narrative-text">
+                {aboutBio || "I am a 3rd-year Artificial Intelligence and Machine Learning undergraduate at Charusat University (CSPIT). My technical journey focuses on building practical computer vision models, training predictive machine learning pipelines, and developing clean, responsive full-stack web applications."}
+              </p>
+              <p className="about-narrative-text">
+                I enjoy engineering solutions where machine learning algorithms integrate seamlessly into intuitive web interfaces. Whether training an OpenCV face-recognition pipeline, developing an automated task management platform, or fine-tuning conversational AI workflows, I value clean code, reproducible experiments, and user-centric software design.
+              </p>
+            </div>
 
-            {/* Highlights ribbon with clean SVG vector badges */}
-            <div className="about-highlights">
-              <div className="highlight-chip" style={{ borderColor: `${color}30` }}>
-                <span className="highlight-icon" style={{ fontSize: '18px' }}>🎓</span>
-                <div>
-                  <div className="highlight-label">Education</div>
-                  <div className="highlight-value">{studies || 'B.Tech AI & ML'}</div>
-                </div>
+            {/* Education & Academic Credentials */}
+            <div className="about-education-card">
+              <div className="edu-card-header">
+                <div className="edu-badge">ACADEMIC BACKGROUND</div>
               </div>
-              <div className="highlight-chip" style={{ borderColor: `${color}30` }}>
-                <span className="highlight-icon" style={{ fontSize: '18px' }}>📍</span>
-                <div>
-                  <div className="highlight-label">Location</div>
-                  <div className="highlight-value">{location || 'India'}</div>
+              <div className="edu-item">
+                <div className="edu-title-row">
+                  <h4 className="edu-degree">Bachelor of Technology in Artificial Intelligence &amp; Machine Learning</h4>
+                  <span className="edu-duration">2023 &ndash; 2027</span>
                 </div>
-              </div>
-              <div className="highlight-chip" style={{ borderColor: `${color}30` }}>
-                <span className="highlight-icon" style={{ fontSize: '18px' }}>🎯</span>
-                <div>
-                  <div className="highlight-label">Focus</div>
-                  <div className="highlight-value">{focusArea || 'AI / ML / Web Dev'}</div>
+                <div className="edu-institution">Chandubhai S. Patel Institute of Technology (CSPIT) &bull; Charusat University</div>
+                <div className="edu-details">
+                  <span><strong>Current CGPA:</strong> 7.44 / 10.0</span> &bull; 
+                  <span><strong>Department:</strong> Department of Artificial Intelligence &amp; Machine Learning</span>
+                </div>
+                <div className="edu-coursework">
+                  <span className="coursework-label">Relevant Coursework:</span>
+                  <div className="coursework-tags">
+                    <span className="course-chip">Data Structures &amp; Algorithms</span>
+                    <span className="course-chip">Machine Learning</span>
+                    <span className="course-chip">Computer Vision</span>
+                    <span className="course-chip">Deep Learning</span>
+                    <span className="course-chip">Database Systems (MySQL/MongoDB)</span>
+                    <span className="course-chip">Web Engineering</span>
+                    <span className="course-chip">Operating Systems</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* What I do section with authentic vector icons */}
-            <div className="about-what-i-do">
-              <h4 className="what-i-do-title">What I Do</h4>
-              <div className="what-i-do-grid">
-                <div className="what-i-do-item" style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
-                  <span className="what-i-do-icon" style={{ background: `${color}12`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', borderRadius: '10px' }}>
-                    <MLNeuralIcon size={24} color={color} />
-                  </span>
+            {/* What I Focus On (Engineering Pillars) */}
+            <div className="about-pillars-card">
+              <div className="edu-badge" style={{ marginBottom: '14px' }}>CORE ENGINEERING PILLARS</div>
+              <div className="pillars-grid">
+                <div className="pillar-item">
+                  <div className="pillar-icon-box">
+                    <MLNeuralIcon size={22} color="var(--theme-color)" />
+                  </div>
                   <div>
-                    <strong style={{ fontSize: '15px', color: '#0f172a' }}>Machine Learning</strong>
-                    <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' }}>Building predictive models and intelligent pipelines</p>
+                    <h5 className="pillar-title">Computer Vision &amp; Applied ML</h5>
+                    <p className="pillar-desc">
+                      Building real-time face detection with OpenCV, training predictive Scikit-Learn models, and developing automated classification workflows.
+                    </p>
                   </div>
                 </div>
-                <div className="what-i-do-item" style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
-                  <span className="what-i-do-icon" style={{ background: '#3b82f615', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', borderRadius: '10px' }}>
-                    <WebDevIcon size={24} color="#2563eb" />
-                  </span>
+
+                <div className="pillar-item">
+                  <div className="pillar-icon-box">
+                    <WebDevIcon size={22} color="var(--theme-color)" />
+                  </div>
                   <div>
-                    <strong style={{ fontSize: '15px', color: '#0f172a' }}>Web Development</strong>
-                    <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' }}>Crafting responsive, modern React applications</p>
+                    <h5 className="pillar-title">Full-Stack Web Architecture</h5>
+                    <p className="pillar-desc">
+                      Developing scalable single-page apps with React 19, building RESTful Express backends, JWT and Google OAuth authentication, and database schemas.
+                    </p>
                   </div>
                 </div>
-                <div className="what-i-do-item" style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
-                  <span className="what-i-do-icon" style={{ background: '#10b98115', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', borderRadius: '10px' }}>
-                    <DataAnalysisIcon size={24} color="#059669" />
-                  </span>
+
+                <div className="pillar-item">
+                  <div className="pillar-icon-box">
+                    <DataAnalysisIcon size={22} color="#10b981" />
+                  </div>
                   <div>
-                    <strong style={{ fontSize: '15px', color: '#0f172a' }}>Data Analysis</strong>
-                    <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' }}>Turning raw data into actionable business insights</p>
+                    <h5 className="pillar-title">Data Engineering &amp; APIs</h5>
+                    <p className="pillar-desc">
+                      Transforming raw data into actionable dashboards, integrating external LLM endpoints with graceful fallbacks, and managing MongoDB Atlas clusters.
+                    </p>
                   </div>
                 </div>
               </div>
