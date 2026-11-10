@@ -72,7 +72,7 @@ function GoogleAuthBtn() {
               width: '28px',
               height: '28px',
               borderRadius: '50%',
-              border: '1.5px solid var(--theme-color, #2563eb)',
+              border: '1.5px solid var(--border-light, #e4e4e7)',
               objectFit: 'cover'
             }}
           />
@@ -82,8 +82,8 @@ function GoogleAuthBtn() {
               width: '28px',
               height: '28px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
-              color: '#ffffff',
+              background: 'var(--btn-primary-bg, #09090b)',
+              color: 'var(--btn-primary-text, #ffffff)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

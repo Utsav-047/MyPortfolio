@@ -202,7 +202,7 @@ function AuthGate({ children, onAuthChange }) {
             ) : (
               <div style={{
                 width: '34px', height: '34px', borderRadius: '50%',
-                background: isManager ? '#4f46e5' : '#059669',
+                background: isManager ? 'var(--btn-primary-bg)' : '#059669',
                 color: '#fff', display: 'flex',
                 alignItems: 'center', justifyContent: 'center',
                 fontWeight: '700', fontSize: '13px'
@@ -376,7 +376,7 @@ function AuthGate({ children, onAuthChange }) {
                   <button
                     type="submit"
                     style={{
-                      background: '#4f46e5',
+                      background: 'var(--btn-primary-bg)',
                       border: 'none',
                       color: '#ffffff',
                       padding: '8px 18px',
@@ -436,7 +436,7 @@ function AuthGate({ children, onAuthChange }) {
           align-items: center;
           justify-content: center;
           margin: 0 auto 18px auto;
-          color: #4f46e5;
+          color: var(--text-primary);
         }
 
         .ag-gate-title {
@@ -477,7 +477,7 @@ function AuthGate({ children, onAuthChange }) {
         }
 
         .ag-role-card.active-manager {
-          border-color: #4f46e5;
+          border-color: var(--text-primary);
           background: #f5f3ff;
         }
 
@@ -547,7 +547,7 @@ function AuthGate({ children, onAuthChange }) {
               className={`ag-role-card ${selectedRole === 'manager' ? 'active-manager' : ''}`}
               onClick={() => setSelectedRole('manager')}
             >
-              <div className="ag-role-header" style={{ color: '#4338ca' }}>
+              <div className="ag-role-header" style={{ color: 'var(--text-primary)' }}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 Manager (Admin)
               </div>
@@ -592,12 +592,12 @@ function AuthGate({ children, onAuthChange }) {
 
           {/* Role Confirmation Prompt */}
           <div style={{ marginBottom: '10px', fontSize: '13px', fontWeight: '600', color: '#475569' }}>
-            Continue with Google OAuth as <span style={{ color: selectedRole === 'manager' ? '#4f46e5' : '#059669', textTransform: 'capitalize', fontWeight: '700' }}>{selectedRole === 'manager' ? 'Manager (Admin)' : 'Employee'}</span>
+            Continue with Google OAuth as <span style={{ color: selectedRole === 'manager' ? 'var(--text-primary)' : '#059669', textTransform: 'capitalize', fontWeight: '700' }}>{selectedRole === 'manager' ? 'Manager (Admin)' : 'Employee'}</span>
           </div>
 
           {/* Google Sign-In */}
           {loading ? (
-            <div style={{ padding: '12px', color: '#4f46e5', fontWeight: 600, fontSize: '13px' }}>
+            <div style={{ padding: '12px', color: 'var(--text-primary)', fontWeight: 600, fontSize: '13px' }}>
               Authenticating session...
             </div>
           ) : (

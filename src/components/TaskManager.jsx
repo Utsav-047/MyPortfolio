@@ -17,7 +17,7 @@ import {
 const AiAssistant = lazy(() => import('./AiAssistant'));
 
 
-function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e5', initialTab = 'tasks' }) {
+function TaskManager({ userRole = 'manager', currentUser = null, color = 'var(--btn-primary-bg)', initialTab = 'tasks' }) {
   // ── State Management ───────────────────────────────────────
   const [role, setRole] = useState(userRole || 'manager');
   const [tasks, setTasks] = useState([]);
@@ -452,17 +452,17 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
           display: flex;
           flex-direction: column;
           gap: 20px;
-          color: #0f172a;
+          color: var(--text-primary);
         }
 
         .tm-header-bar {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          background: #ffffff;
+          background: var(--bg-card);
           padding: 20px 24px;
           border-radius: 16px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-light);
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
           flex-wrap: wrap;
           gap: 16px;
@@ -471,7 +471,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
         .tm-title {
           font-size: 24px;
           font-weight: 800;
-          color: #0f172a;
+          color: var(--text-primary);
           margin: 0;
           display: flex;
           align-items: center;
@@ -486,8 +486,8 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
           border-radius: 9999px;
           font-size: 13px;
           font-weight: 600;
-          border: 1px solid #e2e8f0;
-          background-color: #f8fafc;
+          border: 1px solid var(--border-light);
+          background-color: var(--bg-card-subtle);
         }
 
         .tm-dot { width: 8px; height: 8px; border-radius: 50%; }
@@ -502,8 +502,8 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
         }
 
         .tm-stat-card {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-card);
+          border: 1px solid var(--border-light);
           border-radius: 14px;
           padding: 16px 18px;
           display: flex;
@@ -525,14 +525,14 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
         .tm-stat-number {
           font-size: 22px;
           font-weight: 800;
-          color: #0f172a;
+          color: var(--text-primary);
           line-height: 1.1;
         }
 
         .tm-stat-label {
           font-size: 12px;
           font-weight: 600;
-          color: #64748b;
+          color: var(--text-tertiary);
         }
 
         .tm-grid {
@@ -546,8 +546,8 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
         }
 
         .tm-card {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-card);
+          border: 1px solid var(--border-light);
           border-radius: 16px;
           padding: 24px;
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
@@ -556,7 +556,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
         .tm-card-title {
           font-size: 18px;
           font-weight: 700;
-          color: #0f172a;
+          color: var(--text-primary);
           margin-top: 0;
           margin-bottom: 16px;
           display: flex;
@@ -566,21 +566,21 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
 
         .tm-form { display: flex; flex-direction: column; gap: 14px; }
 
-        .tm-label { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 4px; display: block; }
+        .tm-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block; }
 
         .tm-input, .tm-textarea, .tm-select {
           width: 100%;
           padding: 10px 14px;
           font-size: 14px;
-          border: 1px solid #cbd5e1;
+          border: 1px solid var(--border-light);
           border-radius: 8px;
-          background-color: #f8fafc;
-          color: #0f172a;
+          background-color: var(--bg-card-subtle);
+          color: var(--text-primary);
           outline: none;
         }
 
         .tm-submit-btn {
-          background: #4f46e5;
+          background: var(--btn-primary-bg);
           color: #ffffff;
           border: none;
           padding: 12px 20px;
@@ -591,11 +591,11 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
           transition: background 0.2s ease;
         }
 
-        .tm-submit-btn:hover { background: #4338ca; }
+        .tm-submit-btn:hover { background: var(--btn-primary-hover); }
 
         .tm-cancel-btn {
           background: #e2e8f0;
-          color: #475569;
+          color: var(--text-secondary);
           border: none;
           padding: 12px 20px;
           font-weight: 600;
@@ -606,8 +606,8 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
 
         /* Task Cards & Actions */
         .tm-task-item {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-card);
+          border: 1px solid var(--border-light);
           border-radius: 14px;
           padding: 18px;
           display: flex;
@@ -636,8 +636,8 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
         }
 
         .tm-task-item.optimistic {
-          border: 2px dashed #6366f1;
-          background: #f5f3ff;
+          border: 2px dashed var(--border-subtle);
+          background: var(--bg-card-subtle);
           animation: pulse 1.5s infinite;
         }
 
@@ -649,7 +649,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
           justify-content: space-between;
           align-items: center;
           padding-top: 16px;
-          border-top: 1px solid #e2e8f0;
+          border-top: 1px solid var(--border-light);
           margin-top: 8px;
           flex-wrap: wrap;
           gap: 12px;
@@ -659,9 +659,9 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
           padding: 6px 14px;
           font-size: 13px;
           font-weight: 600;
-          border: 1px solid #cbd5e1;
-          background: #ffffff;
-          color: #334155;
+          border: 1px solid var(--border-light);
+          background: var(--bg-card);
+          color: var(--text-secondary);
           border-radius: 6px;
           cursor: pointer;
         }
@@ -669,9 +669,9 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
         .tm-page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .tm-page-btn.active {
-          background: #4f46e5;
+          background: var(--btn-primary-bg);
           color: #ffffff;
-          border-color: #4f46e5;
+          border-color: var(--btn-primary-border);
         }
 
         /* Toast Container */
@@ -718,7 +718,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
         }
 
         .tm-modal-box {
-          background: #ffffff;
+          background: var(--bg-card);
           border-radius: 16px;
           padding: 24px;
           max-width: 440px;
@@ -782,7 +782,7 @@ function TaskManager({ userRole = 'manager', currentUser = null, color = '#4f46e
             <h2 className="tm-title">
               <span style={{ display: 'inline-flex', verticalAlign: 'middle', marginRight: '8px' }}>
                 {isManager ? (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 ) : (
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 )}

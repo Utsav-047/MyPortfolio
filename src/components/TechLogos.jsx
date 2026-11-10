@@ -114,7 +114,7 @@ export const SklearnLogo = ({ size = 20, className = '' }) => (
 );
 
 // High-tech Concept Vectors (for Machine Learning, Web Dev, Data Analysis)
-export const MLNeuralIcon = ({ size = 24, color = '#2563eb' }) => (
+export const MLNeuralIcon = ({ size = 24, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93"/>
     <circle cx="12" cy="14" r="3"/>
@@ -130,7 +130,7 @@ export const MLNeuralIcon = ({ size = 24, color = '#2563eb' }) => (
   </svg>
 );
 
-export const WebDevIcon = ({ size = 24, color = '#2563eb' }) => (
+export const WebDevIcon = ({ size = 24, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
     <line x1="8" y1="21" x2="16" y2="21"/>

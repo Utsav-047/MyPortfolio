@@ -11,7 +11,7 @@ import {
 // OpenAI & Gemini Integration, Graceful Degradation, Rate Limiting & Responsible AI
 // ============================================================================
 
-function AiAssistant({ color = '#4f46e5' }) {
+function AiAssistant({ color = 'var(--btn-primary-bg)' }) {
   const [activeTab, setActiveTab] = useState('copilot'); // copilot | degradation | governance | status | checklist
   const [titleInput, setTitleInput] = useState('Build automated CI/CD pipeline with GitHub Actions');
   const [contextInput, setContextInput] = useState('Full-stack web application with Node.js and React');
@@ -246,7 +246,7 @@ function AiAssistant({ color = '#4f46e5' }) {
               borderRadius: '10px',
               border: activeTab === t.key ? '1px solid #c7d2fe' : '1px solid #e2e8f0',
               background: activeTab === t.key ? '#ede9fe' : '#ffffff',
-              color: activeTab === t.key ? '#4f46e5' : '#475569',
+              color: activeTab === t.key ? 'var(--text-primary)' : 'var(--text-secondary)',
               fontWeight: 700,
               fontSize: '13.5px',
               cursor: 'pointer',
@@ -324,7 +324,7 @@ function AiAssistant({ color = '#4f46e5' }) {
                 onClick={() => handleGenerateDescription(false)}
                 disabled={loading}
                 style={{
-                  background: loading ? '#94a3b8' : '#4f46e5',
+                  background: loading ? 'var(--text-tertiary)' : 'var(--btn-primary-bg)',
                   color: '#ffffff',
                   border: 'none',
                   padding: '12px 18px',
@@ -336,7 +336,7 @@ function AiAssistant({ color = '#4f46e5' }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  boxShadow: '0 4px 12px rgba(79, 70, 229, 0.25)'
+                  boxShadow: 'var(--shadow-sm)'
                 }}
               >
                 <span>{loading ? 'Calling AI API (POST /api/ai/generate-description)...' : 'Generate Description with AI'}</span>
@@ -348,7 +348,7 @@ function AiAssistant({ color = '#4f46e5' }) {
                   disabled={loadingPriority}
                   style={{
                     background: '#eff6ff',
-                    color: '#2563eb',
+                    color: 'var(--text-primary)',
                     border: '1.5px solid #bfdbfe',
                     padding: '10px 14px',
                     borderRadius: '8px',
@@ -492,7 +492,7 @@ function AiAssistant({ color = '#4f46e5' }) {
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '11px', color: '#475569' }}>Estimated Effort</div>
-                    <div style={{ fontSize: '14px', fontWeight: 800, color: '#4f46e5' }}>
+                    <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>
                       ~{suggestedPriority.estimatedHours} hrs
                     </div>
                   </div>
@@ -881,7 +881,7 @@ React Frontend Form
 
             <div style={{ background: '#ffffff', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
               <div style={{ fontSize: '11px', color: '#475569', fontWeight: 700 }}>Degradation Policy</div>
-              <div style={{ fontSize: '14px', fontWeight: 800, color: '#4f46e5', marginTop: '2px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>
                 Zero Crash Guarantee
               </div>
             </div>
@@ -963,7 +963,7 @@ React Frontend Form
                   height: '32px',
                   borderRadius: '50%',
                   background: 'rgba(212, 185, 150, 0.2)',
-                  color: '#4f46e5',
+                  color: 'var(--text-primary)',
                   border: '1px solid rgba(212, 185, 150, 0.3)',
                   display: 'flex',
                   alignItems: 'center',

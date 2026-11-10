@@ -27,17 +27,32 @@ function App() {
 
   // Dark / Light Mode Toggle State
   const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('portfolio_theme');
-    if (saved === 'dark' || saved === 'light') return saved;
-    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
+    try {
+      const saved = localStorage.getItem('portfolio_theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+      if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+      }
+    } catch {
+      // ignore
     }
     return 'light';
   });
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('portfolio_theme', theme);
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(theme);
+    if (document.body) {
+      document.body.setAttribute('data-theme', theme);
+      document.body.classList.remove('light', 'dark');
+      document.body.classList.add(theme);
+    }
+    try {
+      localStorage.setItem('portfolio_theme', theme);
+    } catch {
+      // ignore
+    }
   }, [theme]);
 
   const toggleTheme = () => {
@@ -59,7 +74,7 @@ function App() {
     phone: '+91 9328292343',
     github: 'Utsav-047',
     linkedin: 'https://www.linkedin.com/in/utsav-patel-422789320',
-    themeColor: '#2563eb'
+    themeColor: '#09090b'
   });
 
   // 2. Active View State ('portfolio' | 'taskmanager') and active section on scroll
@@ -171,7 +186,7 @@ function App() {
   };
 
   return (
-    <div className="app-container">
+    <div className={`app-container ${theme}`} data-theme={theme}>
       {/* Sticky Top Header NavBar */}
       <header className="app-header">
         <div className="header-wrapper">
